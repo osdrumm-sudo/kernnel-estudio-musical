@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Rechaza por defecto todas las rutas no declaradas.
+    match /{document=**} { allow read, write: if false; }
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    // Puntero al último respaldo confirmado.
+    match /users/{userId}/kernnelSaves/{saveId} {
+      allow read, write: if isOwner(userId) && saveId == 'latest';
+    }
+    // Fragmentos de respaldos. Nadie puede acceder a otro usuario.
+    match /users/{userId}/kernnelSnapshots/{snapshotId}/parts/{partId} {
+      allow read, write: if isOwner(userId);
+    }
+  }
+}

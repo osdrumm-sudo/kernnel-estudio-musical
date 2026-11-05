@@ -1,0 +1,6 @@
+Kernnel Estudio musical · Realizado por OSS/26
+
+Consulta README.md para publicar en GitHub Pages y conectar Firebase Spark (gratis).
+La sincronización es MANUAL: subir copia y recuperar copia con confirmaciones.
+Los datos siguen guardados localmente; exporta respaldos JSON.
+No coloques claves privadas ni contraseñas en el repositorio.
