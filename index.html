@@ -711,8 +711,12 @@ initEvents();safeLoad();manageWake();
 /* Instalación de recursos para funcionar sin red después de la primera carga. */
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', {scope: './'})
-      .then(() => navigator.serviceWorker.ready)
+    navigator.serviceWorker.register('./sw.js', {scope: './', updateViaCache: 'none'})
+      .then(reg => {
+        // Busca nuevas versiones del modo sin conexión cada vez que se abre la app.
+        reg.update().catch(err => console.warn('Actualización de recursos:', err));
+        return navigator.serviceWorker.ready;
+      })
       .then(() => console.info('Kernnel Estudio musical: recursos sin conexión preparados'))
       .catch(err => console.warn('No se pudo preparar el modo sin conexión:', err));
   });
