@@ -40,6 +40,9 @@
 .app.sidebar-collapsed .sidebar{opacity:0;visibility:hidden;transform:translateX(-30px);pointer-events:none;overflow:hidden}
 @media(min-width:681px){
  .app.sidebar-collapsed .shell{grid-template-columns:0 minmax(0,1fr);gap:0}
+ /* En modo estudio la barra lateral ya se oculta con display:none; 
+    la partitura debe usar una sola columna, no la segunda de una cuadrícula. */
+ .app.study.sidebar-collapsed .shell{grid-template-columns:minmax(0,1fr);gap:16px}
 }
 @media(max-width:680px){
  .top{gap:8px}
