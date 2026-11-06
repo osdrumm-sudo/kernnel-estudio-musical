@@ -1,5 +1,5 @@
 /* Kernnel Estudio musical · recursos para uso sin conexión · OSS/26 */
-const CACHE_NAME = 'kernnel-shell-2026-11-05-sidebar-v3';
+const CACHE_NAME = 'kernnel-shell-2026-11-06-layout-v4';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './cloud.js', './firebase-config.js', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', event => {
   event.waitUntil(
