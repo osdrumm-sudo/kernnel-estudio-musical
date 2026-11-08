@@ -21,7 +21,7 @@ function setViewV2(view){
   applyPrefs();
   renderAll();
   if(view==='study')manageWake();
-  window.scrollTo({top:0,behavior:'instant'});
+  window.scrollTo({top:0,behavior:'auto'});
 }
 function chooseSongV2(id,view,repId){
   if(!D.temas.some(t=>t.id===id))return;
