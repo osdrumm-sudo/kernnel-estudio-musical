@@ -1,0 +1,23 @@
+/* Kernnel — identidad compartida, temas y accesibilidad. */
+:root,:root[data-theme="light"]{--bg:#e9ecef;--panel:#f1f3f5;--panel2:#e5e9ed;--ink:#20272e;--muted:#52606d;--border:#a6b0b9;--accent:#23694d;--accent-ink:#ffffff;--active:#23694d;--soft:#d0e8dc;--danger:#a82436;--gold:#805700;--staff:#a6b0b9;--shadow:7px 7px 18px #a8b0b64d,-5px -5px 14px #ffffffb3;--raised:linear-gradient(145deg,#f7f8fa,#e8ecef);--rail:#22282e;--rail-ink:#f3f6f8;color-scheme:light;}
+:root[data-theme="dark"]{--bg:#171d23;--panel:#252e36;--panel2:#303b44;--ink:#f1f4f6;--muted:#bac6cf;--border:#70818e;--accent:#a0dfbe;--accent-ink:#10291e;--active:#9edebc;--soft:#284e3e;--danger:#ffb3be;--gold:#efd392;--staff:#70818e;--shadow:7px 7px 18px #080d1359,-3px -3px 12px #46525c26;--raised:linear-gradient(145deg,#2d3841,#222c34);--rail:#10161b;--rail-ink:#f3f6f8;color-scheme:dark;}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]):not([data-theme="dark"]){--bg:#171d23;--panel:#252e36;--panel2:#303b44;--ink:#f1f4f6;--muted:#bac6cf;--border:#70818e;--accent:#a0dfbe;--accent-ink:#10291e;--active:#9edebc;--soft:#284e3e;--danger:#ffb3be;--gold:#efd392;--staff:#70818e;--shadow:7px 7px 18px #080d1359,-3px -3px 12px #46525c26;--raised:linear-gradient(145deg,#2d3841,#222c34);--rail:#10161b;--rail-ink:#f3f6f8;color-scheme:dark;}}
+:root[data-contrast="true"]{--bg:#fff;--panel:#fff;--panel2:#eee;--ink:#000;--muted:#222;--border:#222;--accent:#00522e;--accent-ink:#fff;--active:#00522e;--soft:#d7f4e3;--staff:#333;--shadow:none;--raised:var(--panel);color-scheme:light;}
+:root[data-theme="dark"][data-contrast="true"]{--bg:#000;--panel:#080808;--panel2:#202020;--ink:#fff;--muted:#eee;--border:#fff;--accent:#b0ffd2;--accent-ink:#000;--active:#b0ffd2;--soft:#16452c;--staff:#fff;--shadow:none;--raised:var(--panel);color-scheme:dark;}
+@media(prefers-color-scheme:dark){:root[data-contrast="true"]:not([data-theme="light"]):not([data-theme="dark"]){--bg:#000;--panel:#080808;--panel2:#202020;--ink:#fff;--muted:#eee;--border:#fff;--accent:#b0ffd2;--accent-ink:#000;--active:#b0ffd2;--soft:#16452c;--staff:#fff;--shadow:none;--raised:var(--panel);color-scheme:dark;}}
+
+:root{--text:var(--ink);--line:var(--border);--accent2:var(--active)}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--active);outline-offset:4px}
+.theme-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.theme-tools label{font-size:12px;font-weight:650;color:var(--muted)}
+.theme-tools select,.contrast-toggle{min-height:40px;border:1px solid var(--border);border-radius:10px;background:var(--raised);color:var(--ink);padding:7px 10px;cursor:pointer;font-size:12px;box-shadow:var(--shadow)}
+.contrast-toggle[aria-pressed="true"]{background:var(--soft);border-color:var(--active);color:var(--ink)}
+.design-rail{position:fixed;z-index:40;left:18px;top:20px;bottom:20px;width:64px;display:flex;flex-direction:column;align-items:center;gap:15px;padding:18px 8px;background:var(--rail);color:var(--rail-ink);border:1px solid #6c7983;border-radius:20px;box-shadow:var(--shadow)}
+.design-rail a,.design-rail button{width:46px;height:46px;min-height:46px;display:flex;align-items:center;justify-content:center;padding:10px;border:1px solid transparent;background:transparent;color:var(--rail-ink);border-radius:12px;cursor:pointer}
+.design-rail a:hover,.design-rail button:hover,.design-rail [aria-current="page"]{background:#374b40;border-color:#87b69c;color:#fff}
+.design-rail svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.design-rail .rail-settings{margin-top:auto}.rail-brand{font-size:27px;padding-bottom:10px;border-bottom:1px solid #59646d;width:40px;text-align:center}
+@media(max-width:760px){.design-rail{display:none}.theme-tools{gap:6px}.theme-tools select,.contrast-toggle{min-height:42px}.theme-tools label{font-size:11px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+@media print{.design-rail,.theme-tools{display:none!important}:root{--bg:white!important;--panel:white!important;--ink:black!important;--muted:#333!important;--shadow:none!important}body{background:white!important;color:black!important;margin:0!important}}
