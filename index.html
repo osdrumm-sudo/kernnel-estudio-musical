@@ -701,10 +701,11 @@ window.KernnelBridge = Object.freeze({
   },
   ready: () => loadedStorage
 });
-initEvents();safeLoad();manageWake();
+
 </script>
 <script src="./ui-v2.js"></script>
 <script>
+initEvents();safeLoad();manageWake();
 /* Instalación de recursos para funcionar sin red después de la primera carga. */
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
   window.addEventListener('load', () => {
