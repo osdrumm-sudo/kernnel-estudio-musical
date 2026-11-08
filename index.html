@@ -125,22 +125,15 @@
 #cloud-panel button{width:100%}
 #cloud-panel .flex button{width:auto;flex:1}
 </style>
+<link rel="stylesheet" href="./ui-v2.css">
 </head>
-<body class="app" id="app">
-<header class="top"><div class="brand"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Ocultar herramientas y ajustes" aria-controls="sidebar" aria-expanded="true" title="Ocultar herramientas y ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg></button><div class="brandmark" id="app-logo-slot" aria-hidden="true" title="Espacio reservado para el logo definitivo">♫</div><div><h1>Kernnel Estudio musical</h1><small>Partituras · Metrónomo · Estudio</small></div></div><div class="topright"><span class="pill" id="save-indicator" role="status">Cargando datos…</span><button id="toggle-study" class="primary" type="button">◫ Modo estudio</button></div></header>
+<body class="app home" id="app">
+<header class="top"><div class="brand"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Ocultar herramientas y ajustes" aria-controls="sidebar" aria-expanded="true" title="Ocultar herramientas y ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg></button><div class="brandmark" id="app-logo-slot" aria-hidden="true" title="Espacio reservado para el logo definitivo">♫</div><div><h1>Kernnel Estudio musical</h1><small>Partituras · Metrónomo · Estudio</small></div></div><nav class="view-nav" aria-label="Navegación principal"><button id="nav-home" type="button" aria-current="page">⌂ Inicio</button><button id="nav-edit" type="button">✎ Edición</button><button id="nav-study" type="button">▶ Estudio</button></nav><div class="topright"><span class="pill" id="save-indicator" role="status">Cargando datos…</span><button id="toggle-study" class="primary" type="button">◫ Modo estudio</button></div></header>
 <main class="shell">
 <aside class="sidebar" id="sidebar" aria-label="Menús de la aplicación">
  <div class="sidebar-head"><strong>Herramientas y ajustes</strong><small>Abre solo lo que necesites</small></div>
  <button class="mobile-menu-button" id="mobile-menu" type="button" aria-expanded="false" aria-controls="sidebar">☰ Herramientas y ajustes ▾</button>
  <div class="sidebar-group">Contenido y organización</div>
- <div class="menu-unit menu-create">
- <details class="accordion" id="menu-create"><summary><span class="icon">＋</span> Crear canción</summary><div class="panelbody">
-  <p>Prepara una nueva partitura indicando título, compases y métrica.</p>
-  <form id="create-song" class="stack"><label class="field">Título<input id="song-new-title" required maxlength="150" placeholder="Ej. Fortunate Son"></label><div class="grid2"><label class="field">Compases<input id="song-new-count" type="number" min="1" max="256" value="8" required></label><label class="field">Métrica<select id="song-new-meter"><option>4/4</option><option>2/4</option><option>3/4</option><option>6/8</option><option>9/8</option><option>12/8</option></select></label></div><button class="primary" type="submit">+ Crear canción</button></form>
- </div></details>
- <button class="menu-help-toggle" type="button" title="Ayuda: Crear canción" aria-label="¿Para qué sirve Crear canción?" aria-controls="help-create" aria-expanded="false">?</button>
- <div class="menu-help-card" id="help-create" role="region" aria-label="Ayuda de Crear canción" hidden><strong>Crear una nueva canción</strong><p>Escribe el nombre, elige cuántos compases tendrá y selecciona su métrica. Al pulsar «Crear canción», se guardará en tu biblioteca local y podrás comenzar a editarla.</p></div>
- </div>
  <div class="menu-unit menu-library">
  <details class="accordion" id="menu-library"><summary><span class="icon">▤</span> Biblioteca y repertorios</summary><div class="panelbody">
   <label class="field">Buscar canción<input id="song-search" type="search" placeholder="Escribe parte del nombre…"></label>
@@ -206,7 +199,14 @@
   <div class="menu-help-card" id="help-cloud" role="region" aria-label="Ayuda de Sincronización Google" hidden><strong>¿Para qué sirve esta sección?</strong><p>Guarda una copia de tu biblioteca en Google Firestore asociada a tu cuenta, y recupérala desde el PC o iPad. No mezcla cambios automáticamente; hay botones separados para subir o recuperar, con advertencias antes de reemplazar información.</p></div>
  </div>
 </aside>
-<section class="work" aria-label="Partitura y controles de reproducción">
+<section class="work" aria-label="Área principal de Kernnel">
+ <section id="kernnel-home" class="home-screen" aria-label="Inicio, repertorios y creación de canciones">
+  <div class="home-intro"><div><h2>Mis repertorios</h2><p>Selecciona un repertorio y abre la canción que deseas estudiar.</p></div><span class="pill">Kernnel · Inicio</span></div>
+  <div id="home-repertories" class="home-repertories" aria-label="Listado de repertorios"></div>
+  <details id="home-create" class="home-create"><summary>＋ Crear canción</summary><div class="home-create-body"><p>Crea un tema y asígnalo a los repertorios que necesites. También puedes crear uno nuevo desde aquí.</p><form id="create-song" class="stack"><label class="field">Título<input id="song-new-title" required maxlength="150" placeholder="Ej. Fortunate Son"></label><div class="grid2"><label class="field">Compases<input id="song-new-count" type="number" min="1" max="256" value="8" required></label><label class="field">Métrica<select id="song-new-meter"><option>4/4</option><option>2/4</option><option>3/4</option><option>6/8</option><option>9/8</option><option>12/8</option></select></label></div><div class="stack"><strong>Repertorios asociados</strong><small>Selecciona uno, varios o ninguno. Sin selección, se guardará en «Canciones sin repertorio».</small><div id="new-song-repertoires" class="repertoire-choices" aria-label="Repertorios disponibles"></div><div class="new-song-counter">Seleccionados: <strong id="create-reps-count">0</strong></div><button id="new-repertoire-toggle" type="button" aria-expanded="false" aria-controls="new-repertoire-inline">＋ Crear un repertorio nuevo</button><div id="new-repertoire-inline" class="new-repertoire-inline" hidden><label class="field">Nombre del nuevo repertorio<input id="new-repertoire-title" maxlength="120" placeholder="Ej. Ensayo acústico"></label><button id="new-repertoire-add" type="button">Agregar al formulario</button><small>El repertorio se guardará junto con la canción.</small></div></div><div class="new-song-actions"><button class="primary" type="submit">＋ Crear canción y abrir edición</button></div></form></div></details>
+ </section>
+ <div class="study-exits" aria-label="Salir del modo estudio"><button id="study-to-edit" type="button">✎ Modo edición</button><button id="study-to-repertoire" type="button">▤ Ir al repertorio</button></div>
+
  <div class="hero edit-only"><div><h2 id="current-title">Selecciona una canción</h2><small id="current-meta">Tu biblioteca musical</small></div><div class="hero-side"><button id="rename-song" type="button" disabled>Renombrar</button><button id="print-song" type="button" disabled>Imprimir</button><button class="danger" id="delete-song" type="button" disabled>Eliminar canción</button></div></div>
  <section class="transport" aria-label="Controles de reproducción"><div class="transport-row"><button id="prev-measure" title="Compás anterior" aria-label="Compás anterior" type="button">⏮ Compás</button><button id="play-button" class="primary" type="button">▶ Reproducir</button><button id="stop-button" type="button">■ Detener</button><button id="next-measure" title="Compás siguiente" aria-label="Compás siguiente" type="button">Compás ⏭</button><span style="width:1px;height:26px;background:var(--border)"></span><button id="bpm-minus" title="Reducir BPM en 1" type="button">−</button><strong class="bpm" id="toolbar-bpm">120 BPM</strong><button id="bpm-plus" title="Aumentar BPM en 1" type="button">+</button><small id="toolbar-meter">4/4</small></div><div class="beatstrip"><div class="beatdots" id="beat-dots" aria-label="Pulsos del compás"></div><span class="status" id="playback-status" role="status">Listo para practicar</span></div></section>
  <div class="scorebox"><div class="score-heading"><div><h3 id="score-title">Partitura</h3><small id="score-subtitle">Selecciona una canción para comenzar</small></div><div class="flex"><button id="study-settings-button" class="study-only" type="button">⚙ Ajustes</button><button id="fullscreen-button" type="button">⛶ Pantalla completa</button></div></div><div id="score" class="score-inner"><div class="empty">Crea o selecciona una canción desde «Biblioteca y repertorios».</div></div></div>
@@ -227,7 +227,7 @@ const NOTE4='<svg viewBox="0 0 20 30" aria-hidden="true"><ellipse cx="7" cy="24"
 const NOTE8='<svg viewBox="0 0 20 30" aria-hidden="true"><ellipse cx="7" cy="24" rx="6" ry="4.3" transform="rotate(-20 7 24)"/><path d="M12.4 22.5V3Q23 7 16 14" fill="none" stroke-width="1.7"/></svg>';
 const fresh=()=>({temas:[],sel:null,repertorios:[],papelera:[],prefs:{theme:'system',highContrast:false,bigControls:false,wake:true,reminderDays:14},backupAt:null,updatedAt:Date.now()});
 let D=fresh(),writing=0,delayedSave=null,loadedStorage=false;
-let ui={query:'',rep:'all',study:false,studyMenu:false,mobileMenu:false,sidebarCollapsed:false,beatDraft:null,importDraft:null};
+let ui={query:'',rep:'all',view:'home',study:false,studyMenu:false,mobileMenu:false,sidebarCollapsed:false,beatDraft:null,importDraft:null,originRep:null,homeFocusSong:null,homeOpenReps:[],createReps:[],pendingReps:[],createExpanded:false};
 const clock={ctx:null,voices:new Set(),timer:null,timeouts:[],token:0,playing:false,paused:false,phase:'idle',cursor:null,lastVisual:null,nextTime:0,visualMeasure:0,visualBeat:-1,visualCount:0,playSongId:null,playStart:1,playEnd:1,loop:false,wakeLock:null};
 function uniqueId(prefix='t'){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
 function clone(v){return JSON.parse(JSON.stringify(v))}
@@ -289,7 +289,7 @@ function safeLoad(){
 }
 function initSelection(){const t=current();if(!t){clock.playStart=1;clock.playEnd=1;clock.loop=false;return}const x=setting(t);clock.playStart=bounded(x.last.start,1,t.notas.length,1);clock.playEnd=bounded(x.last.end,clock.playStart,t.notas.length,t.notas.length);clock.loop=!!x.last.loop}
 function persistRange(){const t=current();if(!t)return;const x=setting(t);x.last={start:clock.playStart,end:clock.playEnd,loop:clock.loop};saveSoon()}
-function chooseSong(id){if(D.sel===id)return;stopMetro();D.sel=id;initSelection();save();renderAll()}
+function chooseSong(id){chooseSongV2(id,'edit',ui.rep==='all'?undefined:ui.rep)}
 function syncSidebarToggle(){
  const visible=ui.study?ui.studyMenu:!ui.sidebarCollapsed;
  const btn=$('sidebar-toggle');
@@ -307,7 +307,7 @@ function toggleSidebar(){
 }
 function applyPrefs(){const p=D.prefs;document.documentElement.dataset.theme=p.theme==='system'?'':p.theme;document.documentElement.dataset.contrast=String(!!p.highContrast);document.body.classList.toggle('big-controls',!!p.bigControls);document.body.classList.toggle('study',ui.study);document.body.classList.toggle('show-settings',!!ui.studyMenu);document.body.classList.toggle('mobile-menu',ui.mobileMenu);document.body.classList.toggle('sidebar-collapsed',ui.study?!ui.studyMenu:ui.sidebarCollapsed);syncSidebarToggle()}
 function setField(container,contents){container.replaceChildren(...contents)}
-function renderAll(){applyPrefs();renderLibrary();renderSongEditor();renderMetronome();renderPractice();renderAppearance();renderData();renderTitle();renderScore();renderTransport()}
+function renderAll(){applyPrefs();renderLibrary();renderSongEditor();renderMetronome();renderPractice();renderAppearance();renderData();renderTitle();renderScore();renderTransport();renderV2()}
 function renderTitle(){const t=current();$('current-title').textContent=t?t.nombre:'Sin canción seleccionada';$('current-meta').textContent=t?`${t.notas.length} compases · ${setting(t).meter} · BPM original ${setting(t).bpm}`:'Crea tu primera canción';$('rename-song').disabled=$('print-song').disabled=$('delete-song').disabled=!t;$('score-title').textContent=t?t.nombre:'Partitura';$('score-subtitle').textContent=t?`${t.notas.length} compases · ${setting(t).meter} · ${setting(t).practiceBpm} BPM de práctica`:'Selecciona o crea una canción';$('toggle-study').textContent=ui.study?'↩ Salir de estudio':'◫ Modo estudio';$('study-settings-button').textContent=ui.studyMenu?'⚙ Ocultar ajustes':'⚙ Ajustes'}
 
 // --- Interfaz, biblioteca, edición y reproducción ---
@@ -605,7 +605,7 @@ async function manageWake(){
  if(clock.wakeLock)return;
  try{clock.wakeLock=await navigator.wakeLock.request('screen');clock.wakeLock.addEventListener('release',()=>{clock.wakeLock=null},{once:true})}catch(e){/* Algunos navegadores bloquean el permiso en archivos locales. */}
 }
-function toggleStudy(){ui.study=!ui.study;ui.studyMenu=false;applyPrefs();renderTitle();renderScore();if(ui.study)manageWake()}
+function toggleStudy(){if(ui.study)returnToRepertoireV2();else setViewV2('study')}
 function deleteSong(){const t=current();if(!t)return;if(!confirm(`¿Eliminar la canción «${t.nombre}»? Podrás restaurarla desde la papelera.`))return;
  stopMetro();D.papelera.push({id:uniqueId('trash'),type:'song',value:clone(t),at:Date.now()});D.temas=D.temas.filter(z=>z.id!==t.id);D.repertorios.forEach(r=>r.songs=r.songs.filter(id=>id!==t.id));D.sel=D.temas[0]?.id||null;initSelection();save();renderAll();toast('Canción movida a la papelera.')}
 function mergeTransfer(data){
@@ -641,17 +641,10 @@ function initEvents(){
    if(!help.hidden){help.hidden=true;trigger.setAttribute('aria-expanded','false')}
   });
  });
- $('menu-create').open=true;
  $('menu-library').open=true;
  $('song-search').addEventListener('input',e=>{ui.query=e.target.value;renderLibrary()});
  $('repertoire-filter').addEventListener('change',e=>{ui.rep=e.target.value;renderLibrary()});
- $('create-song').addEventListener('submit',e=>{
-  e.preventDefault();const input=$('song-new-title'),name=input.value.trim(),count=Number($('song-new-count').value),meter=$('song-new-meter').value;
-  if(!name){toast('Escribe un título para la canción.');input.focus();return}
-  if(!Number.isInteger(count)||count<1||count>256){toast('Elige entre 1 y 256 compases.');return}
-  if(!METERS.includes(meter)){toast('La métrica indicada no está disponible.');return}
-  const t=newSong(name,count,meter);stopMetro();D.temas.push(t);D.sel=t.id;ui.query='';$('song-search').value='';ui.rep='all';initSelection();save();renderAll();input.value='';toast(`Canción «${name}» creada y guardada.`);
- });
+ $('create-song').addEventListener('submit',onCreateSongV2);
  $('create-repertoire').addEventListener('submit',e=>{
   e.preventDefault();const input=$('repertoire-name'),name=input.value.trim();if(!name)return;
   const r={id:uniqueId('r'),nombre:name,songs:[]};D.repertorios.push(r);ui.rep=r.id;save();renderLibrary();input.value='';toast('Repertorio creado.')
@@ -710,6 +703,7 @@ window.KernnelBridge = Object.freeze({
 });
 initEvents();safeLoad();manageWake();
 </script>
+<script src="./ui-v2.js"></script>
 <script>
 /* Instalación de recursos para funcionar sin red después de la primera carga. */
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
