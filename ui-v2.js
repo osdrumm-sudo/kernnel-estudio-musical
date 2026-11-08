@@ -36,6 +36,7 @@ function chooseSongV2(id,view,repId){
   setViewV2(view);
 }
 function returnToRepertoireV2(){
+  if($('home-create').open){$('home-create').open=false;ui.createExpanded=false}
   const id=current()?.id;
   if(id){
     const origin=originForSongV2(id);
@@ -71,8 +72,9 @@ function renderHomeV2(){
     const heading=mk('button',{type:'button',class:'home-rep-heading','aria-expanded':String(open&&!ui.createExpanded),'aria-label':'Repertorio '+g.nombre+', '+g.songs.length+' canciones'});
     heading.append(mk('span',{class:'home-rep-label'},[mk('strong',{text:g.nombre}),mk('small',{text:g.songs.length+' canción(es)'})]),mk('span',{class:'home-rep-arrow',text:open&&!ui.createExpanded?'⌃':'⌄'}));
     heading.addEventListener('click',()=>{
-      if(ui.createExpanded){$('home-create').open=false;ui.createExpanded=false}
-      ui.homeOpenReps=open?ui.homeOpenReps.filter(x=>x!==g.id):[...ui.homeOpenReps,g.id];
+      const wasCreating=ui.createExpanded;
+      if(wasCreating){$('home-create').open=false;ui.createExpanded=false}
+      ui.homeOpenReps=wasCreating||!open?[...new Set([...ui.homeOpenReps,g.id])]:ui.homeOpenReps.filter(x=>x!==g.id);
       renderHomeV2();
     });
     card.append(heading);
@@ -148,6 +150,8 @@ function onCreateSongV2(e){
   ui.rep='all';
   ui.pendingReps=[];
   ui.createReps=[];
+  $('home-create').open=false;
+  ui.createExpanded=false;
   input.value='';
   $('new-repertoire-title').value='';
   $('new-repertoire-inline').hidden=true;
