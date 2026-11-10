@@ -38,7 +38,7 @@ La API exige HTTPS, restringe CORS a https://kernnel.app, solo permite GET, devu
 - Cloudflare → Web Analytics → Add a site, hostname kernnel.app.
 - Como la aplicación está en GitHub Pages y DNS only, utilizar instalación manual del beacon oficial.
 - Cloudflare proporciona un identificador PÚBLICO de sitio para el script. Es diferente del token privado CF_ANALYTICS_TOKEN.
-- Después de publicar el aviso de privacidad, insertar el script oficial de Cloudflare antes del cierre de body en el index.html de la aplicación principal; no instalarlo en /admin/ para evitar contabilizar visitas administrativas.
+- El cargador ya está preparado en el index.html de la aplicación y se mantiene inactivo. Después de publicar el aviso de privacidad, copiar el token público del sitio en analytics-config.js. No insertar un segundo script: analytics-beacon.js lo cargará solo en kernnel.app, nunca en /admin/. Al activar el token, actualizar también CACHE_NAME en sw.js para renovar recursos de la PWA.
 - No duplicar métodos manual y automático.
 - El histórico solo comienza desde que se habilita el seguimiento. Si el plan Cloudflare no expone el dataset GraphQL esperado, mostrar error sin inventar cifras.
 
