@@ -62,7 +62,7 @@ Este procedimiento requiere la interacción del usuario en **el navegador/dispos
 - [x] Crear ramas aisladas de desarrollo para ambos repositorios.
 - [x] Auditar rutas locales, JSON y sincronización remota mediante revisión del código.
 - [x] Incorporar pruebas automatizadas al repositorio de desarrollo.
-- [ ] Confirmar ejecución CI en GitHub.
+- [x] Ejecución CI confirmada en GitHub Actions: https://github.com/osdrumm-sudo/kernnel-estudio-musical/actions/runs/42817610799 (resultado: success, pruebas sin despliegue).
 - [ ] Usuario: exportar y comprobar un respaldo JSON real antes de la migración y cualquier importación de datos.
 - [ ] Probar flujos interactivos y PWA en dispositivos (Etapa 6).
 
