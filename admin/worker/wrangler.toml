@@ -1,0 +1,10 @@
+name = "kernnel-admin-api"
+main = "src/index.js"
+compatibility_date = "2026-11-10"
+workers_dev = true
+
+# NO desplegar sobre app-studio-26 (Urgnet). Este Worker es independiente.
+# Cualquier credencial sensible se configura con wrangler secret put.
+[vars]
+FIREBASE_PROJECT_ID = "kernnel-studio"
+ALLOWED_ORIGIN = "https://kernnel.app"
