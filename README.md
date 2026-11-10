@@ -39,3 +39,11 @@ La app y su módulo de nube son una **versión de integración preparada**, no s
 - https://firebase.google.com/docs/firestore/pricing
 - https://firebase.google.com/docs/firestore/security/get-started
 - https://firebase.google.com/docs/web/setup
+
+## Preparación de dominios Kernnel 2.0 (NO ACTIVADA)
+
+- **Aplicación**: https://kernnel.app/
+- **Alias con redirección**: https://www.kernnel.app/ → https://kernnel.app/
+- **Manual**: https://manual.kernnel.app/
+
+Esta configuración está preparada solamente en la rama `preparacion/dominios-kernnel-2026-11-10`. Consultar `docs/plan-dominios-kernnel.md` antes de fusionar, crear DNS o modificar GitHub Pages. La URL GitHub Pages anterior debe utilizarse para exportar los respaldos JSON reales antes del cambio de origen.
