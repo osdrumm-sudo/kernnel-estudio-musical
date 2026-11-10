@@ -1,0 +1,26 @@
+name: Kernnel | Verificación de respaldos (sin despliegue)
+on:
+  push:
+    branches:
+      - desarrollo/kernnel-2-etapa1-seguridad
+  pull_request:
+    paths:
+      - index.html
+      - tests/backup-contract.test.cjs
+      - .github/workflows/seguridad-etapa1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  respaldo-y-recuperacion:
+    name: Comprobar JSON con datos ficticios
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código de la rama
+        uses: actions/checkout@v4
+      - name: Comprobar runtime
+        run: node --version
+      - name: Ejecutar pruebas sin acceso a datos reales
+        run: node --test tests/backup-contract.test.cjs
