@@ -128,8 +128,19 @@
 <link rel="stylesheet" href="./ui-v2.css">
 <link rel="stylesheet" href="./design-theme.css">
 <link rel="stylesheet" href="./design-layout.css">
+<link rel="stylesheet" href="./access.css">
 </head>
-<body class="app home" id="app">
+<body class="app home auth-locked" id="app">
+<section id="access-gate" role="region" aria-labelledby="access-title">
+ <div class="access-card"><h1 id="access-title">Kernnel Estudio musical</h1><p>Tu espacio para practicar y organizar repertorios.</p>
+ <p id="access-status" role="status" aria-live="polite">Comprobando sesión…</p>
+ <button id="access-google" type="button" class="primary">Continuar con Google</button>
+ <button id="access-retry" type="button">Comprobar acceso</button>
+ <form id="access-request" hidden><h2>Solicitar acceso</h2><p id="access-email"></p><label>Nombre<input id="access-name" required maxlength="100" autocomplete="name"></label><label>Motivo<textarea id="access-reason" maxlength="1000"></textarea></label><button type="submit">Enviar solicitud</button></form>
+ <button id="access-logout" type="button" hidden>Cerrar sesión / cambiar cuenta</button>
+ <small>Acceso exclusivo por invitación. El primer ingreso requiere conexión.</small>
+ </div>
+</section>
 <nav class="design-rail" aria-label="Accesos rápidos"><span class="rail-brand" aria-hidden="true">♫</span><button type="button" data-rail-view="home" aria-label="Inicio" title="Inicio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/></svg></button><button type="button" data-rail-library aria-label="Mis repertorios" title="Mis repertorios"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 7 9-4 9 4-9 4zM3 12l9 4 9-4M3 17l9 4 9-4"/></svg></button><a href="https://manual.kernnel.app/#manual" target="_blank" rel="noopener noreferrer" aria-label="Abrir manual" title="Abrir manual"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h7l2 2 2-2h7v16h-7l-2 1-2-1H3zM12 6v15"/></svg></a><button type="button" class="rail-settings" aria-label="Cambiar apariencia" title="Apariencia"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></svg></button></nav>
 <header class="top"><div class="brand"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Ocultar herramientas y ajustes" aria-controls="sidebar" aria-expanded="true" title="Ocultar herramientas y ajustes"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg></button><div class="brandmark" id="app-logo-slot" aria-hidden="true" title="Espacio reservado para el logo definitivo">♫</div><div><h1>Kernnel Estudio musical</h1><small>Partituras · Metrónomo · Estudio</small></div></div><nav class="view-nav" aria-label="Navegación principal"><button id="nav-home" type="button" aria-current="page">⌂ Inicio</button><button id="nav-edit" type="button">✎ Edición</button><button id="nav-study" type="button">▶ Estudio</button></nav><div class="topright"><div class="theme-tools" role="group" aria-label="Apariencia"><label for="design-theme">Tema</label><select id="design-theme"><option value="system">Según el sistema</option><option value="light">Claro</option><option value="dark">Oscuro</option></select><button id="design-contrast" class="contrast-toggle" type="button" aria-pressed="false">Alto contraste</button></div><span class="pill" id="save-indicator" role="status">Cargando datos…</span><button id="toggle-study" class="primary" type="button">◫ Modo estudio</button></div></header>
 <main class="shell">
@@ -183,16 +194,12 @@
   <details class="accordion" id="menu-cloud"><summary><span class="icon">☁</span> Sincronización Google</summary>
     <div class="panelbody" id="cloud-panel">
       <p id="cloud-status" role="status">Sin configurar. La biblioteca local sigue funcionando.</p>
-      <div class="stack" id="cloud-login">
-       <label class="field">Correo electrónico<input id="cloud-email" type="email" autocomplete="email" placeholder="tu@correo.com" maxlength="254"></label>
-       <label class="field">Contraseña de Firebase<input id="cloud-password" type="password" autocomplete="current-password" minlength="6" placeholder="Mínimo 6 caracteres"></label>
-       <div class="flex"><button id="cloud-enter" type="button" class="primary">Entrar</button><button id="cloud-register" type="button">Crear cuenta</button></div>
-      </div>
       <div class="stack" id="cloud-signed" hidden>
         <small id="cloud-user"></small>
         <div class="notice" id="cloud-remote">Consulta la última copia guardada en Google.</div>
         <button id="cloud-upload" type="button" class="primary">↑ Guardar copia en Google</button>
         <button id="cloud-download" type="button">↓ Recuperar desde Google</button>
+        <button id="access-admin-open" type="button" hidden>Administrar accesos</button>
         <button id="cloud-logout" type="button">Cerrar sesión en Google</button>
       </div>
       <p class="hint">Sincronización manual y privada. Antes de reemplazar los datos de otro dispositivo, exporta un respaldo JSON. La aplicación funciona sin Internet, pero los botones de Google requieren conexión.</p>
@@ -224,7 +231,8 @@
 <script>
 'use strict';
 const $=id=>document.getElementById(id);
-const KEY='compases-v1', DBNAME='compases-db', METERS=['2/4','3/4','4/4','6/8','9/8','12/8'];
+let KEY='compases-unassigned';
+const DBNAME='compases-db', METERS=['2/4','3/4','4/4','6/8','9/8','12/8'];
 const COLORS=['#e5484d','#f08c00','#f2c200','#2f9e44','#1c7ed6'];
 const NOTE4='<svg viewBox="0 0 20 30" aria-hidden="true"><ellipse cx="7" cy="24" rx="6" ry="4.3" transform="rotate(-20 7 24)"/><line x1="12.4" y1="22.5" x2="12.4" y2="3" stroke-width="1.6"/></svg>';
 const NOTE8='<svg viewBox="0 0 20 30" aria-hidden="true"><ellipse cx="7" cy="24" rx="6" ry="4.3" transform="rotate(-20 7 24)"/><path d="M12.4 22.5V3Q23 7 16 14" fill="none" stroke-width="1.7"/></svg>';
@@ -274,20 +282,20 @@ function demoData(){const d=fresh();const a={id:uniqueId(),nombre:'Ejemplo · Ri
  const b={id:uniqueId(),nombre:'Ejemplo · Compás compuesto',notas:['Contar seis corcheas','Acentuar el primer pulso','Practicar lentamente','Repetir el patrón'],estudio:{meter:'6/8',bpm:90,practiceBpm:90,marcadores:[2],count:2,sound:'perc',volume:.55,scroll:true,zoom:'auto',sesiones:[],last:{start:1,end:4,loop:false}}};
  d.temas=[a,b];d.sel=a.id;d.repertorios=[{id:uniqueId('r'),nombre:'Ensayo de ejemplo',songs:[a.id,b.id]},{id:uniqueId('r'),nombre:'Estudio personal',songs:[a.id]}];return d}
 function openDB(cb){try{const req=indexedDB.open(DBNAME,1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('kv'))req.result.createObjectStore('kv')};req.onsuccess=()=>cb(req.result);req.onerror=()=>cb(null)}catch(e){cb(null)}}
-function idbSave(payload,done){openDB(db=>{if(!db)return done(false);try{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(payload,KEY);tx.oncomplete=()=>{db.close();done(true)};tx.onerror=()=>{db.close();done(false)}}catch(e){try{db.close()}catch(_){}done(false)}})}
+function idbSave(payload,done){const storageKey=KEY;openDB(db=>{if(!db)return done(false);try{const tx=db.transaction('kv','readwrite');tx.objectStore('kv').put(payload,storageKey);tx.oncomplete=()=>{db.close();done(true)};tx.onerror=()=>{db.close();done(false)}}catch(e){try{db.close()}catch(_){}done(false)}})}
 function idbLoad(done){openDB(db=>{if(!db)return done(null);try{const req=db.transaction('kv','readonly').objectStore('kv').get(KEY);req.onsuccess=()=>{const v=req.result||null;db.close();done(v)};req.onerror=()=>{db.close();done(null)}}catch(e){db.close();done(null)}})}
 function save(){clearTimeout(delayedSave);D.updatedAt=Date.now();let payload;try{payload=JSON.stringify(D)}catch(e){toast('No se pudo preparar el guardado.');return}let local=false;try{localStorage.setItem(KEY,payload);local=localStorage.getItem(KEY)===payload}catch(e){}writing++;const v=writing;idbSave(payload,dbOk=>{if(writing!==v)return;const status=$('save-indicator');status.textContent=(local||dbOk)?'✓ Guardado en este equipo':'⚠ No se guardó: exporta un respaldo';status.style.color=(local||dbOk)?'var(--muted)':'var(--danger)'})}
 function saveSoon(){clearTimeout(delayedSave);delayedSave=setTimeout(save,350)}
-function safeLoad(){
+function safeLoad(done=()=>{}){
  let local=null;try{const raw=localStorage.getItem(KEY);if(raw)local=normalize(JSON.parse(raw))}catch(e){console.warn('Guardado local ilegible',e)}
  idbLoad(raw=>{
   let remote=null;try{if(raw)remote=normalize(JSON.parse(raw))}catch(e){console.warn('Guardado IndexedDB ilegible',e)}
-  D=remote&&(!local||Number(remote.updatedAt)>Number(local.updatedAt))?remote:(local||demoData());
+  D=remote&&(!local||Number(remote.updatedAt)>Number(local.updatedAt))?remote:(local||fresh());
   loadedStorage=true;initSelection();renderAll();
   if(!local&&!remote)save();
   else if(remote&&!local){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
   else if(local&&!remote){idbSave(JSON.stringify(D),()=>{})}
-  $('save-indicator').textContent='✓ Datos cargados';
+  $('save-indicator').textContent='✓ Datos cargados';done();
  });
 }
 function initSelection(){const t=current();if(!t){clock.playStart=1;clock.playEnd=1;clock.loop=false;return}const x=setting(t);clock.playStart=bounded(x.last.start,1,t.notas.length,1);clock.playEnd=bounded(x.last.end,clock.playStart,t.notas.length,t.notas.length);clock.loop=!!x.last.loop}
@@ -691,6 +699,15 @@ function initEvents(){
 
 // Puente mínimo: el módulo cloud.js nunca accede directamente a las variables internas.
 window.KernnelBridge = Object.freeze({
+  selectAccount: async (uid) => {
+    stopMetro(); clearTimeout(delayedSave); loadedStorage=false;
+    KEY='compases-v1:'+uid; D=fresh();
+    ui.rep='all';ui.query='';ui.homeOpenReps=[];
+    $('song-search').value='';
+    await new Promise(resolve=>safeLoad(resolve));
+    setViewV2('home');
+  },
+  pause: () => stopMetro(),
   snapshot: () => clone(D),
   importCloudSnapshot: (raw) => {
     if (!loadedStorage) throw new Error('La biblioteca local aún está cargando.');
@@ -709,7 +726,7 @@ window.KernnelBridge = Object.freeze({
 <script src="./ui-v2.js"></script>
 <script src="./design-theme.js"></script>
 <script>
-initEvents();safeLoad();manageWake();
+initEvents();manageWake();
 document.querySelector('[data-rail-view]').addEventListener('click',()=>setViewV2('home'));
 document.querySelector('[data-rail-library]').addEventListener('click',()=>{setViewV2('home');document.querySelector('.home-intro').scrollIntoView({block:'start'})});
 /* Instalación de recursos para funcionar sin red después de la primera carga. */
@@ -726,6 +743,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
   });
 }
 </script>
+<dialog id="access-admin"><h2>Administrar accesos</h2><p id="admin-status" role="status"></p><form id="admin-invite"><label>Correo autorizado<input id="admin-email" type="email" required></label><button>Autorizar correo</button></form><h3>Solicitudes</h3><div id="admin-requests"></div><h3>Correos autorizados</h3><div id="admin-users"></div><button id="admin-close" type="button">Cerrar</button></dialog>
 <script src="./firebase-config.js"></script>
 <script type="module" src="./cloud.js"></script>
 </body>

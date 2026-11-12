@@ -1,18 +1,36 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/{database}/documents {
-    // Rechaza por defecto todas las rutas no declaradas.
-    match /{document=**} { allow read, write: if false; }
-    function isOwner(userId) {
-      return request.auth != null && request.auth.uid == userId;
-    }
-    // Puntero al último respaldo confirmado.
-    match /users/{userId}/kernnelSaves/{saveId} {
-      allow read, write: if isOwner(userId) && saveId == 'latest';
-    }
-    // Fragmentos de respaldos. Nadie puede acceder a otro usuario.
-    match /users/{userId}/kernnelSnapshots/{snapshotId}/parts/{partId} {
-      allow read, write: if isOwner(userId);
-    }
+ match /databases/{database}/documents {
+  function isGoogleUser() {
+   return request.auth != null
+    && request.auth.token.firebase.sign_in_provider == 'google.com'
+    && request.auth.token.email_verified == true;
   }
+  function isAdmin() { return isGoogleUser() && request.auth.token.email == 'ols.bds@gmail.com'; }
+  function isAuthorized() {
+   return isGoogleUser() && (isAdmin() || get(/databases/$(database)/documents/authorizedEmails/$(request.auth.token.email)).data.active == true);
+  }
+  function isOwner(userId) { return isAuthorized() && request.auth.uid == userId; }
+  match /authorizedEmails/{email} {
+   allow get: if isGoogleUser() && (isAdmin() || request.auth.token.email == email);
+   allow list: if isAdmin();
+   allow create, update: if isAdmin() && request.resource.data.keys().hasOnly(['active']) && request.resource.data.active is bool;
+   allow delete: if isAdmin();
+  }
+  match /accessRequests/{userId} {
+   allow create: if isGoogleUser() && request.auth.uid == userId
+    && request.resource.data.keys().hasAll(['email','name','reason','status','createdAt'])
+    && request.resource.data.keys().hasOnly(['email','name','reason','status','createdAt'])
+    && request.resource.data.email == request.auth.token.email
+    && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 100
+    && request.resource.data.reason is string && request.resource.data.reason.size() <= 1000
+    && request.resource.data.status == 'pending' && request.resource.data.createdAt == request.time;
+   allow get: if isGoogleUser() && (isAdmin() || request.auth.uid == userId);
+   allow list: if isAdmin();
+   allow update, delete: if isAdmin();
+  }
+  match /users/{userId}/kernnelSaves/{saveId} { allow read, write: if isOwner(userId) && saveId == 'latest'; }
+  match /users/{userId}/kernnelSnapshots/{snapshotId}/parts/{partId} { allow read, write: if isOwner(userId); }
+  match /{document=**} { allow read, write: if false; }
+ }
 }
