@@ -1,0 +1,6 @@
+[hidden]{display:none!important}
+body.auth-locked{overflow:hidden!important}
+body.auth-locked > :not(#access-gate):not(script):not(style):not(link){display:none!important}
+#access-gate{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;overflow:auto;background:var(--bg,#edf0f4)}
+.access-card{width:min(100%,480px);padding:32px;border:1px solid var(--line,#94a3b8);border-radius:24px;background:var(--panel,#fff);color:var(--text,#172033);box-shadow:0 16px 50px #0002;display:grid;gap:16px}
+.access-card h1{font-size:1.8rem;line-height:1.2}.access-card p{margin:0}.access-card form,.access-card label,#admin-invite{display:grid;gap:10px}.access-card input,.access-card textarea{width:100%;box-sizing:border-box}#access-status{min-height:3em}#access-admin{width:min(680px,90vw);max-height:85vh;overflow:auto;border-radius:18px;padding:24px;background:var(--panel,#fff);color:var(--text,#172033)}.access-row{padding:12px 0;border-bottom:1px solid #8885;overflow-wrap:anywhere}.access-row button{margin:4px}#access-admin::backdrop{background:#0008}
