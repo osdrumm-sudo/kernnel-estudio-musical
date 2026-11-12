@@ -23,3 +23,23 @@ body.app{margin:20px 22px 0 102px}
 @media(max-width:760px){body.app{margin:10px}.top{padding:14px 12px;gap:12px;border-radius:16px}.brand{flex:1}.brand h1{font-size:16px}.brand small{display:none}.view-nav{order:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;margin:0;gap:6px}.view-nav button{min-height:44px;padding:7px 3px;font-size:13px}.topright{order:2;margin:0;width:100%;justify-content:flex-end}.theme-tools{width:100%;justify-content:flex-end}.theme-tools select{flex:1;max-width:190px}.shell,.app.study.show-settings .shell{display:flex;flex-direction:column;padding:18px 0 155px;gap:16px}.sidebar,.work{width:100%}.app.home .shell{padding:24px 2px 18px}.app.home .home-screen{gap:18px}.home-repertories{grid-template-columns:1fr;gap:16px}.home-intro h2{font-size:28px}.home-intro p{font-size:14px}.home-rep-heading{padding:18px;min-height:76px}.home-rep-label strong{font-size:17px}.home-create>summary{font-size:18px;padding:18px}.home-create-body{padding:18px}.home-song-open{font-size:14px}.home-song-edit{min-height:44px}.transport{position:fixed;top:auto;bottom:max(7px,env(safe-area-inset-bottom));left:9px;right:9px;padding:10px;z-index:60}.transport-row{justify-content:center}.transport button{min-height:40px}.app.study .scorebox{padding:12px}.app-credits{padding:0 8px 160px}.app.home .app-credits{padding-bottom:24px}.home-rep-songs{padding:7px 12px}}
 @media print{body.app{margin:0}.top{display:none}.shell,.app.study .shell{padding:0;display:block}.scorebox{box-shadow:none;border:0}.app-credits{display:none}}
 .app.big-controls .theme-tools select,.app.big-controls .contrast-toggle,.app.big-controls .view-nav button,.app.big-controls .home-song-edit{min-height:48px;font-size:15px}
+
+/* Kernnel 2.0: los colores de los módulos no deben quedar anulados por el diseño con relieve. */
+.menu-unit .accordion{background:color-mix(in srgb,var(--module-bg) 12%,var(--panel))}
+.app .menu-unit .accordion>summary{background:color-mix(in srgb,var(--module-bg) 18%,var(--panel));color:var(--ink)}
+.app .menu-unit .accordion>summary:hover{background:color-mix(in srgb,var(--module-bg) 25%,var(--panel))}
+.app .menu-unit .accordion[open]>summary{background:color-mix(in srgb,var(--module-bg) 28%,var(--panel));color:var(--ink)}
+:root[data-theme="dark"] .menu-unit .accordion,
+:root[data-theme="dark"] .app .menu-unit .accordion>summary{background:var(--module-bg)}
+:root[data-theme="dark"] .app .menu-unit .accordion>summary:hover,
+:root[data-theme="dark"] .app .menu-unit .accordion[open]>summary{background:color-mix(in srgb,var(--module-bg) 75%,#73889d)}
+@media(prefers-color-scheme:dark){
+ :root:not([data-theme="light"]):not([data-theme="dark"]) .menu-unit .accordion,
+ :root:not([data-theme="light"]):not([data-theme="dark"]) .app .menu-unit .accordion>summary{background:var(--module-bg)}
+ :root:not([data-theme="light"]):not([data-theme="dark"]) .app .menu-unit .accordion>summary:hover,
+ :root:not([data-theme="light"]):not([data-theme="dark"]) .app .menu-unit .accordion[open]>summary{background:color-mix(in srgb,var(--module-bg) 75%,#73889d)}
+}
+:root[data-contrast="true"] .menu-unit .accordion,
+:root[data-contrast="true"] .app .menu-unit .accordion>summary,
+:root[data-contrast="true"] .app .menu-unit .accordion>summary:hover,
+:root[data-contrast="true"] .app .menu-unit .accordion[open]>summary{background:var(--panel);color:var(--ink)}
