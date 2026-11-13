@@ -11,7 +11,7 @@
  function change(){if(app){if(!loadedStorage)return;save();applyPrefs();renderAppearance()}else{try{localStorage.setItem(key,JSON.stringify(manual))}catch{}sync()}}
  select.addEventListener('change',()=>{if(app&&!loadedStorage)return;prefs().theme=select.value;change()});
  contrast.addEventListener('click',()=>{if(app&&!loadedStorage)return;prefs().highContrast=!prefs().highContrast;change()});
- document.querySelector('.rail-settings')?.addEventListener('click',()=>{select.scrollIntoView({block:'center'});select.focus()});
+ document.querySelector('.rail-settings')?.addEventListener('click',()=>{document.getElementById('accessibility-dialog').showModal();select.focus()});
  matchMedia('(prefers-color-scheme:dark)').addEventListener('change',sync);
  sync();
 })();
