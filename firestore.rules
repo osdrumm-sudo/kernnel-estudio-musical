@@ -31,6 +31,35 @@ service cloud.firestore {
   }
   match /users/{userId}/kernnelSaves/{saveId} { allow read, write: if isOwner(userId) && saveId == 'latest'; }
   match /users/{userId}/kernnelSnapshots/{snapshotId}/parts/{partId} { allow read, write: if isOwner(userId); }
+  // Biblioteca incremental: sólo su propietario autorizado puede acceder.
+  function validSyncHead() {
+   let d = request.resource.data;
+   return d.keys().hasAll(['version','kind','id','hash','modifiedAt','name','parts','bytes','deleted','history','committedAt'])
+    && d.keys().hasOnly(['version','kind','id','hash','modifiedAt','name','parts','bytes','deleted','history','committedAt'])
+    && d.version is string && d.version.size() <= 100
+    && d.kind in ['temas','repertorios'] && d.id is string && d.id.size() <= 500
+    && d.name is string && d.name.size() <= 2000
+    && d.modifiedAt is number && d.modifiedAt > 0
+    && d.parts is int && d.parts >= 0 && d.parts <= 300
+    && d.bytes is int && d.bytes >= 0 && d.bytes <= 26214400
+    && d.deleted is bool && ((d.deleted && d.hash == null && d.parts == 0) || (!d.deleted && d.hash is string && d.hash.size() == 64 && d.parts > 0))
+    && d.history is list && d.history.size() > 0 && d.history.size() <= 20
+    && d.committedAt == request.time;
+  }
+  match /users/{userId}/syncItems/{itemId} {
+   allow read: if isOwner(userId);
+   allow create, update: if isOwner(userId) && validSyncHead();
+   // Las eliminaciones se registran como versiones, no borran el historial.
+   allow delete: if false;
+  }
+  match /users/{userId}/syncVersions/{versionId}/parts/{partId} {
+   allow read, delete: if isOwner(userId);
+   allow create: if isOwner(userId)
+    && request.resource.data.keys().hasOnly(['index','payload'])
+    && request.resource.data.index is int && request.resource.data.index >= 0 && request.resource.data.index < 300
+    && request.resource.data.payload is string && request.resource.data.payload.size() <= 560000;
+   allow update: if false;
+  }
   match /{document=**} { allow read, write: if false; }
  }
 }

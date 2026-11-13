@@ -2,6 +2,8 @@
 'use strict';
 const NO_REPERTOIRE_V2='__sin_repertorio__';
 
+function conflictLabelV2(item){const c=item.syncConflict;return c?'Duplicada por conflicto · Última modificación: '+new Date(c.localModifiedAt).toLocaleString('es-CL')+' · Otra versión: '+new Date(c.remoteModifiedAt).toLocaleString('es-CL'):'';}
+function modificationLabelV2(item,kind){const at=D._sync?.times?.[kind+'~'+encodeURIComponent(item.id)]||D._sync?.base?.[kind+'~'+encodeURIComponent(item.id)]?.modifiedAt;return at?'Última modificación: '+new Date(at).toLocaleString('es-CL'):'';}
 function songRepertoiresV2(songId){
   return D.repertorios.filter(r=>r.songs.includes(songId));
 }
@@ -65,7 +67,7 @@ function renderHomeV2(){
   if(!container)return;
   container.replaceChildren();
   const unassigned=D.temas.filter(t=>!D.repertorios.some(r=>r.songs.includes(t.id)));
-  const groups=[...D.repertorios.map(r=>({id:r.id,nombre:r.nombre,songs:r.songs.map(id=>D.temas.find(t=>t.id===id)).filter(Boolean)})),{id:NO_REPERTOIRE_V2,nombre:'Canciones sin repertorio',songs:unassigned}];
+  const groups=[...D.repertorios.map(r=>({id:r.id,nombre:r.nombre,syncConflict:r.syncConflict,songs:r.songs.map(id=>D.temas.find(t=>t.id===id)).filter(Boolean)})),{id:NO_REPERTOIRE_V2,nombre:'Canciones sin repertorio',songs:unassigned}];
   groups.forEach(g=>{
     const open=ui.homeOpenReps.includes(g.id);
     const card=mk('section',{class:'home-rep-card'+(ui.createExpanded?' compact':'')+(open&&!ui.createExpanded?' is-open':'')});
@@ -77,7 +79,7 @@ function renderHomeV2(){
       ui.homeOpenReps=wasCreating||!open?[...new Set([...ui.homeOpenReps,g.id])]:ui.homeOpenReps.filter(x=>x!==g.id);
       renderHomeV2();
     });
-    card.append(heading);
+    card.append(heading);if(g.syncConflict)card.append(mk('small',{class:'conflict-notice',text:conflictLabelV2(g)}));else if(modificationLabelV2(g,'repertorios'))card.append(mk('small',{class:'modification-date',text:modificationLabelV2(g,'repertorios')}));
     if(open&&!ui.createExpanded){
       const songs=mk('div',{class:'home-rep-songs'});
       if(!g.songs.length)songs.append(info('Este repertorio no tiene canciones.'));
@@ -85,7 +87,7 @@ function renderHomeV2(){
         const row=mk('div',{class:'home-song'+(ui.homeFocusSong===t.id?' last-song':'')});
         const entry=button(t.nombre,()=>chooseSongV2(t.id,'study',g.id),'home-song-open',{title:'Estudiar '+t.nombre});
         const edit=button('Editar',()=>chooseSongV2(t.id,'edit',g.id),'home-song-edit',{title:'Editar '+t.nombre,'aria-label':'Editar '+t.nombre});
-        row.append(entry,edit);
+        row.append(entry,edit);if(t.syncConflict)row.append(mk('small',{class:'conflict-notice',text:conflictLabelV2(t)}));else if(modificationLabelV2(t,'temas'))row.append(mk('small',{class:'modification-date',text:modificationLabelV2(t,'temas')}));
         songs.append(row);
       });
       card.append(songs);
@@ -136,7 +138,7 @@ function onCreateSongV2(e){
   if(!METERS.includes(meter)){toast('La métrica indicada no está disponible.');return}
   const ids=new Set(ui.createReps);
   // Una única transacción lógica: repertorios pendientes y canción se incorporan juntos.
-  ui.pendingReps.filter(r=>ids.has(r.id)).forEach(r=>D.repertorios.push({id:r.id,nombre:r.nombre,songs:[]}));
+  ui.pendingReps.filter(r=>ids.has(r.id)).forEach(r=>D.repertorios.push({id:r.id,nombre:r.nombre,syncConflict:r.syncConflict,songs:[]}));
   const t=newSong(name,count,meter);
   stopMetro();
   D.temas.push(t);

@@ -64,3 +64,16 @@ Esta configuración está preparada solamente en la rama `preparacion/dominios-k
 ### Validación de esta entrega
 
 `node --test tests/access.test.cjs` verifica ocho escenarios de acceso con Firebase simulado. También se comprobó la sintaxis y el inicio real del SDK en navegador sin sesión. Falta la prueba integral autenticada con la cuenta administradora, una cuenta invitada y un iPad. No se han ejecutado pruebas de reglas en el emulador de Firestore.
+
+## Sincronización incremental (cambio preparado, 13/11/2026)
+
+Esta sección reemplaza las instrucciones históricas de transferencia manual una vez desplegado este cambio.
+
+- Canciones y repertorios se cargan al iniciar y se comparan con la última revisión conocida por el dispositivo.
+- Guardado automático después de 1,5 segundos sin edición; sólo se escriben los elementos modificados.
+- Los cambios simultáneos conservan la versión remota y una copia local marcada con sus fechas. Las copias de canciones pueden aparecer en «Canciones sin repertorio».
+- Historial de hasta 20 revisiones por elemento; recuperar crea una copia adicional, no destruye la actual.
+- Preferencias visuales y papelera siguen siendo locales. Los borrados de canciones/repertorios se propagan con una revisión eliminada y su historial.
+- El cierre intenta guardar localmente y muestra el aviso genérico del navegador si queda trabajo pendiente. Los móviles no garantizan ese aviso ni una subida durante el cierre.
+- Publicar `firestore.rules` antes del frontend: las rutas nuevas requieren permisos explícitos. El repositorio no despliega reglas automáticamente.
+- Especificación, migración y validación: `docs/sincronizacion-incremental.md`.
