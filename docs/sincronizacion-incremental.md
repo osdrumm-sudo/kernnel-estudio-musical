@@ -37,3 +37,9 @@ Actualizar todos los dispositivos. Clientes antiguos continúan usando el sistem
 
 ## Alcance y límites
 Sincroniza canciones completas (incluidos ajustes de práctica) y repertorios. Preferencias globales de apariencia y papelera se mantienen por dispositivo. No es edición colaborativa de caracteres ni un respaldo ilimitado. Las reglas protegen por UID; el recibo offline previo no es una licencia antifraude. La prueba de Auth existente sigue usando mocks.
+
+## Administración y privacidad
+Panel superpuesto exclusivo del administrador, con buscador, filtros, invitación copiable y actividad. Las estadísticas se almacenan por sesión en usageSessions: uid, correo, segundos aproximados de actividad y última comunicación. No incluyen nombres, identificadores, cantidades ni contenido musical. El tiempo cuenta sólo con página visible e interacción reciente; se comunica cada minuto y puede perder el último minuto al cerrar. No es un registro contable exacto. El administrador de la aplicación no tiene permiso para leer bibliotecas ajenas; los propietarios del proyecto Firebase conservan sus facultades de infraestructura (esto no es cifrado de extremo a extremo).
+
+## Funciones futuras
+Práctica en grupo: pendiente de diseño y autorización. No habilita compartir canciones ni acceso entre usuarios.

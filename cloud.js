@@ -8,7 +8,7 @@ function report(e){console.warn('[Kernnel]',e.code||e.message);info(errors[e.cod
 function lock(busy){state.busy=busy;['access-google','cloud-upload','cloud-download','cloud-logout'].forEach(id=>byId(id).disabled=busy);}
 function receipt(){try{return JSON.parse(localStorage.getItem(RECEIPT)||'null')}catch{return null}}
 function forget(){try{localStorage.removeItem(RECEIPT)}catch{}}
-function gate(message){stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
+function gate(message){window.KernnelUsage?.stop();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
 async function grant(user,offline=false){
  const epoch=state.epoch;
  if(state.account!==user.uid){await window.KernnelBridge.selectAccount(user.uid);if(epoch!==state.epoch)return;state.account=user.uid;}
@@ -19,6 +19,7 @@ async function grant(user,offline=false){
  info(offline?'Sin conexión. Los cambios se guardan localmente y se enviarán al reconectar.':'Acceso autorizado. Cargando canciones y repertorios…');
  if(!offline){try{localStorage.setItem(RECEIPT,JSON.stringify({uid:user.uid,email:user.email}))}catch{}}
  startSync();
+ if(!offline)window.KernnelUsage?.start(state.sdk,state.db,user);
 }
 async function checkAccess(){
  const user=state.user;if(!user)return;
@@ -37,7 +38,7 @@ async function checkAccess(){
  info('Tu cuenta aún no está autorizada. Puedes solicitar acceso.');
  const request=await state.sdk.getDocFromServer(state.sdk.doc(state.db,'accessRequests',user.uid));
  if(epoch!==state.epoch)return;
- if(request.exists()){byId('access-request').hidden=true;info('Tu solicitud ya fue recibida. El administrador debe autorizar tu acceso.');}
+ if(request.exists()){byId('access-request').hidden=true;info(request.data().status==='rejected'?'Tu solicitud fue rechazada. Contacta al administrador.':'Tu solicitud ya fue recibida. Comprueba el acceso después de su aprobación.');}
  }catch(e){if(epoch===state.epoch){gate();report(e);}}
 }
 async function boot(){
@@ -82,17 +83,19 @@ async function loadAdmin(){
  const sdk=state.sdk;
  const [requests,users]=await Promise.all([sdk.getDocsFromServer(sdk.collection(state.db,'accessRequests')),sdk.getDocsFromServer(sdk.collection(state.db,'authorizedEmails'))]);
  byId('admin-status').textContent='Solo tú puedes autorizar o revocar accesos.';
+ window.KernnelUsage?.admin(state.sdk,state.db,requests,users);
  for(const [id,list] of [['admin-requests',requests],['admin-users',users]]){
  const box=byId(id);box.replaceChildren();
  if(list.empty){box.textContent='Sin registros.';continue;}
  list.forEach(snap=>{const data=snap.data(),row=document.createElement('div');row.className='access-row';const text=document.createElement('p');
  if(id==='admin-requests'){
  text.textContent=`${data.name} · ${data.email} · ${data.reason||'Sin motivo'} · ${data.status}`;
- row.append(text,adminButton('Aprobar',async()=>{await authorize(data.email,true);await sdk.updateDoc(snap.ref,{status:'approved'})}),adminButton('Rechazar solicitud',()=>sdk.updateDoc(snap.ref,{status:'rejected'})));
+ row.append(text);if(data.status==='pending')row.append(adminButton('Aprobar',async()=>{await authorize(data.email,true);await sdk.updateDoc(snap.ref,{status:'approved'})}),adminButton('Rechazar solicitud',()=>sdk.updateDoc(snap.ref,{status:'rejected'})));
  }else{ text.textContent=`${snap.id} · ${data.active?'Autorizado':'Revocado'}`;row.append(text,adminButton(data.active?'Revocar':'Autorizar',async()=>{if(data.active&&!confirm(`¿Revocar el acceso de ${snap.id}? Se aplicará al conectarse.`))return;await authorize(snap.id,!data.active)}));}
- box.append(row);});
+ row.dataset.status=id==='admin-requests'?data.status:(data.active?'active':'revoked');box.append(row);});
  }
 }
+window.KernnelAdminRefresh=()=>loadAdmin();
 let syncEngine=null,syncWatch=null;
 function stopSync(){syncEngine?.stop();syncEngine=null;syncWatch?.();syncWatch=null;}
 function syncStatus(status,error){

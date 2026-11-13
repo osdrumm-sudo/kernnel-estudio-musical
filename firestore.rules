@@ -31,6 +31,26 @@ service cloud.firestore {
   }
   match /users/{userId}/kernnelSaves/{saveId} { allow read, write: if isOwner(userId) && saveId == 'latest'; }
   match /users/{userId}/kernnelSnapshots/{snapshotId}/parts/{partId} { allow read, write: if isOwner(userId); }
+  // Estadísticas separadas: nunca contienen información musical.
+  match /usageSessions/{sessionId} {
+   allow read: if isAdmin();
+   allow create: if isAuthorized()
+    && request.resource.data.keys().hasOnly(['uid','email','seconds','lastSeen'])
+    && request.resource.data.uid == request.auth.uid
+    && request.resource.data.email == request.auth.token.email
+    && request.resource.data.seconds == 0
+    && request.resource.data.lastSeen == request.time;
+   allow update: if isAuthorized()
+    && resource.data.uid == request.auth.uid
+    && request.resource.data.keys().hasOnly(['uid','email','seconds','lastSeen'])
+    && request.resource.data.uid == resource.data.uid
+    && request.resource.data.email == resource.data.email
+    && request.resource.data.seconds is int
+    && request.resource.data.seconds >= resource.data.seconds
+    && request.resource.data.seconds <= resource.data.seconds + 120
+    && request.resource.data.lastSeen == request.time;
+   allow delete: if isAdmin();
+  }
   // Biblioteca incremental: sólo su propietario autorizado puede acceder.
   function validSyncHead() {
    let d = request.resource.data;
