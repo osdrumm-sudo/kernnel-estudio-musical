@@ -1,0 +1,38 @@
+name: Kernnel | Pruebas de mantenimiento (sin despliegue)
+
+on:
+  push:
+    branches:
+      - mantenimiento/**
+  pull_request:
+    paths:
+      - "index.html"
+      - "cloud.js"
+      - "sync-*.js"
+      - "usage-admin.js"
+      - "ui-v2.js"
+      - "tests/**"
+      - ".github/workflows/validacion-kernnel.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Pruebas de acceso, sincronización y respaldos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Comprobar sintaxis JavaScript
+        run: |
+          for f in cloud.js ui-v2.js sync-core.js sync-engine.js sync-store.js usage-admin.js; do
+            node --check "$f"
+          done
+      - name: Ejecutar pruebas con datos ficticios
+        run: node --test tests/*.test.cjs
