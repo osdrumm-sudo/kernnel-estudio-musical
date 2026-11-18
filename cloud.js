@@ -8,7 +8,22 @@ function report(e){console.warn('[Kernnel]',e.code||e.message);info(errors[e.cod
 function lock(busy){state.busy=busy;['access-google','cloud-upload','cloud-download','cloud-logout'].forEach(id=>byId(id).disabled=busy);}
 function receipt(){try{return JSON.parse(localStorage.getItem(RECEIPT)||'null')}catch{return null}}
 function forget(){try{localStorage.removeItem(RECEIPT)}catch{}}
-function gate(message){window.KernnelUsage?.stop();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
+function gate(message){window.KernnelUsage?.stop();window.KernnelProfile?.disconnect();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
+function startProfile(uid){
+ const profile=window.KernnelProfile;
+ if(!profile)return;
+ const sdk=state.sdk;
+ const ref=sdk?.doc(state.db,'users',uid,'profile','display');
+ profile.connect(uid,{
+  save:async name=>{
+   if(!navigator.onLine||!ref)throw Object.assign(new Error('Sin conexión'),{code:'offline'});
+   await sdk.setDoc(ref,{displayName:name});
+  },
+  watch:ref&&sdk.onSnapshot?onName=>sdk.onSnapshot(ref,{includeMetadataChanges:true},snap=>{
+   if(!snap.metadata.fromCache&&!snap.metadata.hasPendingWrites)onName(snap.data()?.displayName);
+  },error=>console.warn('[Perfil]',error.code)):undefined
+ });
+}
 async function grant(user,offline=false){
  const epoch=state.epoch;
  if(state.account!==user.uid){await window.KernnelBridge.selectAccount(user.uid);if(epoch!==state.epoch)return;state.account=user.uid;}
@@ -18,6 +33,7 @@ async function grant(user,offline=false){
  byId('access-admin-open').hidden=offline||user.email!==ADMIN;
  info(offline?'Sin conexión. Los cambios se guardan localmente y se enviarán al reconectar.':'Acceso autorizado. Cargando canciones y repertorios…');
  if(!offline){try{localStorage.setItem(RECEIPT,JSON.stringify({uid:user.uid,email:user.email}))}catch{}}
+ startProfile(user.uid);
  startSync();
  if(!offline)window.KernnelUsage?.start(state.sdk,state.db,user);
 }
