@@ -52,14 +52,14 @@ function updateNavigationV2(){
   document.body.classList.toggle('home',ui.view==='home');
   document.body.classList.toggle('edit',ui.view==='edit');
   document.body.classList.toggle('study',ui.view==='study');
-  const enabled=!!current();
+  const enabled=D.temas.length>0;
   [['home','nav-home'],['edit','nav-edit'],['study','nav-study']].forEach(([view,id])=>{
     const el=$(id);
     if(!el)return;
     el.classList.toggle('is-current',ui.view===view);
     if(ui.view===view)el.setAttribute('aria-current','page');
     else el.removeAttribute('aria-current');
-    if(view!=='home')el.disabled=!enabled;
+    if(view!=='home')el.disabled=ui.view==='home'?!enabled:!current();
   });
 }
 function renderHomeV2(){
@@ -85,9 +85,9 @@ function renderHomeV2(){
       if(!g.songs.length)songs.append(info('Este repertorio no tiene canciones.'));
       g.songs.forEach(t=>{
         const row=mk('div',{class:'home-song'+(ui.homeFocusSong===t.id?' last-song':'')});
-        const entry=button(t.nombre,()=>chooseSongV2(t.id,'study',g.id),'home-song-open',{title:'Estudiar '+t.nombre});
+        const study=button('Estudiar',()=>chooseSongV2(t.id,'study',g.id),'home-song-edit',{'aria-label':'Estudiar '+t.nombre});
         const edit=button('Editar',()=>chooseSongV2(t.id,'edit',g.id),'home-song-edit',{title:'Editar '+t.nombre,'aria-label':'Editar '+t.nombre});
-        row.append(entry,edit);if(t.syncConflict)row.append(mk('small',{class:'conflict-notice',text:conflictLabelV2(t)}));else if(modificationLabelV2(t,'temas'))row.append(mk('small',{class:'modification-date',text:modificationLabelV2(t,'temas')}));
+        row.append(mk('strong',{class:'home-song-name',text:t.nombre}),study,edit);if(t.syncConflict)row.append(mk('small',{class:'conflict-notice',text:conflictLabelV2(t)}));else if(modificationLabelV2(t,'temas'))row.append(mk('small',{class:'modification-date',text:modificationLabelV2(t,'temas')}));
         songs.append(row);
       });
       card.append(songs);
@@ -168,6 +168,24 @@ function renderV2(){
   renderHomeV2();
   renderCreateChoicesV2();
 }
+function openModeV2(view){
+  if(ui.view!=='home'){
+    setViewV2(view);
+    return;
+  }
+  const picker=$('song-picker');
+  $('song-picker-title').textContent=view==='study'?'Selecciona un tema para estudiar':'Selecciona un tema para editar';
+  const list=$('song-picker-list');
+  list.replaceChildren();
+  for(const song of D.temas){
+    list.append(button(song.nombre,()=>{
+      picker.close();
+      chooseSongV2(song.id,view);
+    },'song-picker-option'));
+  }
+  picker.showModal();
+}
+
 function initV2(){
   // La biblioteca inicia en Inicio, y el formulario de repertorios no guarda nada hasta crear canción.
   ui.view='home';
@@ -196,11 +214,8 @@ function initV2(){
     if(ui.view==='study')returnToRepertoireV2();
     else setViewV2('home');
   });
-  $('nav-edit').addEventListener('click',()=>setViewV2('edit'));
-  $('nav-study').addEventListener('click',()=>{
-    if(current())ui.originRep=originForSongV2(current().id);
-    setViewV2('study');
-  });
+  $('nav-edit').addEventListener('click',()=>openModeV2('edit'));
+  $('nav-study').addEventListener('click',()=>openModeV2('study'));
   $('study-to-edit').addEventListener('click',()=>setViewV2('edit'));
   $('study-to-repertoire').addEventListener('click',returnToRepertoireV2);
   document.querySelectorAll('.sidebar .accordion').forEach(el=>{

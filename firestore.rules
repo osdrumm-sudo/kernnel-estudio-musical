@@ -31,6 +31,14 @@ service cloud.firestore {
   }
   match /users/{userId}/kernnelSaves/{saveId} { allow read, write: if isOwner(userId) && saveId == 'latest'; }
   match /users/{userId}/kernnelSnapshots/{snapshotId}/parts/{partId} { allow read, write: if isOwner(userId); }
+  match /users/{userId}/profile/display {
+   allow get: if isOwner(userId);
+   allow create, update: if isOwner(userId)
+    && request.resource.data.keys().hasOnly(['displayName'])
+    && request.resource.data.displayName is string
+    && request.resource.data.displayName.size() > 0
+    && request.resource.data.displayName.size() <= 60;
+  }
   // Estadísticas separadas: nunca contienen información musical.
   match /usageSessions/{sessionId} {
    allow read: if isAdmin();

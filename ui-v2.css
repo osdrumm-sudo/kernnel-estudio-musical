@@ -4,9 +4,12 @@
 .view-nav button.is-current{background:var(--soft);border-color:var(--accent);color:var(--accent)}
 .view-nav button:disabled{opacity:.4}
 .topright #toggle-study{display:none}
-.app.home .sidebar,.app.home .sidebar-toggle,.app.home .transport,.app.home .hero,.app.home .scorebox,.app.home .footnote{display:none!important}
-.app.home .shell{display:block;max-width:1200px}
+.app.home.sidebar-collapsed .sidebar,.app.home .transport,.app.home .hero,.app.home .scorebox,.app.home .footnote{display:none!important}
+.app.home .shell{max-width:1200px}
+.app.home.sidebar-collapsed .shell{display:block}
 .app.home .work{width:100%}
+.app.edit .sidebar>.sidebar-group,
+.app.edit .sidebar>.menu-unit:not(.menu-song){display:none}
 .home-screen{display:none;min-width:0}
 .app.home .home-screen{display:grid;gap:20px}
 .home-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
@@ -26,8 +29,6 @@
 .home-rep-songs p{margin:4px;color:var(--muted)}
 .home-song{display:flex;align-items:stretch;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:5px}
 .home-song.last-song{outline:2px solid var(--active);outline-offset:-2px}
-.home-song-open{flex:1;min-width:0;text-align:left;border:0;background:transparent;overflow-wrap:anywhere;font-weight:650}
-.home-song-open::before{content:'▶';font-size:10px;color:var(--active);margin-right:9px}
 .home-song-edit{flex:0 0 auto;border-color:var(--border);background:var(--panel);font-size:12px}
 .home-create{border:1px solid var(--border);border-radius:15px;background:var(--panel);box-shadow:var(--shadow);overflow:hidden}
 .home-create>summary{display:flex;align-items:center;gap:12px;padding:17px;min-height:65px;cursor:pointer;font-weight:800;font-size:16px;list-style:none}
