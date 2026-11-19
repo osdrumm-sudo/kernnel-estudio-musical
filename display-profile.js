@@ -23,13 +23,34 @@
     submit.disabled = !!active?.saving;
   }
 
-  function update(account, value) {
-    account.name = cleanName(value);
+  function profileRecord(key, value) {
+    const writing = value !== undefined;
+    return new Promise(resolve => {
+      const fallback = writing ? false : '';
+      if (typeof openDB !== 'function') { resolve(fallback); return; }
+      openDB(db => {
+        if (!db) { resolve(fallback); return; }
+        try {
+          const transaction = db.transaction('kv', writing ? 'readwrite' : 'readonly');
+          const store = transaction.objectStore('kv');
+          const request = writing ? store.put(value, key) : store.get(key);
+          transaction.oncomplete = () => { db.close(); resolve(writing ? true : cleanName(request.result)); };
+          transaction.onabort = transaction.onerror = () => { db.close(); resolve(fallback); };
+        } catch {
+          db.close();
+          resolve(fallback);
+        }
+      });
+    });
+  }
+
+  function cacheName(key, name) {
     try {
-      if (account.name) localStorage.setItem(account.key, account.name);
-      else localStorage.removeItem(account.key);
-    } catch {}
-    render();
+      localStorage.setItem(key, name);
+      return Promise.resolve(true);
+    } catch {
+      return profileRecord(key, name);
+    }
   }
 
   function disconnect() {
@@ -47,8 +68,25 @@
     try { account.name = cleanName(localStorage.getItem(key)); } catch {}
     active = account;
     render();
-    account.unwatch = watch?.(name => {
-      if (active === account) update(account, name);
+    const listen = () => {
+      if (active !== account) return;
+      account.unwatch = watch?.((value, preserveCached = false) => {
+        const name = cleanName(value);
+        if (active !== account || account.saving || !name || name === account.name ||
+          (preserveCached && account.name)) return;
+        account.name = name;
+        void cacheName(account.key, name);
+        render();
+      });
+    };
+    if (account.name) listen();
+    else profileRecord(key).then(name => {
+      if (active !== account) return;
+      if (!account.name && !account.saving) {
+        account.name = name;
+        render();
+      }
+      listen();
     });
   }
 
@@ -74,15 +112,19 @@
     status.textContent = 'Guardando nombre…';
     render();
     try {
-      // La sesión local usa el almacenamiento del navegador. En línea, el perfil
-      // se confirma con Firestore y el observador recibe cualquier cambio posterior.
       await account.save?.(name);
       if (active !== account) return;
-      if (!account.unwatch) update(account, name);
+      const persisted = await cacheName(account.key, name);
+      if (active !== account) return;
+      if (!account.save && !persisted) {
+        status.textContent = 'El navegador no pudo guardar el nombre en este dispositivo.';
+        return;
+      }
+      account.name = name;
       if (dialog.open) dialog.close();
     } catch (error) {
       if (active === account) {
-        status.textContent = error.code === 'offline'
+        status.textContent = ['offline', 'auth/network-request-failed'].includes(error.code)
           ? 'Conéctate a Internet para guardar el nombre en tu cuenta.'
           : 'No se pudo guardar el nombre. Inténtalo nuevamente.';
       }
