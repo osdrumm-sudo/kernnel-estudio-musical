@@ -9,19 +9,59 @@ function lock(busy){state.busy=busy;['access-google','cloud-upload','cloud-downl
 function receipt(){try{return JSON.parse(localStorage.getItem(RECEIPT)||'null')}catch{return null}}
 function forget(){try{localStorage.removeItem(RECEIPT)}catch{}}
 function gate(message){window.KernnelUsage?.stop();window.KernnelProfile?.disconnect();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
-function startProfile(uid){
+function startProfile(user){
  const profile=window.KernnelProfile;
  if(!profile)return;
- const sdk=state.sdk;
- const ref=sdk?.doc(state.db,'users',uid,'profile','display');
+ const sdk=state.sdk,uid=user.uid;
+ const ref=state.db&&sdk?.doc(state.db,'users',uid,'profile','display');
+ let useAuth=!ref,firestoreName=false;
+ let revision=0;
  profile.connect(uid,{
   save:async name=>{
-   if(!navigator.onLine||!ref)throw Object.assign(new Error('Sin conexión'),{code:'offline'});
-   await sdk.setDoc(ref,{displayName:name});
+   if(!navigator.onLine)throw Object.assign(new Error('Sin conexión'),{code:'offline'});
+   revision++;
+   try{
+    if(!useAuth){
+     try{await sdk.setDoc(ref,{displayName:name});firestoreName=true;return;}
+     catch(error){if(error.code!=='permission-denied')throw error;useAuth=true;}
+    }
+    await sdk.updateProfile(user,{displayName:name});
+   }finally{revision++;}
   },
-  watch:ref&&sdk.onSnapshot?onName=>sdk.onSnapshot(ref,{includeMetadataChanges:true},snap=>{
-   if(!snap.metadata.fromCache&&!snap.metadata.hasPendingWrites)onName(snap.data()?.displayName);
-  },error=>console.warn('[Perfil]',error.code)):undefined
+  watch:onName=>{
+   let listening=true;
+   const isCurrent=()=>listening&&state.allowed&&state.user?.uid===uid;
+   const showAuthName=()=>{
+    const google=user.providerData?.find(provider=>provider.providerId==='google.com');
+    onName(user.displayName,!!google&&google.displayName===user.displayName);
+   };
+   const refreshAuth=async ()=>{
+    if(!isCurrent()||!navigator.onLine||(firestoreName&&!useAuth))return;
+    const refreshRevision=revision;
+    try{
+     if(sdk?.reload)await sdk.reload(user);
+     if(isCurrent()&&refreshRevision===revision&&(!firestoreName||useAuth))showAuthName();
+    }catch(error){if(isCurrent())console.warn('[Perfil]',error.code);}
+   };
+   showAuthName();
+   const unsubscribe=ref&&sdk.onSnapshot?sdk.onSnapshot(ref,{includeMetadataChanges:true},snap=>{
+    if(!isCurrent()||useAuth||snap.metadata.fromCache||snap.metadata.hasPendingWrites)return;
+    const name=snap.data()?.displayName;
+    firestoreName=!!name;
+    if(firestoreName)onName(name);
+    else refreshAuth();
+   },error=>{
+    if(error.code==='permission-denied')useAuth=true;
+    if(isCurrent())refreshAuth();
+   }):undefined;
+   if(useAuth||!unsubscribe)refreshAuth();
+   window.addEventListener('focus',refreshAuth);
+   return ()=>{
+    listening=false;
+    window.removeEventListener('focus',refreshAuth);
+    unsubscribe?.();
+   };
+  }
  });
 }
 async function grant(user,offline=false){
@@ -33,7 +73,7 @@ async function grant(user,offline=false){
  byId('access-admin-open').hidden=offline||user.email!==ADMIN;
  info(offline?'Sin conexión. Los cambios se guardan localmente y se enviarán al reconectar.':'Acceso autorizado. Cargando canciones y repertorios…');
  if(!offline){try{localStorage.setItem(RECEIPT,JSON.stringify({uid:user.uid,email:user.email}))}catch{}}
- startProfile(user.uid);
+ startProfile(user);
  startSync();
  if(!offline)window.KernnelUsage?.start(state.sdk,state.db,user);
 }
