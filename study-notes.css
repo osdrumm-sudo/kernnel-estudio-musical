@@ -1,0 +1,33 @@
+/* Notas personales, con los colores y controles de la aplicación. */
+.study-notes{min-width:0;display:grid;gap:10px}
+.study-notes h3{margin:0;font-size:1.16rem}
+#study-notes-repertoires{display:grid;gap:8px}
+#study-notes-repertoires>p{margin:4px 0}
+.study-notes-group{border:1px solid var(--border);border-radius:12px;background:var(--panel)}
+.study-notes-group>summary{display:flex;align-items:center;gap:8px;min-height:42px;padding:9px 12px;cursor:pointer;list-style:none;list-style-type:none}
+.study-notes-group>summary::-webkit-details-marker{display:none}
+.study-notes-group>summary strong{flex:1;min-width:0;overflow-wrap:anywhere}
+.study-notes-group>summary::after{content:'⌄';font-size:1.1rem;color:var(--accent)}
+.study-notes-group[open]>summary{border-bottom:1px solid var(--border)}
+.study-notes-group[open]>summary::after{transform:rotate(180deg)}
+.study-notes-songs{margin:0;padding:4px 12px;list-style:none}
+.study-notes-songs>li{padding:8px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.study-notes-songs>li+li{border-top:1px solid var(--border)}
+.study-note-song{display:grid;gap:2px;min-width:0;overflow-wrap:anywhere}
+.study-note-name{justify-self:start;max-width:100%;min-height:32px;padding:0;border:0;background:none;color:var(--accent);font-weight:650;text-align:left;text-decoration:underline;text-underline-offset:.18em;overflow-wrap:anywhere}
+.study-note-action{flex-shrink:0;min-height:38px}
+.study-notes-empty{margin:10px 12px}
+#study-note-dialog,#study-note-view{max-height:calc(100dvh - 24px);overflow:auto}
+#study-note-dialog [hidden],#study-note-view [hidden]{display:none}
+#study-note-dialog h2,#study-note-view h2{margin-bottom:3px}
+.study-note-view-text{white-space:pre-wrap;overflow-wrap:anywhere}
+#study-note-view .study-note-preview{max-height:min(45dvh,460px)}
+.study-note-song-name{margin:0 0 12px;color:var(--muted);overflow-wrap:anywhere}
+#study-note-file{width:100%;max-width:100%}
+.study-note-attachment{display:grid;gap:8px;margin:8px 0;padding:8px;border:1px solid var(--border);border-radius:9px}
+.study-note-preview{display:block;max-width:100%;max-height:180px;margin:0 auto;object-fit:contain}
+.study-note-file-actions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.study-note-download{color:var(--accent);font-weight:650;overflow-wrap:anywhere}
+.study-note-download:focus-visible{outline:3px solid var(--active);outline-offset:2px}
+.study-note-status{margin:3px 0;color:var(--muted);min-height:1.1em}
+@media(max-width:680px){.study-note-name,.study-note-action{min-height:44px}}

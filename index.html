@@ -128,6 +128,8 @@
 <link rel="stylesheet" href="./ui-v2.css">
 <link rel="stylesheet" href="./design-theme.css">
 <link rel="stylesheet" href="./design-layout.css">
+<link rel="stylesheet" href="./study-notes.css">
+<link rel="stylesheet" href="./study-room.css">
 <link rel="stylesheet" href="./access.css">
 </head>
 <body class="app home auth-locked" id="app">
@@ -210,14 +212,15 @@
 </aside>
 <section class="work" aria-label="Área principal de Kernnel">
  <section id="kernnel-home" class="home-screen" aria-label="Inicio, repertorios y creación de canciones">
-  <div class="home-intro"><div><h2>Mis repertorios</h2><p>Organiza tus canciones y prepara tu próxima práctica.</p></div><span class="pill">Kernnel · Inicio</span></div>
+  <div class="home-intro"><div><h2>Mis repertorios</h2><p>Organiza tus canciones y prepara tu próxima práctica.</p></div><button id="study-room-open" type="button" aria-haspopup="dialog">Salas de estudio</button></div>
   <div id="home-repertories" class="home-repertories" aria-label="Listado de repertorios"></div>
+  <section class="study-notes" id="study-notes" aria-labelledby="study-notes-title"><h3 id="study-notes-title">Notas</h3><div id="study-notes-repertoires"></div></section>
   <details id="home-create" class="home-create"><summary>＋ Crear canción</summary><div class="home-create-body"><p>Crea un tema y asígnalo a los repertorios que necesites. También puedes crear uno nuevo desde aquí.</p><form id="create-song" class="stack"><label class="field">Título<input id="song-new-title" required maxlength="150" placeholder="Ej. Fortunate Son"></label><div class="grid2"><label class="field">Compases<input id="song-new-count" type="number" min="1" max="256" value="8" required></label><label class="field">Métrica<select id="song-new-meter"><option>4/4</option><option>2/4</option><option>3/4</option><option>6/8</option><option>9/8</option><option>12/8</option></select></label></div><div class="stack"><strong>Repertorios asociados</strong><small>Selecciona uno, varios o ninguno. Sin selección, se guardará en «Canciones sin repertorio».</small><div id="new-song-repertoires" class="repertoire-choices" aria-label="Repertorios disponibles"></div><div class="new-song-counter">Seleccionados: <strong id="create-reps-count">0</strong></div><button id="new-repertoire-toggle" type="button" aria-expanded="false" aria-controls="new-repertoire-inline">＋ Crear un repertorio nuevo</button><div id="new-repertoire-inline" class="new-repertoire-inline" hidden><label class="field">Nombre del nuevo repertorio<input id="new-repertoire-title" maxlength="120" placeholder="Ej. Ensayo acústico"></label><button id="new-repertoire-add" type="button">Agregar al formulario</button><small>El repertorio se guardará junto con la canción.</small></div></div><div class="new-song-actions"><button class="primary" type="submit">＋ Crear canción y abrir edición</button></div></form></div></details>
  </section>
  <div class="study-exits" aria-label="Salir del modo estudio"><button id="study-to-edit" type="button">✎ Modo edición</button><button id="study-to-repertoire" type="button">▤ Ir al repertorio</button></div>
 
  <div class="hero edit-only"><div><h2 id="current-title">Selecciona una canción</h2><small id="current-meta">Tu biblioteca musical</small></div><div class="hero-side"><div class="song-edit-actions" role="group" aria-label="Cambios de la canción"><button id="save-song-edits" class="primary" type="button" disabled>Guardar</button><button id="cancel-song-edits" type="button" title="Deshacer cambios desde el último guardado manual" disabled>Cancelar</button></div><button id="rename-song" type="button" disabled>Renombrar</button><button id="exit-edit" type="button" title="Volver al repertorio">Salir</button><button class="danger" id="delete-song" type="button" disabled>Eliminar canción</button></div></div>
- <section class="transport" aria-label="Controles de reproducción"><div class="transport-row"><button id="prev-measure" class="edit-only" title="Compás anterior" aria-label="Compás anterior" type="button">⏮ Compás</button><button id="play-button" class="primary" type="button">▶ Reproducir</button><button id="stop-button" type="button">■ Detener</button><button id="next-measure" class="edit-only" title="Compás siguiente" aria-label="Compás siguiente" type="button">Compás ⏭</button><button id="jump-measure" type="button">Ir a compás</button>
+ <section class="transport" aria-label="Controles de reproducción"><div class="transport-row"><button id="prev-measure" class="edit-only" title="Compás anterior" aria-label="Compás anterior" type="button">⏮ Compás</button><button id="play-button" class="primary" type="button">▶ Reproducir</button><button id="stop-button" type="button">■ Detener</button><button id="restart-study-measure" class="study-only" type="button">Inicio del compás</button><button id="next-measure" class="edit-only" title="Compás siguiente" aria-label="Compás siguiente" type="button">Compás ⏭</button><button id="jump-measure" type="button">Ir a compás</button>
  <div class="transport-loop study-only" role="group" aria-label="Repetición">
   <button id="loop-button" type="button" aria-haspopup="dialog" aria-controls="loop-dialog">Loop</button>
   <button id="clear-loop" type="button" aria-label="Desactivar loop" title="Desactivar loop y volver a la canción completa" hidden>×</button>
@@ -226,7 +229,7 @@
   <span class="tempo-reference"><span id="original-bpm">— BPM original</span><span id="toolbar-meter" aria-label="Métrica">—</span></span>
   <span class="tempo-adjustment"><button id="bpm-minus" aria-label="Reducir BPM de práctica" title="Reducir BPM en 1" type="button">−</button><strong class="bpm" id="toolbar-bpm">— BPM actual</strong><button id="bpm-plus" aria-label="Aumentar BPM de práctica" title="Aumentar BPM en 1" type="button">+</button></span>
  </div></div><div class="beatstrip"><div class="beatdots" id="beat-dots" aria-label="Pulsos del compás"></div><span class="status" id="playback-status" role="status">Listo para practicar</span></div></section>
- <div class="scorebox"><div class="score-heading"><div><h3 id="score-title">Partitura</h3><small id="score-subtitle">Selecciona una canción para comenzar</small></div><div class="flex"><button id="study-settings-button" class="study-only" type="button">⚙ Ajustes</button><button id="fullscreen-button" type="button">⛶ Pantalla completa</button></div></div><div id="score" class="score-inner"><div class="empty">Crea o selecciona una canción desde «Biblioteca y repertorios».</div></div></div>
+ <div class="scorebox"><div class="score-heading"><div><h3 id="score-title">Partitura</h3><small id="score-subtitle">Selecciona una canción para comenzar</small></div><div class="flex"><button id="study-show-note" class="study-only" type="button" aria-haspopup="dialog" aria-controls="study-note-view">Ver nota</button><button id="study-settings-button" class="study-only" type="button">⚙ Ajustes</button><button id="fullscreen-button" type="button">⛶ Pantalla completa</button></div></div><div id="score" class="score-inner"><div class="empty">Crea o selecciona una canción desde «Biblioteca y repertorios».</div></div></div>
  <aside id="study-comment-popup" class="study-comment-popup" role="tooltip" hidden></aside>
  <p class="footnote nonscore edit-only">Las anotaciones se guardan automáticamente en este navegador. Para descargar un respaldo, abre «Respaldos y papelera» desde las herramientas de Inicio.</p>
 </section>
@@ -246,8 +249,8 @@ const NOTE4='<svg viewBox="0 0 20 30" aria-hidden="true"><ellipse cx="7" cy="24"
 const NOTE8='<svg viewBox="0 0 20 30" aria-hidden="true"><ellipse cx="7" cy="24" rx="6" ry="4.3" transform="rotate(-20 7 24)"/><path d="M12.4 22.5V3Q23 7 16 14" fill="none" stroke-width="1.7"/></svg>';
 const fresh=()=>({temas:[],sel:null,repertorios:[],papelera:[],prefs:{theme:'system',highContrast:false,bigControls:false,wake:true,reminderDays:14},backupAt:null,updatedAt:Date.now()});
 let D=fresh(),writing=0,delayedSave=null,loadedStorage=false;
-let ui={query:'',rep:'all',view:'home',study:false,studyMenu:false,mobileMenu:false,sidebarCollapsed:true,beatDraft:null,importDraft:null,originRep:null,homeFocusSong:null,homeOpenReps:[],createReps:[],pendingReps:[],createExpanded:false};
-const clock={ctx:null,voices:new Set(),timer:null,timeouts:new Set(),token:0,starting:false,playing:false,paused:false,phase:'idle',cursor:null,lastVisual:null,nextTime:0,visualMeasure:0,visualBeat:-1,visualCount:0,playSongId:null,playStart:1,playEnd:1,loop:false,wakeLock:null};
+let ui={query:'',rep:'all',view:'home',study:false,studyMenu:false,mobileMenu:false,sidebarCollapsed:true,beatDraft:null,importDraft:null,originRep:null,homeFocusSong:null,homeOpenReps:[],createReps:[],pendingReps:[],createExpanded:false,studyVisitSong:null};
+const clock={ctx:null,voices:new Set(),timer:null,timeouts:new Set(),token:0,starting:false,playing:false,paused:false,phase:'idle',cursor:null,queuedPulse:null,lastVisual:null,nextTime:0,visualMeasure:0,visualBeat:-1,visualCount:0,playSongId:null,playStart:1,playEnd:1,loop:false,wakeLock:null};
 function uniqueId(prefix='t'){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function bounded(x,min,max,def){const n=Number(x);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):def}
@@ -273,11 +276,19 @@ function setting(t){if(!t.estudio||typeof t.estudio!=='object')t.estudio={};cons
  if(![0,1,2,4].includes(x.count))x.count=1;if(typeof x.scroll!=='boolean')x.scroll=true;
  if(!x.last||typeof x.last!=='object')x.last={start:1,end:t.notas.length,loop:false};
  return x}
+function activeStudyMeasureKeys(song){
+ return song.studyMeasureKeys||song.notas.map((_,index)=>String(index+1));
+}
 function normalize(data){if(!data||typeof data!=='object'||!Array.isArray(data.temas))throw Error('Archivo sin canciones válidas.');
  const o=clone(data);if(o.temas.length>3000)throw Error('Demasiadas canciones.');
  for(const t of o.temas){if(!t||typeof t.id!=='string'||typeof t.nombre!=='string'||!Array.isArray(t.notas)||t.notas.length<1||t.notas.length>256||!t.notas.every(n=>typeof n==='string'))throw Error('Datos de una canción incorrectos.');
   if(t.nombres&&!Array.isArray(t.nombres))throw Error('Nombres de compases incorrectos.');if(t.tiempos&&!Array.isArray(t.tiempos))throw Error('Pulsos incorrectos.');if(t.secciones&&!Array.isArray(t.secciones))throw Error('Secciones incorrectas.');
   for(const s of t.secciones||[])if(!s||typeof s.nombre!=='string'||!Number.isInteger(s.desde)||!Number.isInteger(s.hasta)||s.desde<1||s.hasta>t.notas.length||s.desde>s.hasta||!/^#[0-9a-f]{6}$/i.test(s.color))throw Error('Sección incorrecta.');
+  const keys=t.studyMeasureKeys;
+  if(!Array.isArray(keys)||keys.length!==t.notas.length||new Set(keys).size!==keys.length||
+    !keys.every(key=>typeof key==='string'&&/^(?:[1-9][0-9]{0,2}|m-[a-z0-9]{1,40})$/.test(key))){
+   delete t.studyMeasureKeys;
+  }
   setting(t);
  }
  if(!Array.isArray(o.repertorios))o.repertorios=[];o.repertorios=o.repertorios.filter(r=>r&&typeof r.id==='string'&&typeof r.nombre==='string'&&Array.isArray(r.songs)).map(r=>({...r,songs:r.songs.filter(id=>o.temas.some(t=>t.id===id))}));
@@ -328,6 +339,28 @@ function safeLoad(done=()=>{}){
 }
 function initSelection(){const t=current();if(!t){clock.playStart=1;clock.playEnd=1;clock.loop=false;return}const x=setting(t);clock.playStart=bounded(x.last.start,1,t.notas.length,1);clock.playEnd=bounded(x.last.end,clock.playStart,t.notas.length,t.notas.length);clock.loop=!!x.last.loop}
 const studiedMeasures=new Set();
+let practiceMeasure=null;
+function finishPracticeMeasure(songId){
+ const completed=practiceMeasure;
+ practiceMeasure=null;
+ if(!completed||completed.songId!==songId||completed.nextBeat!==completed.totalBeats)return;
+ if(studiedMeasures.has(completed.number))return;
+ studiedMeasures.add(completed.number);
+ markMeasureStudied(document.querySelector(`.measure[data-measure="${completed.number}"]`),completed.number);
+ window.KernnelStudyData.recordMeasure(songId,completed.key);
+}
+function trackPracticeBeat(songId,number,beat,totalBeats){
+ if(beat===0){
+  finishPracticeMeasure(songId);
+  const key=current()?.studyMeasureKeys?.[number-1]??String(number);
+  practiceMeasure={songId,number,key,nextBeat:0,totalBeats};
+ }
+ if(practiceMeasure?.songId===songId&&practiceMeasure.number===number&&practiceMeasure.nextBeat===beat&&practiceMeasure.totalBeats===totalBeats){
+  practiceMeasure.nextBeat++;
+ }else{
+  practiceMeasure=null;
+ }
+}
 let studiedSongId=null;
 function setStudiedSong(id){
  if(studiedSongId===id)return;
@@ -457,14 +490,15 @@ function renderSongEditor(){
  box.append(label('Métrica',sel(METERS.map(m=>[m,m]),x.meter,v=>{stopMetro();x.meter=v;save();renderAll()})));
  box.append(label('BPM original',number(x.bpm,30,300,v=>{x.bpm=v;save();renderAll()})));
  box.append(mk('div',{class:'notice',text:`Compases actuales: ${t.notas.length}. Las anotaciones se editan directamente debajo de cada compás.`}));
- box.append(button('+ Añadir compás al final',()=>{if(t.notas.length>=256)return toast('Máximo 256 compases.');t.notas.push('');if(!Array.isArray(t.nombres))t.nombres=[];t.nombres.push('');x.last.end=t.notas.length;clock.playEnd=t.notas.length;save();renderAll()}));
+ box.append(button('+ Añadir compás al final',()=>{if(t.notas.length>=256)return toast('Máximo 256 compases.');t.studyMeasureKeys=[...activeStudyMeasureKeys(t),uniqueId('m-')];t.notas.push('');if(!Array.isArray(t.nombres))t.nombres=[];t.nombres.push('');x.last.end=t.notas.length;clock.playEnd=t.notas.length;save();renderAll()}));
  box.append(button('− Eliminar último compás',()=>{
    if(t.notas.length<=1)return toast('Cada canción debe contener al menos un compás.');
    if(!confirm(`¿Eliminar el compás ${t.notas.length} de «${t.nombre}»? Podrás recuperarlo desde la papelera.`))return;
    const n=t.notas.length,trashId=uniqueId('trash');
-   D.papelera.push({id:trashId,type:'measure',songId:t.id,songName:t.nombre,index:n-1,value:{note:t.notas[n-1],name:(t.nombres||[])[n-1]||'',beats:(t.tiempos||[])[n-1]||null},at:Date.now()});
+   const studyKeys=activeStudyMeasureKeys(t);
+   D.papelera.push({id:trashId,type:'measure',songId:t.id,songName:t.nombre,index:n-1,value:{note:t.notas[n-1],name:(t.nombres||[])[n-1]||'',beats:(t.tiempos||[])[n-1]||null,studyMeasureKey:studyKeys[n-1]},at:Date.now()});
    if(editCheckpoint?.song.id===t.id)editCheckpoint.deletedMeasures.add(trashId);
-   t.notas.pop();if(t.nombres)t.nombres.pop();if(t.tiempos)t.tiempos.pop();x.marcadores=x.marcadores.filter(m=>m<n);
+   t.studyMeasureKeys=studyKeys.slice(0,-1);t.notas.pop();if(t.nombres)t.nombres.pop();if(t.tiempos)t.tiempos.pop();x.marcadores=x.marcadores.filter(m=>m<n);
    t.secciones=(t.secciones||[]).map(s=>({...s,hasta:Math.min(s.hasta,t.notas.length)})).filter(s=>s.desde<=s.hasta);
    clock.playEnd=Math.min(clock.playEnd,t.notas.length);clock.playStart=Math.min(clock.playStart,t.notas.length);x.last.end=Math.min(x.last.end,t.notas.length);save();renderAll();
  },'danger'));
@@ -552,7 +586,11 @@ function restoreTrash(item){
   const r=clone(item.value);if(D.repertorios.some(z=>z.id===r.id))r.id=uniqueId('r');r.songs=r.songs.filter(id=>D.temas.some(t=>t.id===id));D.repertorios.push(r);
  }else if(item.type==='measure'){
   const t=D.temas.find(z=>z.id===item.songId);if(!t)return toast('Restaura primero la canción para recuperar ese compás.');if(t.notas.length>=256)return toast('Esta canción ya tiene 256 compases.');
-  const i=Math.min(item.index,t.notas.length);t.notas.splice(i,0,item.value.note||'');if(!Array.isArray(t.nombres))t.nombres=[];t.nombres.splice(i,0,item.value.name||'');if(!Array.isArray(t.tiempos))t.tiempos=[];t.tiempos.splice(i,0,item.value.beats||null);
+  const i=Math.min(item.index,t.notas.length), keys=[...activeStudyMeasureKeys(t)];
+  const studyKey=item.value.studyMeasureKey;
+  keys.splice(i,0,typeof studyKey==='string'&&/^(?:[1-9][0-9]{0,2}|m-[a-z0-9]{1,40})$/.test(studyKey)&&!keys.includes(studyKey)?studyKey:uniqueId('m-'));
+  t.studyMeasureKeys=keys;
+  t.notas.splice(i,0,item.value.note||'');if(!Array.isArray(t.nombres))t.nombres=[];t.nombres.splice(i,0,item.value.name||'');if(!Array.isArray(t.tiempos))t.tiempos=[];t.tiempos.splice(i,0,item.value.beats||null);
   const x=setting(t);x.marcadores=x.marcadores.map(n=>n>=i+1?n+1:n);x.last.end=t.notas.length;
  }
  D.papelera=D.papelera.filter(z=>z.id!==item.id);initSelection();save();renderAll();toast('Elemento restaurado.')
@@ -640,7 +678,7 @@ function markMeasureStudied(measure,number){
 }
 function renderTransport(){
  const t=current(),x=t?setting(t):null,enabled=!!t;
- ['prev-measure','jump-measure','loop-button','play-button','next-measure','stop-button','bpm-plus','bpm-minus'].forEach(id=>$(id).disabled=!enabled);
+ ['prev-measure','jump-measure','loop-button','play-button','next-measure','stop-button','bpm-plus','bpm-minus','restart-study-measure'].forEach(id=>$(id).disabled=!enabled);
  $('toolbar-bpm').textContent=`${x?.practiceBpm??'—'} BPM actual`;
  $('original-bpm').textContent=`${x?.bpm??'—'} BPM original`;
  $('toolbar-meter').textContent=x?x.meter:'—';
@@ -666,10 +704,17 @@ function visualUpdate(){
  [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===clock.visualBeat));
 }
 function setPlaybackStatus(text){$('playback-status').textContent=text}
+function silenceMetro(){
+ clock.token++;
+ clearMetronomeTimers();
+ clock.queuedPulse=null;
+ for(const voice of clock.voices){try{voice.stop()}catch{}}
+ clock.voices.clear();
+}
 function stopMetro(){
- clock.token++;clearMetronomeTimers();
- clock.starting=false;clock.playing=false;clock.paused=false;clock.phase='idle';clock.cursor=null;clock.visualBeat=-1;clock.visualMeasure=null;
- if(clock.ctx){for(const v of clock.voices){try{v.stop()}catch(e){}}clock.voices.clear()}
+ silenceMetro();
+ clock.starting=false;clock.playing=false;clock.paused=false;clock.phase='idle';clock.cursor=null;clock.playSongId=null;
+ clock.visualBeat=-1;clock.visualMeasure=null;practiceMeasure=null;
  visualUpdate();renderTransport();setPlaybackStatus('Listo para practicar');
 }
 function ensureAudio(){
@@ -724,11 +769,36 @@ async function startMetro(){
  clock.timer=setInterval(scheduleTick,25);
  scheduleTick();renderTransport();
 }
-function pauseMetro(){
- if(!clock.playing||clock.paused)return;clock.paused=true;clock.playing=false;
- clock.token++;clearMetronomeTimers();
- if(clock.ctx){for(const v of clock.voices){try{v.stop()}catch(e){}}clock.voices.clear()}
- visualUpdate();setPlaybackStatus('En pausa · pulsa Reanudar para continuar');renderTransport()
+function pauseMetro(label='En pausa'){
+ if(!clock.playing&&!clock.paused)return;
+ const pending=clock.queuedPulse;
+ if(pending&&pending.at>metronomeTime()){
+  clock.phase=pending.phase;
+  clock.cursor=pending.cursor;
+ }
+ silenceMetro();
+ clock.starting=false;clock.paused=true;clock.playing=false;
+ const next=clock.cursor;
+ const position=clock.phase==='play'&&next
+  ? ` · Reanudar en compás ${next.measure}, pulso ${next.beat+1}`
+  : ' · Pulsa Reanudar para continuar';
+ visualUpdate();setPlaybackStatus(label+position);renderTransport();
+}
+function stopFromTransport(){
+ if(ui.study&&(clock.playing||clock.paused))pauseMetro('Detenido');
+ else stopMetro();
+}
+function restartStudyMeasure(){
+ const song=current();
+ if(!ui.study||!song)return;
+ const number=bounded(clock.visualMeasure||clock.cursor?.measure||clock.playStart,clock.playStart,clock.playEnd,clock.playStart);
+ const keepPlaying=clock.playing;
+ silenceMetro();
+ clock.starting=false;clock.playing=false;clock.paused=true;
+ clock.playSongId=song.id;clock.phase='play';clock.cursor={measure:number,beat:0,countRemaining:0};
+ clock.visualMeasure=number;clock.visualBeat=-1;practiceMeasure=null;
+ visualUpdate();renderTransport();setPlaybackStatus(`Compás ${number} · Pulso 1 listo`);
+ if(keepPlaying)startMetro();
 }
 function scheduleTick(){
  if(!clock.playing||clock.paused)return;const t=current();if(!t||t.id!==clock.playSongId){stopMetro();return}
@@ -740,23 +810,27 @@ function scheduleTick(){
   if(!c){stopMetro();return}
   if(phase==='ending'){
    clearInterval(clock.timer);clock.timer=null;
-   queueMetronomeEvent(()=>{if(token===clock.token){stopMetro();setPlaybackStatus('Reproducción finalizada')}},Math.max(0,(at-currentTime)*1000));
+   queueMetronomeEvent(()=>{
+    if(token!==clock.token)return;
+    if(ui.study)finishPracticeMeasure(t.id);
+    stopMetro();setPlaybackStatus('Reproducción finalizada');
+   },Math.max(0,(at-currentTime)*1000));
    break;
   }
   const beat=phase==='count'?(x.count*count-c.countRemaining)%count:c.beat;
   clickAudio(at,beat===0,x);
   const delay=Math.max(0,(at-currentTime)*1000);
   // Congelar el compás y el pulso de este clic antes de adelantar el planificador.
-  const snapshot={measure:c.measure,countRemaining:c.countRemaining};
+  const pulse={at,phase,cursor:{...c}};
+  const snapshot=pulse.cursor;
+  clock.queuedPulse=pulse;
   queueMetronomeEvent(()=>{
    if(token!==clock.token)return;
+   if(clock.queuedPulse===pulse)clock.queuedPulse=null;
    clock.visualBeat=beat;clock.visualMeasure=phase==='play'?snapshot.measure:null;
    if(phase==='count')setPlaybackStatus(`Preparación · compás ${x.count-Math.ceil(snapshot.countRemaining/count)+1}/${x.count} · pulso ${beat+1}/${count}`);
    else{setPlaybackStatus(`Compás ${snapshot.measure} · pulso ${beat+1}/${count}`);if(x.scroll&&beat===0){const elem=document.querySelector(`.measure[data-measure="${snapshot.measure}"]`);if(elem){const r=elem.getBoundingClientRect();if(r.top<95||r.bottom>innerHeight-130)elem.scrollIntoView({behavior:'smooth',block:'center'})}}}
-   if(ui.study&&phase==='play'&&beat===count-1&&!studiedMeasures.has(snapshot.measure)){
-    studiedMeasures.add(snapshot.measure);
-    markMeasureStudied(document.querySelector(`.measure[data-measure="${snapshot.measure}"]`),snapshot.measure);
-   }
+   if(ui.study&&phase==='play')trackPracticeBeat(t.id,snapshot.measure,beat,count);
    visualUpdate();
   },delay);
   if(phase==='count'){
@@ -833,7 +907,9 @@ function initEvents(){
  $('rename-song').addEventListener('click',()=>{const t=current();if(!t)return;const name=prompt('Nuevo título de la canción:',t.nombre);if(name===null)return;if(!name.trim())return toast('El título no puede estar vacío.');t.nombre=name.trim().slice(0,150);save();renderAll()});
  $('delete-song').addEventListener('click',deleteSong);
  $('exit-edit').addEventListener('click',returnToRepertoireV2);
- $('play-button').addEventListener('click',startMetro);$('stop-button').addEventListener('click',stopMetro);
+ $('play-button').addEventListener('click',startMetro);$('stop-button').addEventListener('click',stopFromTransport);
+ $('restart-study-measure').addEventListener('click',restartStudyMeasure);
+ $('study-show-note').addEventListener('click',()=>window.KernnelStudyNotes.show(current()?.id));
  $('jump-measure').addEventListener('click',()=>{
   const t=current();
   if(!t)return;
@@ -922,6 +998,13 @@ function initEvents(){
  document.addEventListener('pointerdown',()=>manageWake(),{once:true});
 }
 
+function connectStudyRooms(adapter){
+ if(!adapter)return;
+ window.KernnelRooms.connect(adapter);
+ const room=new URLSearchParams(location.search).get('sala');
+ if(room)window.KernnelRooms.open(room);
+}
+
 // Puente mínimo: el módulo cloud.js nunca accede directamente a las variables internas.
 window.KernnelBridge = Object.freeze({
   selectAccount: async (uid) => {
@@ -933,6 +1016,7 @@ window.KernnelBridge = Object.freeze({
     setViewV2('home');
   },
   pause: () => stopMetro(),
+  connectRooms: connectStudyRooms,
   syncTimes: (times) => {D._sync={...(D._sync||{}),times:{...times}};},
   flushLocal: () => {if(loadedStorage)save(false)},
   applySync: (raw) => {
@@ -1008,9 +1092,18 @@ window.KernnelBridge = Object.freeze({
 </dialog>
 <script src="./display-profile.js"></script>
 <script src="./study-comments.js"></script>
+<script src="./study-data.js"></script>
+<script src="./study-notes-ui.js"></script>
+<script src="./study-room-clock.js"></script>
+<script src="./study-room-cloud.js"></script>
+<script src="./study-room-ui.js"></script>
 <script src="./ui-v2.js"></script>
 <script>
 initEvents();manageWake();
+$('study-room-open').addEventListener('click',()=>{
+ if(!navigator.onLine&&!window.KernnelRoomDemo){toast('Conéctate a Internet para abrir una sala.');return}
+ window.KernnelRooms.open();
+});
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',updateThemeColor);
 document.querySelector('[data-rail-view]').addEventListener('click',()=>setViewV2('home'));
 document.querySelector('[data-rail-library]').addEventListener('click',()=>{setViewV2('home');document.querySelector('.home-intro').scrollIntoView({block:'start'})});
