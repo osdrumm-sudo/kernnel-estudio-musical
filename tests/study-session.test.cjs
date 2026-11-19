@@ -96,7 +96,7 @@ test('Study Stop retains the next pulse and rewinds any queued pulse that has no
   assert.equal(run('clock.queuedPulse===null'), true);
 });
 
-test('rewinding in Study returns to the visible compás and preserves the loop', () => {
+test('Study returns to the first compás of the song even if a loop starts later', () => {
   const { run } = setup();
   run(`
     visualUpdate=()=>{};
@@ -109,10 +109,36 @@ test('rewinding in Study returns to the visible compás and preserves the loop',
     clock.paused=true;
     clock.visualMeasure=3;
     clock.cursor={measure:2,beat:0};
-    restartStudyMeasure();
+    restartStudySong();
   `);
   assert.equal(run('clock.paused'), true);
-  assert.equal(run('JSON.stringify(clock.cursor)'), '{"measure":3,"beat":0,"countRemaining":0}');
+  assert.equal(run('JSON.stringify(clock.cursor)'), '{"measure":1,"beat":0,"countRemaining":0}');
   assert.equal(run('clock.loop'), true);
   assert.equal(run('clock.playStart'), 2);
+});
+
+test('Study Stop resets an active loop without starting playback', () => {
+  const { run } = setup();
+  run(`
+    visualUpdate=()=>{};
+    renderTransport=()=>{};
+    setPlaybackStatus=()=>{};
+    startMetro=()=>{throw new Error('Stop must not start playback')};
+    ui.study=true;
+    clock.playStart=2;
+    clock.playEnd=3;
+    clock.loop=true;
+    clock.playing=true;
+    clock.visualMeasure=3;
+    clock.cursor={measure:3,beat:2};
+    clock.queuedPulse={at:1.08,phase:'play',cursor:{measure:3,beat:1}};
+    trackPracticeBeat('verso',3,0,4);
+    stopFromTransport();
+  `);
+  assert.equal(run('clock.playing'),false);
+  assert.equal(run('clock.paused'),true);
+  assert.equal(run('JSON.stringify(clock.cursor)'), '{"measure":2,"beat":0,"countRemaining":0}');
+  assert.equal(run('clock.visualMeasure'),2);
+  assert.equal(run('clock.queuedPulse===null&&practiceMeasure===null'),true);
+  assert.equal(run('clock.loop'),true);
 });

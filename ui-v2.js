@@ -142,14 +142,33 @@ function renderCreateChoicesV2(){
   }
   $('create-reps-count').textContent=String(ui.createReps.length);
 }
-function addPendingRepertoireV2(){
-  const input=$('new-repertoire-title'),nombre=input.value.trim();
+function availableRepertoireNameV2(input){
+  const nombre=input.value.trim();
   if(!nombre){toast('Escribe el nombre del nuevo repertorio.');input.focus();return}
   if(nombre.length>120){toast('El nombre supera los 120 caracteres.');return}
   const norm=s=>s.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
   if([...D.repertorios,...ui.pendingReps].some(r=>norm(r.nombre)===norm(nombre))){
     toast('Ya existe un repertorio con ese nombre.');input.focus();return;
   }
+  return nombre;
+}
+function onCreateHomeRepertoireV2(event){
+  event.preventDefault();
+  if(!loadedStorage)return toast('Espera a que termine la carga de tus canciones.');
+  const input=$('home-repertoire-name'),nombre=availableRepertoireNameV2(input);
+  if(!nombre)return;
+  const repertoire={id:uniqueId('r'),nombre,songs:[]};
+  D.repertorios.push(repertoire);
+  ui.homeOpenReps.push(repertoire.id);
+  $('home-create-repertoire').open=false;
+  input.value='';
+  save();
+  renderV2();
+  toast('Repertorio creado.');
+}
+function addPendingRepertoireV2(){
+  const input=$('new-repertoire-title'),nombre=availableRepertoireNameV2(input);
+  if(!nombre)return;
   const rep={id:uniqueId('r'),nombre,songs:[]};
   ui.pendingReps.push(rep);
   ui.createReps.push(rep.id);
@@ -166,10 +185,12 @@ function onCreateSongV2(e){
   if(!name){toast('Escribe un título para la canción.');input.focus();return}
   if(!Number.isInteger(count)||count<1||count>256){toast('Elige entre 1 y 256 compases.');return}
   if(!METERS.includes(meter)){toast('La métrica indicada no está disponible.');return}
+  const bpm=$('song-new-bpm').valueAsNumber;
+  if(!Number.isInteger(bpm)||bpm<30||bpm>300){toast('Elige un BPM entre 30 y 300.');return}
   const ids=new Set(ui.createReps);
   // Una única transacción lógica: repertorios pendientes y canción se incorporan juntos.
   ui.pendingReps.filter(r=>ids.has(r.id)).forEach(r=>D.repertorios.push({id:r.id,nombre:r.nombre,syncConflict:r.syncConflict,songs:[]}));
-  const t=newSong(name,count,meter);
+  const t=newSong(name,count,meter,bpm);
   stopMetro();
   D.temas.push(t);
   D.repertorios.forEach(r=>{if(ids.has(r.id)&&!r.songs.includes(t.id))r.songs.push(t.id)});
