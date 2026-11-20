@@ -22,9 +22,9 @@ La presencia de un archivo en la rama principal no certifica que la web esté de
 | Manual oficial | https://manual.kernnel.app/#manual |
 | Repositorio de la aplicación | https://github.com/osdrumm-sudo/kernnel-estudio-musical |
 | Repositorio del manual | https://github.com/osdrumm-sudo/kernnel-guia-oficial |
-| Firebase | https://console.firebase.google.com/ (proyecto \`kernnel-studio\`) |
+| Firebase | https://console.firebase.google.com/ (proyecto `kernnel-studio`) |
 
-El alias \`https://www.kernnel.app/\` debe redirigir a \`https://kernnel.app/\`. El DNS, SSL y las reglas de Cloudflare se comprueban por separado; **no** se dan por verificados solo porque las URLs estén escritas en el código.
+El alias `https://www.kernnel.app/` debe redirigir a `https://kernnel.app/`. El DNS, SSL y las reglas de Cloudflare se comprueban por separado; **no** se dan por verificados solo porque las URLs estén escritas en el código.
 
 ## Funciones principales
 
@@ -51,7 +51,7 @@ El alias \`https://www.kernnel.app/\` debe redirigir a \`https://kernnel.app/\`.
 
 ## Acceso, almacenamiento y respaldos
 
-1. Ingresar desde https://kernnel.app/ con Google. La cuenta administradora es \`ols.bds@gmail.com\`; las demás necesitan aprobación explícita.
+1. Ingresar desde https://kernnel.app/ con Google. La cuenta administradora es `ols.bds@gmail.com`; las demás necesitan aprobación explícita.
 2. La biblioteca local se separa por UID. No existe un modo invitado anónimo.
 3. Canciones y repertorios se sincronizan automáticamente con Firestore después de aproximadamente 1,5 s de inactividad. Las notas y el progreso utilizan módulos adicionales de persistencia y sincronización.
 4. Sin conexión, la biblioteca ya autorizada puede usarse localmente; los datos pendientes se envían al reconectar. Las salas necesitan conexión.
@@ -64,7 +64,7 @@ El alias \`https://www.kernnel.app/\` debe redirigir a \`https://kernnel.app/\`.
 
 Las reglas versionadas están en [firestore.rules](firestore.rules). **GitHub Pages no publica reglas a Firestore**. Antes de habilitar funciones nuevas en el proyecto real:
 
-1. Revisar \`firestore.rules\` en GitHub y la versión publicada en **Firebase Console → Firestore Database → Reglas**.
+1. Revisar `firestore.rules` en GitHub y la versión publicada en **Firebase Console → Firestore Database → Reglas**.
 2. Probar en un emulador o ambiente de pruebas: acceso solo al UID autorizado, denegación entre cuentas y restricciones de salas y adjuntos.
 3. Publicar expresamente las reglas compatibles en Firebase, sin reemplazarlas por reglas abiertas.
 4. Probar con dos usuarios y dos dispositivos: login, solicitud de acceso, revocación, notas, progreso, invitación a una sala y cierre.
@@ -76,9 +76,9 @@ La configuración pública de Firebase para aplicaciones web no es una clave pri
 
 Requiere Node.js. Desde la raíz:
 
-\`\`\`sh
+```sh
 node --test tests/*.test.cjs
-\`\`\`
+```
 
 GitHub Actions ejecuta estas pruebas y revisa sintaxis e integridad de rutas internas. Los tests con dobles de Firebase **no certifican las reglas reales**. El workflow también inspecciona el estado HTTP de los dominios, pero no modifica DNS ni Firestore.
 
