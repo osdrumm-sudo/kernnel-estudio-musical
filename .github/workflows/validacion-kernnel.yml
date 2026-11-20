@@ -1,0 +1,55 @@
+name: Kernnel | Revisión de código y enlaces (sin despliegue)
+on:
+  push:
+    branches:
+      - codex/publicar-salas-y-avance
+      - mantenimiento/**
+  pull_request:
+    paths:
+      - "index.html"
+      - "cloud.js"
+      - "desktop-study.js"
+      - "display-profile.js"
+      - "study-*.js"
+      - "sync-*.js"
+      - "usage-admin.js"
+      - "ui-v2.js"
+      - "sw.js"
+      - "firestore.rules"
+      - "tests/**"
+      - ".github/workflows/validacion-kernnel.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: Sintaxis, vínculos internos y pruebas
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Comprobar sintaxis de módulos
+        run: |
+          for f in cloud.js ui-v2.js sync-core.js sync-engine.js sync-store.js usage-admin.js display-profile.js study-comments.js study-data.js study-notes-ui.js study-room-clock.js study-room-cloud.js study-room-ui.js desktop-study.js; do
+            node --check "$f"
+          done
+      - name: Ejecutar pruebas con datos ficticios
+        run: node --test tests/*.test.cjs
+  enlaces-publicos:
+    name: Respuesta HTTP de dominios (diagnóstico)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Consultar aplicación, manual y alias
+        shell: bash
+        run: |
+          for url in https://kernnel.app/ https://manual.kernnel.app/#manual https://www.kernnel.app/; do
+            printf '%s : ' "$url"
+            curl -L -sS --connect-timeout 10 --max-time 25 -o /dev/null -w '%{http_code} final=%{url_effective} redirecciones=%{num_redirects}\n' "$url" || true
+          done

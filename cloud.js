@@ -8,7 +8,7 @@ function report(e){console.warn('[Kernnel]',e.code||e.message);info(errors[e.cod
 function lock(busy){state.busy=busy;['access-google','cloud-upload','cloud-download','cloud-logout'].forEach(id=>byId(id).disabled=busy);}
 function receipt(){try{return JSON.parse(localStorage.getItem(RECEIPT)||'null')}catch{return null}}
 function forget(){try{localStorage.removeItem(RECEIPT)}catch{}}
-function gate(message){window.KernnelUsage?.stop();window.KernnelProfile?.disconnect();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
+function gate(message){window.KernnelUsage?.stop();window.KernnelProfile?.disconnect();window.KernnelStudyData?.disconnect();window.KernnelRooms?.disconnect();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
 function startProfile(user){
  const profile=window.KernnelProfile;
  if(!profile)return;
@@ -67,6 +67,8 @@ function startProfile(user){
 async function grant(user,offline=false){
  const epoch=state.epoch;
  if(state.account!==user.uid){await window.KernnelBridge.selectAccount(user.uid);if(epoch!==state.epoch)return;state.account=user.uid;}
+ await window.KernnelStudyData?.connectLocal(user.uid);
+ if(epoch!==state.epoch)return;
  state.allowed=true;
  byId('access-gate').hidden=true;document.body.classList.remove('auth-locked');
  byId('cloud-signed').hidden=false;byId('cloud-user').textContent=`Cuenta: ${user.email}`;
@@ -75,6 +77,11 @@ async function grant(user,offline=false){
  if(!offline){try{localStorage.setItem(RECEIPT,JSON.stringify({uid:user.uid,email:user.email}))}catch{}}
  startProfile(user);
  startSync();
+ if(!offline)window.KernnelStudyData?.connectCloud({uid:user.uid,sdk:state.sdk,db:state.db}).catch(error=>console.warn('[Estudio]',error));
+ if(!offline&&window.KernnelRoomCloud&&window.KernnelRooms){
+  const adapter=window.KernnelRoomCloud.create({uid:user.uid,email:user.email,sdk:state.sdk,db:state.db});
+  window.KernnelBridge.connectRooms(adapter);
+ }
  if(!offline)window.KernnelUsage?.start(state.sdk,state.db,user);
 }
 async function checkAccess(){

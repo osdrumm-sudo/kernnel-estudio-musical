@@ -44,7 +44,8 @@ body.app{margin:20px 22px 0 102px}
 #song-picker-list{max-height:55vh;overflow:auto}
 .song-picker-option{text-align:left;overflow-wrap:anywhere}
 .home-song{flex-wrap:wrap}
-.home-song :is(.conflict-notice,.modification-date){flex-basis:100%}
+.home-song :is(.conflict-notice,.modification-date,.home-song-stats){flex-basis:100%}
+.home-song-stats{padding-inline:8px;font-variant-numeric:tabular-nums}
 @media(max-width:400px){.app .sidebar-toggle{gap:4px}.app .sidebar-toggle span:first-of-type{max-width:75px}}
 
 .transport-tempo,.tempo-reference,.tempo-adjustment{display:flex;align-items:center;gap:7px}
