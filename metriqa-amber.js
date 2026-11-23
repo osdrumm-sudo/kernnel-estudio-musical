@@ -96,11 +96,11 @@
     if(state.tab==='notes'){
       if(note)labels.push({title:'Nota del compás '+n,body:note});
       for(const [i,b]of beatData.entries()){
-        if(b?.txt?.trim())labels.push({title:'Nota del pulso '+(i+1),body:b.txt.trim()});
+        if(typeof b?.txt==='string'&&b.txt.trim())labels.push({title:'Nota del pulso '+(i+1),body:b.txt.trim()});
       }
     }else{
       for(const [i,b]of beatData.entries()){
-        if(b?.txt?.trim())labels.push({title:'Pulso '+(i+1),body:b.txt.trim()});
+        if(typeof b?.txt==='string'&&b.txt.trim())labels.push({title:'Pulso '+(i+1),body:b.txt.trim()});
       }
       if(note)labels.push({title:'Compás '+n,body:note});
     }
@@ -194,7 +194,8 @@
       $a('menu-metronome').open=true;
       document.getElementById('sidebar')?.scrollIntoView({block:'nearest',behavior:'smooth'});
     }else{
-      document.querySelector('.rail-settings')?.click();
+      const dialog=document.getElementById('accessibility-dialog');
+      if(dialog&&!dialog.open)dialog.showModal();
     }
   });
   window.renderStudioAmber=renderStudioAmber;
