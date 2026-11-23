@@ -712,6 +712,7 @@ function renderTransport(){
  $('play-button').textContent=clock.starting?'Activando audio…':clock.paused?'▶ Reanudar':clock.playing?'Ⅱ Pausar':'▶ Reproducir';
  const el=$('beat-dots');el.replaceChildren();if(!x)return;
  const count=beatsPerMeasure(x);for(let i=0;i<count;i++)el.append(mk('span',{class:'beatdot'+(x.accents.includes(i+1)?' accent':'')+(clock.visualBeat===i?' active':''),title:`Pulso ${i+1}`}));
+  window.updateStudioAmber?.();
 }
 function visualUpdate(){
  const t=current();
@@ -725,6 +726,7 @@ function visualUpdate(){
  studyComments.update(ui.study?measure:null,beat,!clock.playing);
  const dots=$('beat-dots');if(dots.children.length!==beatsPerMeasure(setting(t)))renderTransport();
  [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===clock.visualBeat));
+  window.updateStudioAmber?.();
 }
 function setPlaybackStatus(text){$('playback-status').textContent=text}
 function stopMetro(){
