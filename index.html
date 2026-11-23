@@ -234,7 +234,34 @@
  </section>
  <div class="study-exits" aria-label="Salir del modo estudio"><button id="study-to-edit" type="button">✎ Modo edición</button><button id="study-to-repertoire" type="button">▤ Ir al repertorio</button></div>
 
- <div class="hero edit-only"><div><h2 id="current-title">Selecciona una canción</h2><small id="current-meta">Tu biblioteca musical</small></div><div class="hero-side"><div class="song-edit-actions" role="group" aria-label="Cambios de la canción"><button id="save-song-edits" class="primary" type="button" disabled>Guardar</button><button id="cancel-song-edits" type="button" title="Deshacer cambios desde el último guardado manual" disabled>Cancelar</button></div><button id="rename-song" type="button" disabled>Renombrar</button><button id="exit-edit" type="button" title="Volver al repertorio">Salir</button><button class="danger" id="delete-song" type="button" disabled>Eliminar canción</button></div></div>
+ <section id="mq-studio" class="mq-studio" aria-label="Práctica musical guiada">
+ <div class="mq-stage mq-panel">
+  <div class="mq-song-icon" aria-hidden="true">♫</div>
+  <div class="mq-song-meta"><h2 id="mq-song-name">Canción</h2><p id="mq-song-details">Compases · BPM</p></div>
+  <div class="mq-structure"><span class="mq-structure-label">Estructura del tema</span><div id="mq-section-buttons" class="mq-section-buttons" role="group" aria-label="Ir a una sección"></div></div>
+ </div>
+ <div class="mq-position"><span id="mq-position-label">Compás 1</span><input id="mq-seek" type="range" min="1" max="1" value="1" aria-label="Navegar a un compás"><span>Posición en compases</span></div>
+ <div class="mq-columns">
+  <div class="mq-left">
+   <div class="mq-fact mq-panel"><small>Compás actual</small><div class="mq-measure-number"><span id="mq-measure-num">1</span> <em id="mq-measure-total">/ 1</em></div></div>
+   <div class="mq-fact mq-panel"><small>Pulso / acento</small><div class="mq-pulses" id="mq-pulse-dots" aria-label="Pulsos del metrónomo"></div><strong class="mq-pulse-count" id="mq-beat-number">—</strong></div>
+  </div>
+  <section class="mq-center mq-panel" aria-label="Posición y recursos del tema">
+   <div class="mq-section-head"><span class="mq-section-marker" aria-hidden="true"></span><div><h3 id="mq-section-name">Sección actual</h3><p id="mq-section-range">Compases</p></div><span class="mq-meter" id="mq-meter">4/4</span></div>
+   <div id="mq-measure-strip" class="mq-measure-strip" role="group" aria-label="Saltar a un compás"></div>
+   <div class="mq-extract">
+    <div class="mq-extract-title"><h4>Extractos adjuntos del compás</h4><button id="mq-show-score" type="button" aria-controls="score">Ver partitura completa</button></div>
+    <div id="mq-attachments" class="mq-attachments"></div>
+   </div>
+  </section>
+  <aside class="mq-right mq-panel" aria-label="Anotaciones de estudio">
+   <div class="mq-tabs" role="tablist" aria-label="Tipo de anotaciones"><button class="mq-tab" type="button" data-tab="comments" aria-selected="true" role="tab">Comentarios</button><button class="mq-tab" type="button" data-tab="notes" aria-selected="false" role="tab">Notas</button></div>
+   <div id="mq-note-list" class="mq-note-list" aria-live="polite"></div>
+   <button id="mq-add-note" class="mq-add-note" type="button">＋ Añadir desde Edición</button>
+  </aside>
+ </div>
+</section>
+<div class="hero edit-only"><div><h2 id="current-title">Selecciona una canción</h2><small id="current-meta">Tu biblioteca musical</small></div><div class="hero-side"><div class="song-edit-actions" role="group" aria-label="Cambios de la canción"><button id="save-song-edits" class="primary" type="button" disabled>Guardar</button><button id="cancel-song-edits" type="button" title="Deshacer cambios desde el último guardado manual" disabled>Cancelar</button></div><button id="rename-song" type="button" disabled>Renombrar</button><button id="exit-edit" type="button" title="Volver al repertorio">Salir</button><button class="danger" id="delete-song" type="button" disabled>Eliminar canción</button></div></div>
  <section class="transport" aria-label="Controles de reproducción"><div class="transport-row"><button id="prev-measure" class="edit-only" title="Compás anterior" aria-label="Compás anterior" type="button">⏮ Compás</button><button id="play-button" class="primary" type="button">▶ Reproducir</button><button id="stop-button" type="button">■ Detener</button><button id="next-measure" class="edit-only" title="Compás siguiente" aria-label="Compás siguiente" type="button">Compás ⏭</button><button id="jump-measure" type="button">Ir a compás</button>
  <div class="transport-loop study-only" role="group" aria-label="Repetición">
   <button id="loop-button" type="button" aria-haspopup="dialog" aria-controls="loop-dialog">Loop</button>
@@ -1044,6 +1071,7 @@ window.KernnelBridge = Object.freeze({
   <button id="leave-edit-save" class="primary" type="button">Guardar y salir</button>
  </div>
 </dialog>
+<dialog id="mq-image-dialog" aria-labelledby="mq-image-title"><h2 id="mq-image-title">Extracto de partitura</h2><img id="mq-image-full" alt="Extracto ampliado" style="width:100%;height:auto;max-height:70vh;object-fit:contain"><div class="dialog-actions"><button type="button" id="mq-image-close">Cerrar</button></div></dialog>
 <dialog id="profile-dialog" aria-labelledby="profile-title">
  <form id="profile-form">
   <h2 id="profile-title">Nombre del perfil</h2>
