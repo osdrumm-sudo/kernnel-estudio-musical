@@ -121,6 +121,15 @@
     const t=current();if(!t)return;
     const x=setting(t),n=currentMeasure(),s=getSection(t,n);
     state.measure=n;
+    const songSelect=$a('mq-song-select');
+    if(songSelect){
+      songSelect.replaceChildren();
+      for(const song of D.temas){
+        const option=document.createElement('option');
+        option.value=song.id;option.textContent=song.nombre;songSelect.append(option);
+      }
+      songSelect.value=t.id;
+    }
     setText('mq-song-name',t.nombre);
     setText('mq-song-details',x.meter+' · '+x.practiceBpm+' BPM de práctica · '+t.notas.length+' compases');
     setText('mq-section-name',s.nombre);
@@ -192,6 +201,7 @@
   $a('mq-style-toggle')?.addEventListener('click',()=>setEnabled(!state.enabled));
   $a('mq-open-settings')?.addEventListener('click',openPracticeSettings);
   $a('mq-seek')?.addEventListener('change',event=>selectMeasure(event.target.value));
+  $a('mq-song-select')?.addEventListener('change',event=>chooseSongV2(event.target.value,'study'));
   $a('mq-show-score')?.addEventListener('click',toggleScore);
   $a('mq-add-note')?.addEventListener('click',editCurrentMeasure);
   document.querySelectorAll('.mq-tab').forEach(b=>b.addEventListener('click',()=>{state.tab=b.dataset.tab;renderStudioAmber()}));
