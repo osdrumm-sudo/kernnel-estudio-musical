@@ -191,3 +191,13 @@ body.app.mq-amber #access-gate{z-index:999}
  body.app.mq-amber{margin:0}
  body.app.study.mq-amber .scorebox{display:block!important}
 }
+
+/* Atajos y accesibilidad de la propuesta Full. */
+.mq-open-settings{align-self:center;border:1px solid #735c47;background:#41342b;border-radius:11px;min-height:42px;padding:9px 12px;color:#f4d3ae;font-weight:690;white-space:normal}
+.mq-open-settings:hover{background:#534031}
+:root[data-contrast="true"] body.app.mq-amber .mq-studio :is(.mq-panel,.mq-section-head,.mq-extract,.mq-measure-card,.mq-note-card,.mq-excerpt,.mq-section-button,.mq-open-settings,.mq-add-note){background:var(--panel)!important;color:var(--ink)!important;border-color:var(--border)!important}
+:root[data-contrast="true"] body.app.mq-amber .mq-studio .mq-measure-card.is-now{outline:3px solid var(--active)!important}
+:root[data-contrast="true"] body.app.mq-amber .mq-studio .mq-section-button.is-active{outline:3px solid var(--active)!important}
+:root[data-contrast="true"] body.app.mq-amber .mq-studio .mq-tab[aria-selected="true"]{color:var(--ink)!important;border-bottom-color:var(--active)}
+@media(max-width:1090px){.mq-open-settings{margin-left:auto}}
+@media(max-width:760px){.mq-open-settings{flex:1 0 100%;margin:2px 0 0;max-width:none;width:100%}}
