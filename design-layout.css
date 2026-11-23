@@ -115,3 +115,34 @@ body.app{margin:20px 22px 0 102px}
   .home-whats-new .update-body{padding:13px}
 }
 @media print{.home-whats-new{display:none!important}}
+
+/* Metriqa · Repertorios y acentos, noviembre 2026. */
+.view-nav button[hidden]{display:none!important}
+.home-repertoire-create{display:grid;gap:9px;padding:16px 18px;background:var(--raised);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+.home-repertoire-create>label{font-weight:800;font-size:15px;color:var(--ink)}
+.home-repertoire-form{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.home-repertoire-form input{flex:1 1 180px;min-height:42px;min-width:0}
+.home-repertoire-form button{min-height:42px;white-space:nowrap}
+.home-song-delete{flex:none;color:var(--danger);border:1px solid var(--border);background:var(--panel);font-size:12px;min-height:40px;border-radius:10px;padding:7px 12px}
+.home-song-delete:hover{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 10%,var(--panel))}
+.repertoire-picker-list{display:grid;gap:8px;max-height:min(55vh,480px);overflow-y:auto}
+.repertoire-picker-option{display:block;width:100%;text-align:left;white-space:normal;padding:13px 14px;border:1px solid var(--border);border-radius:10px;background:var(--raised)}
+.repertoire-picker-option:hover,.repertoire-picker-option:focus-visible{border-color:var(--accent);background:var(--soft)}
+#leave-edit-status{color:var(--danger);font-size:12px;min-height:1.2em}
+.accent-options{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.accent-options .accent-beat-toggle{min-width:41px;min-height:41px;border:1px solid var(--border);border-radius:9px;font-weight:800;font-variant-numeric:tabular-nums;background:var(--panel)}
+.accent-options .accent-beat-toggle.is-accented{background:var(--active);border-color:var(--active);color:var(--accent-ink)}
+.accent-options .accent-beat-toggle:focus-visible{outline:3px solid var(--active);outline-offset:2px}
+:root[data-contrast="true"] .accent-options .accent-beat-toggle.is-accented{outline:2px solid var(--ink);outline-offset:-4px}
+@media(max-width:760px){
+ .app:not(.home) .view-nav{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .view-nav .nav-repertoires{font-size:12px;min-width:0;padding:7px 2px}
+ .home-repertoire-form{display:grid;grid-template-columns:minmax(0,1fr)}
+ .home-repertoire-form button{width:100%}
+ .home-song{flex-wrap:wrap}
+ .home-song-name{flex:1 1 100%}
+ .home-song-edit,.home-song-delete{flex:1 1 auto;min-height:44px}
+}
+@media(max-width:380px){
+ .app:not(.home) .view-nav{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
