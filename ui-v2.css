@@ -10,6 +10,8 @@
 .app.home .work{width:100%}
 .app.edit .sidebar>.sidebar-group,
 .app.edit .sidebar>.menu-unit:not(.menu-song){display:none}
+.app.study .sidebar>.sidebar-group:not(.study-settings-group),
+.app.study .sidebar>.menu-unit:not(.menu-metronome,.menu-practice){display:none!important}
 .home-screen{display:none;min-width:0}
 .app.home .home-screen{display:grid;gap:20px}
 .home-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}

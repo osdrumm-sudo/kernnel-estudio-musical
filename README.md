@@ -1,79 +1,93 @@
 # Kernnel Estudio musical
-**Realizado por OSS/26** · Logo definitivo pendiente.
 
-Aplicación web para gestionar canciones, compases, anotaciones, repertorios y metrónomo.
-Requiere acceso autorizado con Google, conserva el trabajo local sin conexión tras el primer ingreso y ofrece **copias manuales en Google Firestore** mediante Firebase Authentication.
+**Realizado por OSS/26** · Metriqa es la evolución comercial prevista de Kernnel; el producto publicado y el código conservan por ahora el nombre **Kernnel**.
 
-## Pasos de instalación gratuita
+Aplicación web musical para organizar canciones, compases y repertorios, estudiar con metrónomo, escribir notas y trabajar con salas privadas. Interfaz en español de Chile. Aplicación estática alojada mediante GitHub Pages, Firebase Authentication para ingresar y Cloud Firestore para los datos de cada cuenta.
 
-1. Crea un repositorio **público** en https://github.com/new, por ejemplo `kernnel-estudio-musical`.
-2. Sube **el contenido** de esta carpeta a la raíz del repositorio (no la carpeta exterior).
-3. En GitHub: Settings → Pages → Build and deployment → **Deploy from a branch** → `main` → `/(root)` → Save.
-4. El sitio quedará en `https://TU_USUARIO.github.io/kernnel-estudio-musical/`. Esta URL es HTTPS.
-5. En https://console.firebase.google.com crea un proyecto en el plan **Spark (gratis)**. No vincules una cuenta de facturación.
-6. Agrega una aplicación **Web** en Firebase, copia los valores públicos de configuración en `firebase-config.js`.
-7. Firebase → Authentication → Sign-in method → **Google: habilitado**. Si Firebase solicita dominios autorizados, añade `TU_USUARIO.github.io` en Authentication → Settings → Authorized domains.
-8. Firebase → Firestore Database → Crear base de datos **(default)**, modo Production, edición Standard. En la pestaña Rules pega el contenido de `firestore.rules` y pulsa Publish.
-9. Sube el `firebase-config.js` actualizado al repositorio. Espera la publicación de GitHub Pages y abre desde Safari en el iPad.
-10. En menú **Sincronización Google**, inicia sesión con Google, y pulsa **Guardar copia en Google**. En el otro dispositivo, inicia sesión con la misma cuenta y pulsa **Recuperar desde Google**.
+## Estado del código — 20 de noviembre de 2026
 
-## Importante: datos y seguridad
+- **PR #7 (12/11):** ingreso obligatorio con Google y autorización por invitación.
+- **PR #8 (13/11):** sincronización incremental de canciones y repertorios.
+- **PR #10 (18/11):** mejoras de Inicio, Edición y Estudio.
+- **PR #11 (19/11):** corrección de nombre de perfil.
+- **PR #12:** notas por canción, adjuntos de imagen/PDF, avance de estudio y salas privadas por invitación. Estas funciones **requieren publicar las nuevas reglas de Firestore** y probarlas con cuentas reales. Integrar el PR en GitHub no publica automáticamente esas reglas.
 
-- La app **mantiene la biblioteca en el dispositivo** y su modo offline. Google se utiliza para almacenar una copia completa cuando pulsas el botón correspondiente.
-- **No hay fusión automática** de cambios de distintos dispositivos. Siempre exporta un respaldo JSON antes de recuperar y comprueba qué dispositivo tiene la versión más reciente antes de subir.
-- La restauración reemplaza todos los datos locales de la instalación donde la ejecutas.
-- El código del repositorio público puede verlo cualquiera, pero las reglas de Firestore permiten leer y escribir cada respaldo solo al usuario autenticado dueño.
-- El objeto `firebaseConfig` es público por diseño; **nunca incluyas contraseñas, certificados, claves privadas ni claves de administrador en el repositorio**.
-- Las imágenes incrustadas en canciones se guardan en fragmentos de Firestore hasta 25 MB por respaldo. No se necesita Cloud Storage ni plan Blaze. Las copias antiguas no se borran automáticamente y ocupan cuota; inicialmente se recomienda hacer pruebas con pocos archivos.
-- Para migrar canciones guardadas en Netlify, **exporta JSON allí e impórtalo en el nuevo GitHub Pages**: son orígenes distintos y no comparten almacenamiento local.
-- Debes usar GitHub Pages con URL HTTPS (no abrir `index.html` desde Archivos).
-- Los módulos de Firebase requieren Internet; el modo local y metrónomo siguen funcionando offline después de instalar la PWA.
-- Las cuotas del plan Spark de Firestore son limitadas. Si te acercas a ellas, revisa Usage y utiliza los respaldos JSON como alternativa.
+La presencia de un archivo en la rama principal no certifica que la web esté desplegada ni que los permisos del proyecto Firebase ya coincidan con él.
 
-## Límites de esta entrega
+## Enlaces y repositorios
 
-La app y su módulo de nube son una **versión de integración preparada**, no se han probado todavía contra tu proyecto Firebase ni una cuenta GitHub real, ya que es necesaria su configuración y autorización. Las acciones de nube son manuales y no sincronizan en segundo plano.
+| Recurso | Dirección |
+| --- | --- |
+| Aplicación | https://kernnel.app/ |
+| Manual oficial | https://manual.kernnel.app/#manual |
+| Repositorio de la aplicación | https://github.com/osdrumm-sudo/kernnel-estudio-musical |
+| Repositorio del manual | https://github.com/osdrumm-sudo/kernnel-guia-oficial |
+| Firebase | https://console.firebase.google.com/ (proyecto `kernnel-studio`) |
 
-## Enlaces oficiales
-- https://docs.github.com/en/pages/quickstart
-- https://firebase.google.com/docs/firestore/pricing
-- https://firebase.google.com/docs/firestore/security/get-started
-- https://firebase.google.com/docs/web/setup
+El alias `https://www.kernnel.app/` debe redirigir a `https://kernnel.app/`. El DNS, SSL y las reglas de Cloudflare se comprueban por separado; **no** se dan por verificados solo porque las URLs estén escritas en el código.
 
-## Preparación de dominios Kernnel 2.0 (NO ACTIVADA)
+## Funciones principales
 
-- **Aplicación**: https://kernnel.app/
-- **Alias con redirección**: https://www.kernnel.app/ → https://kernnel.app/
-- **Manual**: https://manual.kernnel.app/
+### Inicio y repertorios
+- Crear canciones y repertorios; asociar una canción a uno o varios repertorios, o dejarla sin repertorio.
+- Crear repertorios independientemente y elegir BPM al agregar una canción.
+- Ver notas, progreso y accesos a Edición y Estudio.
 
-Esta configuración está preparada solamente en la rama `preparacion/dominios-kernnel-2026-11-10`. Consultar `docs/plan-dominios-kernnel.md` antes de fusionar, crear DNS o modificar GitHub Pages. La URL GitHub Pages anterior debe utilizarse para exportar los respaldos JSON reales antes del cambio de origen.
+### Edición
+- Modificar título, compases, secciones de color y anotaciones de la partitura.
+- Ajustar número total de compases; guardar cambios localmente.
 
+### Estudio
+- Practicar con metrónomo Web Audio, tempo independiente, cuenta previa, selección de rango y repetición.
+- Registrar avance por compases y aperturas de la vista de Estudio.
+- Crear notas por canción y adjuntar imágenes o PDF dentro de los límites de tamaño definidos por la aplicación.
 
-## Acceso por invitación — noviembre de 2026
+### Salas privadas
+- El director crea una sala e invita hasta 30 cuentas Google por correo.
+- El director comparte la partitura y controla el tramo, tempo y repetición.
+- Los invitados autorizados ven la sala y escuchan un metrónomo producido **en su propio dispositivo**; no se transmite audio en tiempo real desde un servidor.
+- Requiere conexión y reglas de Firestore compatibles. Esta función **no equivale a una sesión de audio de latencia cero** ni se considera validada hasta la prueba entre cuentas reales.
+- Para impedir el acceso de todos los participantes, el director puede cerrar la sala; la revocación individual de invitaciones no está implementada en las reglas actuales.
 
-- Administrador único de la aplicación: `ols.bds@gmail.com`. No otorga permisos IAM de la consola Firebase.
-- Login obligatorio con Google; los demás correos requieren un documento `authorizedEmails/{correo}` con `active: true`.
-- En Sincronización Google, el administrador dispone de «Administrar accesos»: solicitudes, autorización directa y revocación.
-- La solicitud se crea después del ingreso con Google y contiene nombre, correo verificado, motivo, estado y fecha del servidor. No se envían correos automáticos.
-- Las bibliotecas locales se separan por UID (`compases-v1:{uid}`). El material de prueba anterior queda intacto bajo su clave antigua y no se asigna automáticamente a ninguna cuenta.
-- El acceso sin conexión usa el registro de la última autorización en este navegador. No es una licencia antifraude ni cifra los datos locales; una revocación requiere reconexión. Las reglas siguen protegiendo los datos en Firestore.
-- La sincronización sigue siendo manual: Guardar copia en Google / Recuperar desde Google. Iniciar sesión no reemplaza silenciosamente una biblioteca local.
-- Cerrar sesión sin conexión deja pendiente cerrar también la sesión Firebase al reconectar.
-- El proveedor Google y los dominios deben estar habilitados en Firebase. Las reglas se publican separadamente de GitHub Pages.
+## Acceso, almacenamiento y respaldos
 
-### Validación de esta entrega
+1. Ingresar desde https://kernnel.app/ con Google. La cuenta administradora es `ols.bds@gmail.com`; las demás necesitan aprobación explícita.
+2. La biblioteca local se separa por UID. No existe un modo invitado anónimo.
+3. Canciones y repertorios se sincronizan automáticamente con Firestore después de aproximadamente 1,5 s de inactividad. Las notas y el progreso utilizan módulos adicionales de persistencia y sincronización.
+4. Sin conexión, la biblioteca ya autorizada puede usarse localmente; los datos pendientes se envían al reconectar. Las salas necesitan conexión.
+5. Ante ediciones simultáneas de canciones o repertorios, se conserva un duplicado de conflicto y existe un historial recuperable de hasta 20 versiones por elemento.
+6. La apariencia y la papelera permanecen locales. Los límites de Firestore, las cargas incompletas y el almacenamiento del navegador siguen siendo riesgos operativos.
 
-`node --test tests/access.test.cjs` verifica ocho escenarios de acceso con Firebase simulado. También se comprobó la sintaxis y el inicio real del SDK en navegador sin sesión. Falta la prueba integral autenticada con la cuenta administradora, una cuenta invitada y un iPad. No se han ejecutado pruebas de reglas en el emulador de Firestore.
+**Exportar periódicamente «Exportar todo (JSON)» y comprobar el archivo descargado.** Conservar otra copia fuera del dispositivo. No limpiar datos de Safari/Chrome ni del origen web como procedimiento de actualización.
 
-## Sincronización incremental (cambio preparado, 13/11/2026)
+## Seguridad y reglas
 
-Esta sección reemplaza las instrucciones históricas de transferencia manual una vez desplegado este cambio.
+Las reglas versionadas están en [firestore.rules](firestore.rules). **GitHub Pages no publica reglas a Firestore**. Antes de habilitar funciones nuevas en el proyecto real:
 
-- Canciones y repertorios se cargan al iniciar y se comparan con la última revisión conocida por el dispositivo.
-- Guardado automático después de 1,5 segundos sin edición; sólo se escriben los elementos modificados.
-- Los cambios simultáneos conservan la versión remota y una copia local marcada con sus fechas. Las copias de canciones pueden aparecer en «Canciones sin repertorio».
-- Historial de hasta 20 revisiones por elemento; recuperar crea una copia adicional, no destruye la actual.
-- Preferencias visuales y papelera siguen siendo locales. Los borrados de canciones/repertorios se propagan con una revisión eliminada y su historial.
-- El cierre intenta guardar localmente y muestra el aviso genérico del navegador si queda trabajo pendiente. Los móviles no garantizan ese aviso ni una subida durante el cierre.
-- Publicar `firestore.rules` antes del frontend: las rutas nuevas requieren permisos explícitos. El repositorio no despliega reglas automáticamente.
-- Especificación, migración y validación: `docs/sincronizacion-incremental.md`.
+1. Revisar `firestore.rules` en GitHub y la versión publicada en **Firebase Console → Firestore Database → Reglas**.
+2. Probar en un emulador o ambiente de pruebas: acceso solo al UID autorizado, denegación entre cuentas y restricciones de salas y adjuntos.
+3. Publicar expresamente las reglas compatibles en Firebase, sin reemplazarlas por reglas abiertas.
+4. Probar con dos usuarios y dos dispositivos: login, solicitud de acceso, revocación, notas, progreso, invitación a una sala y cierre.
+5. Revisar uso/cuotas de Firestore y la limpieza de fragmentos de versiones antiguas.
+
+La configuración pública de Firebase para aplicaciones web no es una clave privada de servicio. Nunca subir cuentas de servicio, tokens, archivos JSON de canciones reales o contraseñas a un repositorio público.
+
+## Pruebas y publicación
+
+Requiere Node.js. Desde la raíz:
+
+```sh
+node --test tests/*.test.cjs
+```
+
+GitHub Actions ejecuta estas pruebas y revisa sintaxis e integridad de rutas internas. Los tests con dobles de Firebase **no certifican las reglas reales**. El workflow también inspecciona el estado HTTP de los dominios, pero no modifica DNS ni Firestore.
+
+La aplicación y el manual son repositorios independientes. Fusionar cambios de aplicación **puede publicar la web** según cómo esté configurado GitHub Pages; requiere revisión previa.
+
+Consultar [validación anterior a la publicación](docs/validacion-prepublicacion.md) y [sincronización incremental](docs/sincronizacion-incremental.md).
+
+## Documentación oficial
+
+- [Firestore: reglas de seguridad](https://firebase.google.com/docs/firestore/security/get-started)
+- [Firebase Authentication](https://firebase.google.com/docs/auth)
+- [GitHub Pages](https://docs.github.com/en/pages)

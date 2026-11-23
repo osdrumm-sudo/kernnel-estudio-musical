@@ -12,8 +12,12 @@ function originForSongV2(songId){
   return chosen?.id||songRepertoiresV2(songId)[0]?.id||NO_REPERTOIRE_V2;
 }
 function setViewV2(view){
-  if(view!=='home'&&!current()){toast('Selecciona una canción para continuar.');return}
+  const song=current();
+  if(view!=='home'&&!song){toast('Selecciona una canción para continuar.');return}
+  const studySong=view==='study'?song.id:null;
+  const openingStudy=studySong!==null&&studySong!==ui.studyVisitSong;
   stopMetro();
+  ui.studyVisitSong=studySong;
   ui.view=view;
   ui.study=view==='study';
   ui.studyMenu=false;
@@ -22,6 +26,7 @@ function setViewV2(view){
   $('mobile-menu').setAttribute('aria-expanded','false');
   applyPrefs();
   renderAll();
+  if(openingStudy)window.KernnelStudyData.recordOpen(studySong);
   if(view==='study')manageWake();
   window.scrollTo({top:0,behavior:'auto'});
 }
@@ -62,13 +67,34 @@ function updateNavigationV2(){
     if(view!=='home')el.disabled=ui.view==='home'?!enabled:!current();
   });
 }
+function homeSongGroupsV2(){
+  const songs=new Map(D.temas.map(song=>[song.id,song]));
+  const assigned=new Set(D.repertorios.flatMap(repertoire=>repertoire.songs));
+  const groups=D.repertorios.map(repertoire=>({
+    id:repertoire.id,nombre:repertoire.nombre,syncConflict:repertoire.syncConflict,
+    songs:repertoire.songs.map(id=>songs.get(id)).filter(Boolean)
+  }));
+  groups.push({id:NO_REPERTOIRE_V2,nombre:'Canciones sin repertorio',songs:D.temas.filter(song=>!assigned.has(song.id))});
+  return groups;
+}
+function studyStatsTextV2(song){
+  const {opens,studied,percent}=window.KernnelStudyData.progress(song.id,activeStudyMeasureKeys(song));
+  const label=opens===1?'apertura en Estudio':'aperturas en Estudio';
+  return `${percent.toLocaleString('es-CL')} % estudiado (${studied}/${song.notas.length} compases) · ${opens} ${label}`;
+}
+function refreshHomeStudyStatsV2(event){
+  const id=event.detail?.songId;
+  const songs=new Map(D.temas.map(song=>[song.id,song]));
+  for(const label of document.querySelectorAll('.home-song-stats')){
+    const song=songs.get(label.dataset.studySong);
+    if(song&&(!id||id===song.id))label.textContent=studyStatsTextV2(song);
+  }
+}
 function renderHomeV2(){
   const container=$('home-repertories');
   if(!container)return;
   container.replaceChildren();
-  const unassigned=D.temas.filter(t=>!D.repertorios.some(r=>r.songs.includes(t.id)));
-  const groups=[...D.repertorios.map(r=>({id:r.id,nombre:r.nombre,syncConflict:r.syncConflict,songs:r.songs.map(id=>D.temas.find(t=>t.id===id)).filter(Boolean)})),{id:NO_REPERTOIRE_V2,nombre:'Canciones sin repertorio',songs:unassigned}];
-  groups.forEach(g=>{
+  homeSongGroupsV2().forEach(g=>{
     const open=ui.homeOpenReps.includes(g.id);
     const card=mk('section',{class:'home-rep-card'+(ui.createExpanded?' compact':'')+(open&&!ui.createExpanded?' is-open':'')});
     const heading=mk('button',{type:'button',class:'home-rep-heading','aria-expanded':String(open&&!ui.createExpanded),'aria-label':'Repertorio '+g.nombre+', '+g.songs.length+' canciones'});
@@ -87,7 +113,11 @@ function renderHomeV2(){
         const row=mk('div',{class:'home-song'+(ui.homeFocusSong===t.id?' last-song':'')});
         const study=button('Estudiar',()=>chooseSongV2(t.id,'study',g.id),'home-song-edit',{'aria-label':'Estudiar '+t.nombre});
         const edit=button('Editar',()=>chooseSongV2(t.id,'edit',g.id),'home-song-edit',{title:'Editar '+t.nombre,'aria-label':'Editar '+t.nombre});
-        row.append(mk('strong',{class:'home-song-name',text:t.nombre}),study,edit);if(t.syncConflict)row.append(mk('small',{class:'conflict-notice',text:conflictLabelV2(t)}));else if(modificationLabelV2(t,'temas'))row.append(mk('small',{class:'modification-date',text:modificationLabelV2(t,'temas')}));
+        row.append(
+          mk('strong',{class:'home-song-name',text:t.nombre}),study,edit,
+          mk('small',{class:'home-song-stats','data-study-song':t.id,text:studyStatsTextV2(t)})
+        );
+        if(t.syncConflict)row.append(mk('small',{class:'conflict-notice',text:conflictLabelV2(t)}));else if(modificationLabelV2(t,'temas'))row.append(mk('small',{class:'modification-date',text:modificationLabelV2(t,'temas')}));
         songs.append(row);
       });
       card.append(songs);
@@ -112,14 +142,33 @@ function renderCreateChoicesV2(){
   }
   $('create-reps-count').textContent=String(ui.createReps.length);
 }
-function addPendingRepertoireV2(){
-  const input=$('new-repertoire-title'),nombre=input.value.trim();
+function availableRepertoireNameV2(input){
+  const nombre=input.value.trim();
   if(!nombre){toast('Escribe el nombre del nuevo repertorio.');input.focus();return}
   if(nombre.length>120){toast('El nombre supera los 120 caracteres.');return}
   const norm=s=>s.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
   if([...D.repertorios,...ui.pendingReps].some(r=>norm(r.nombre)===norm(nombre))){
     toast('Ya existe un repertorio con ese nombre.');input.focus();return;
   }
+  return nombre;
+}
+function onCreateHomeRepertoireV2(event){
+  event.preventDefault();
+  if(!loadedStorage)return toast('Espera a que termine la carga de tus canciones.');
+  const input=$('home-repertoire-name'),nombre=availableRepertoireNameV2(input);
+  if(!nombre)return;
+  const repertoire={id:uniqueId('r'),nombre,songs:[]};
+  D.repertorios.push(repertoire);
+  ui.homeOpenReps.push(repertoire.id);
+  $('home-create-repertoire').open=false;
+  input.value='';
+  save();
+  renderV2();
+  toast('Repertorio creado.');
+}
+function addPendingRepertoireV2(){
+  const input=$('new-repertoire-title'),nombre=availableRepertoireNameV2(input);
+  if(!nombre)return;
   const rep={id:uniqueId('r'),nombre,songs:[]};
   ui.pendingReps.push(rep);
   ui.createReps.push(rep.id);
@@ -136,10 +185,12 @@ function onCreateSongV2(e){
   if(!name){toast('Escribe un título para la canción.');input.focus();return}
   if(!Number.isInteger(count)||count<1||count>256){toast('Elige entre 1 y 256 compases.');return}
   if(!METERS.includes(meter)){toast('La métrica indicada no está disponible.');return}
+  const bpm=$('song-new-bpm').valueAsNumber;
+  if(!Number.isInteger(bpm)||bpm<30||bpm>300){toast('Elige un BPM entre 30 y 300.');return}
   const ids=new Set(ui.createReps);
   // Una única transacción lógica: repertorios pendientes y canción se incorporan juntos.
   ui.pendingReps.filter(r=>ids.has(r.id)).forEach(r=>D.repertorios.push({id:r.id,nombre:r.nombre,syncConflict:r.syncConflict,songs:[]}));
-  const t=newSong(name,count,meter);
+  const t=newSong(name,count,meter,bpm);
   stopMetro();
   D.temas.push(t);
   D.repertorios.forEach(r=>{if(ids.has(r.id)&&!r.songs.includes(t.id))r.songs.push(t.id)});
@@ -166,6 +217,7 @@ function onCreateSongV2(e){
 function renderV2(){
   updateNavigationV2();
   renderHomeV2();
+  window.KernnelStudyNotes.render();
   renderCreateChoicesV2();
 }
 function openModeV2(view){
@@ -187,6 +239,7 @@ function openModeV2(view){
 }
 
 function initV2(){
+  window.addEventListener('kernnel-study-data-updated',refreshHomeStudyStatsV2);
   // La biblioteca inicia en Inicio, y el formulario de repertorios no guarda nada hasta crear canción.
   ui.view='home';
   ui.study=false;
