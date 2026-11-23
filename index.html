@@ -146,7 +146,7 @@
  <span role="img" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3z" fill="currentColor"/></svg></span>
  <span role="img" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12A8.5 8.5 0 0 1 8 19.5L3.5 21l1.4-4.5A8.5 8.5 0 1 1 20.5 12Z"/><path d="M9 8c-.8-.5-1.6.4-1.5 1.5.2 2.5 3.5 5.7 6 6 .9.1 1.8-.6 1.8-1.4l-2.2-1.2-.8 1a7.7 7.7 0 0 1-2.7-2.7l.8-.8Z" fill="currentColor" stroke="none"/></svg></span>
 </div></nav>
-<header class="top"><div class="brand"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Ocultar herramientas e instrucciones" aria-controls="sidebar" aria-expanded="true" title="Ocultar herramientas e instrucciones"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg><span>Herramientas e instrucciones</span><span class="sidebar-chevron" aria-hidden="true">⌄</span></button><div class="brandmark" id="app-logo-slot" aria-hidden="true" title="Espacio reservado para el logo definitivo">♫</div><div><h1>Kernnel Estudio musical</h1><small>Partituras · Metrónomo · Estudio</small></div></div><nav class="view-nav" aria-label="Navegación principal"><button id="nav-home" type="button" aria-current="page">⌂ Inicio</button><button id="nav-edit" type="button">✎ Edición</button><button id="nav-study" type="button">▶ Estudio</button></nav><div class="topright"><button id="profile-button" type="button" aria-haspopup="dialog" hidden>Elegir nombre</button><span class="pill" id="sync-indicator" role="status">Nube: esperando sesión</span><span class="pill" id="save-indicator" role="status">Cargando datos…</span><button id="toggle-study" class="primary" type="button">◫ Modo estudio</button></div></header>
+<header class="top"><div class="brand"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Ocultar herramientas e instrucciones" aria-controls="sidebar" aria-expanded="true" title="Ocultar herramientas e instrucciones"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg><span>Herramientas e instrucciones</span><span class="sidebar-chevron" aria-hidden="true">⌄</span></button><div class="brandmark" id="app-logo-slot" aria-hidden="true" title="Espacio reservado para el logo definitivo">♫</div><div><h1>Kernnel Estudio musical</h1><small>Partituras · Metrónomo · Estudio</small></div></div><nav class="view-nav" aria-label="Navegación principal"><button id="nav-home" type="button" aria-current="page">⌂ Inicio</button><button id="nav-edit" type="button">✎ Edición</button><button id="nav-study" type="button">▶ Estudio</button><button id="nav-repertoires" class="nav-repertoires" type="button" aria-haspopup="dialog" aria-controls="repertoire-picker" hidden>▤ Repertorios</button></nav><div class="topright"><button id="profile-button" type="button" aria-haspopup="dialog" hidden>Elegir nombre</button><span class="pill" id="sync-indicator" role="status">Nube: esperando sesión</span><span class="pill" id="save-indicator" role="status">Cargando datos…</span><button id="toggle-study" class="primary" type="button">◫ Modo estudio</button></div></header>
 <main class="shell">
 <aside class="sidebar" id="sidebar" aria-label="Menús de la aplicación">
  <div class="sidebar-head"><strong>Herramientas y ajustes</strong><small>Abre solo lo que necesites</small></div>
@@ -226,7 +226,8 @@
       <a href="https://github.com/osdrumm-sudo/kernnel-estudio-musical/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Historial de actualizaciones</a>
     </div>
   </details>
-  <div id="home-repertories" class="home-repertories" aria-label="Listado de repertorios"></div>
+  <form id="home-create-repertoire" class="home-repertoire-create"><label for="home-repertoire-name">Crear repertorio</label><div class="home-repertoire-form"><input id="home-repertoire-name" type="text" maxlength="120" required placeholder="Nombre del nuevo repertorio" autocomplete="off"><button type="submit" class="primary">＋ Crear repertorio</button></div></form>
+   <div id="home-repertories" class="home-repertories" aria-label="Listado de repertorios"></div>
   <details id="home-create" class="home-create"><summary>＋ Crear canción</summary><div class="home-create-body"><p>Crea un tema y asígnalo a los repertorios que necesites. También puedes crear uno nuevo desde aquí.</p><form id="create-song" class="stack"><label class="field">Título<input id="song-new-title" required maxlength="150" placeholder="Ej. Fortunate Son"></label><div class="grid2"><label class="field">Compases<input id="song-new-count" type="number" min="1" max="256" value="8" required></label><label class="field">Métrica<select id="song-new-meter"><option>4/4</option><option>2/4</option><option>3/4</option><option>6/8</option><option>9/8</option><option>12/8</option></select></label></div><div class="stack"><strong>Repertorios asociados</strong><small>Selecciona uno, varios o ninguno. Sin selección, se guardará en «Canciones sin repertorio».</small><div id="new-song-repertoires" class="repertoire-choices" aria-label="Repertorios disponibles"></div><div class="new-song-counter">Seleccionados: <strong id="create-reps-count">0</strong></div><button id="new-repertoire-toggle" type="button" aria-expanded="false" aria-controls="new-repertoire-inline">＋ Crear un repertorio nuevo</button><div id="new-repertoire-inline" class="new-repertoire-inline" hidden><label class="field">Nombre del nuevo repertorio<input id="new-repertoire-title" maxlength="120" placeholder="Ej. Ensayo acústico"></label><button id="new-repertoire-add" type="button">Agregar al formulario</button><small>El repertorio se guardará junto con la canción.</small></div></div><div class="new-song-actions"><button class="primary" type="submit">＋ Crear canción y abrir edición</button></div></form></div></details>
  </section>
  <div class="study-exits" aria-label="Salir del modo estudio"><button id="study-to-edit" type="button">✎ Modo edición</button><button id="study-to-repertoire" type="button">▤ Ir al repertorio</button></div>
@@ -285,6 +286,8 @@ function setting(t){if(!t.estudio||typeof t.estudio!=='object')t.estudio={};cons
  if(x.zoom!=='auto')x.zoom=Number.isFinite(Number(x.zoom))?bounded(x.zoom,.75,2.5,1):'auto';
  if(!Array.isArray(x.marcadores))x.marcadores=[];if(!Array.isArray(x.sesiones))x.sesiones=[];
  if(!['click','perc','mute'].includes(x.sound))x.sound='click';x.volume=bounded(x.volume,0,1,.55);
+ const totalBeats=Number(x.meter.split('/')[0])||4;
+ x.accents=Array.isArray(x.accents)?[...new Set(x.accents.map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=totalBeats))].sort((a,b)=>a-b):[1];
  if(![0,1,2,4].includes(x.count))x.count=1;if(typeof x.scroll!=='boolean')x.scroll=true;
  if(!x.last||typeof x.last!=='object')x.last={start:1,end:t.notas.length,loop:false};
  return x}
@@ -393,7 +396,7 @@ function renderEditActions(t=current()){
  const disabled=!loadedStorage||!editCheckpoint||editCheckpoint.saving;
  $('save-song-edits').disabled=$('cancel-song-edits').disabled=disabled;
 }
-function saveSongEdits(){
+function saveSongEdits(onComplete){
  const checkpoint=editCheckpoint,t=current();
  if(!checkpoint||checkpoint.saving||t?.id!==checkpoint.song.id)return;
  const song=clone(t),savedDeletions=[...checkpoint.deletedMeasures];
@@ -408,6 +411,7 @@ function saveSongEdits(){
   }
   renderEditActions();
   toast(saved?'Cambios guardados. Punto de retorno actualizado.':'No se pudo guardar el tema en este equipo.');
+  if(typeof onComplete==='function')onComplete(saved);
  });
 }
 function cancelSongEdits(){
@@ -501,7 +505,19 @@ function renderMetronome(){
  box.append(label('Sonido',sel([['click','Clic clásico'],['perc','Percusión'],['mute','Solo visual (silencio)']],x.sound,v=>{x.sound=v;save();renderAll()})));
  const vol=mk('input',{type:'range',min:0,max:100,step:1,value:Math.round(x.volume*100),on:{input:e=>{x.volume=Number(e.target.value)/100;saveSoon()}}});box.append(label('Volumen independiente',vol));
  box.append(label('Compases de preparación',sel([[0,'Sin preparación'],[1,'1 compás'],[2,'2 compases'],[4,'4 compases']],x.count,v=>{x.count=Number(v);save();renderAll()})));
- box.append(info('En 6/8, 9/8 y 12/8 el clic se produce en cada corchea. Solo el primer pulso del compás es acentuado.'));
+ box.append(title('Acentos del clic'));
+ box.append(info('Selecciona qué pulsos llevan acento. Puedes marcar varios o ninguno. Se guarda por canción.'));
+ const accentOptions=mk('div',{class:'accent-options',role:'group','aria-label':'Pulsos acentuados'});
+ for(let beat=1;beat<=beatsPerMeasure(x);beat++){
+  const accent=x.accents.includes(beat);
+  accentOptions.append(button(String(beat),()=>{
+   x.accents=x.accents.includes(beat)?x.accents.filter(n=>n!==beat):[...x.accents,beat].sort((a,b)=>a-b);
+   save();renderMetronome();renderTransport();
+  },'accent-beat-toggle'+(accent?' is-accented':''),{'aria-pressed':String(accent),'aria-label':'Acentuar pulso '+beat}));
+ }
+ box.append(accentOptions);
+ box.append(button('Acentuar solo el primer pulso',()=>{x.accents=[1];save();renderMetronome();renderTransport()},'tiny-control'));
+ box.append(info('En 6/8, 9/8 y 12/8 el clic se produce en cada corchea. Los acentos son configurables.'));
 }
 function changeBpm(delta){const t=current();if(!t)return;const x=setting(t);x.practiceBpm=bounded(x.practiceBpm+delta,30,300,x.practiceBpm);save();renderAll()}
 function renderPractice(){
@@ -563,6 +579,7 @@ function renderData(){
 function restoreTrash(item){
  if(item.type==='song'){
   const t=clone(item.value);if(D.temas.some(z=>z.id===t.id))t.id=uniqueId('t');D.temas.push(t);D.sel=t.id;
+  for(const r of D.repertorios)if((item.repertoireIds||[]).includes(r.id)&&!r.songs.includes(t.id))r.songs.push(t.id);
  }else if(item.type==='repertoire'){
   const r=clone(item.value);if(D.repertorios.some(z=>z.id===r.id))r.id=uniqueId('r');r.songs=r.songs.filter(id=>D.temas.some(t=>t.id===id));D.repertorios.push(r);
  }else if(item.type==='measure'){
@@ -665,7 +682,7 @@ function renderTransport(){
  $('play-button').disabled=!enabled||clock.starting;
  $('play-button').textContent=clock.starting?'Activando audio…':clock.paused?'▶ Reanudar':clock.playing?'Ⅱ Pausar':'▶ Reproducir';
  const el=$('beat-dots');el.replaceChildren();if(!x)return;
- const count=beatsPerMeasure(x);for(let i=0;i<count;i++)el.append(mk('span',{class:'beatdot'+(i===0?' accent':'')+(clock.visualBeat===i?' active':''),title:`Pulso ${i+1}`}));
+ const count=beatsPerMeasure(x);for(let i=0;i<count;i++)el.append(mk('span',{class:'beatdot'+(x.accents.includes(i+1)?' accent':'')+(clock.visualBeat===i?' active':''),title:`Pulso ${i+1}`}));
 }
 function visualUpdate(){
  const t=current();
@@ -759,7 +776,7 @@ function scheduleTick(){
    break;
   }
   const beat=phase==='count'?(x.count*count-c.countRemaining)%count:c.beat;
-  clickAudio(at,beat===0,x);
+  clickAudio(at,x.accents.includes(beat+1),x);
   const delay=Math.max(0,(at-currentTime)*1000);
   // Congelar el compás y el pulso de este clic antes de adelantar el planificador.
   const snapshot={measure:c.measure,countRemaining:c.countRemaining};
@@ -800,8 +817,7 @@ async function manageWake(){
  try{clock.wakeLock=await navigator.wakeLock.request('screen');clock.wakeLock.addEventListener('release',()=>{clock.wakeLock=null},{once:true})}catch(e){/* Algunos navegadores bloquean el permiso en archivos locales. */}
 }
 function toggleStudy(){if(ui.study)returnToRepertoireV2();else setViewV2('study')}
-function deleteSong(){const t=current();if(!t)return;if(!confirm(`¿Eliminar la canción «${t.nombre}»? Podrás restaurarla desde la papelera.`))return;
- stopMetro();D.papelera.push({id:uniqueId('trash'),type:'song',value:clone(t),at:Date.now()});D.temas=D.temas.filter(z=>z.id!==t.id);D.repertorios.forEach(r=>r.songs=r.songs.filter(id=>id!==t.id));D.sel=D.temas[0]?.id||null;initSelection();save();renderAll();toast('Canción movida a la papelera.')}
+function deleteSong(){deleteSongByIdV2(current()?.id)}
 function mergeTransfer(data){
  const imported=normalize(data);let count=0;
  const ids=new Map();for(const t of imported.temas){const copy=clone(t);const old=copy.id;copy.id=uniqueId('t');ids.set(old,copy.id);copy.nombre=D.temas.some(a=>a.nombre===copy.nombre)?copy.nombre+' (importada)':copy.nombre;D.temas.push(copy);count++}
@@ -840,14 +856,15 @@ function initEvents(){
  $('repertoire-filter').addEventListener('change',e=>{ui.rep=e.target.value;renderLibrary()});
  $('create-song').addEventListener('submit',onCreateSongV2);
  $('create-repertoire').addEventListener('submit',e=>{
-  e.preventDefault();const input=$('repertoire-name'),name=input.value.trim();if(!name)return;
-  const r={id:uniqueId('r'),nombre:name,songs:[]};D.repertorios.push(r);ui.rep=r.id;save();renderLibrary();input.value='';toast('Repertorio creado.')
+  e.preventDefault();
+  const input=$('repertoire-name');
+  if(createRepertoireV2(input.value))input.value='';
  });
- $('save-song-edits').addEventListener('click',saveSongEdits);
+ $('save-song-edits').addEventListener('click',()=>saveSongEdits());
  $('cancel-song-edits').addEventListener('click',cancelSongEdits);
  $('rename-song').addEventListener('click',()=>{const t=current();if(!t)return;const name=prompt('Nuevo título de la canción:',t.nombre);if(name===null)return;if(!name.trim())return toast('El título no puede estar vacío.');t.nombre=name.trim().slice(0,150);save();renderAll()});
  $('delete-song').addEventListener('click',deleteSong);
- $('exit-edit').addEventListener('click',returnToRepertoireV2);
+ $('exit-edit').addEventListener('click',()=>confirmLeaveEditV2(returnToRepertoireV2));
  $('play-button').addEventListener('click',startMetro);$('stop-button').addEventListener('click',stopMetro);
  $('jump-measure').addEventListener('click',()=>{
   const t=current();
@@ -1008,6 +1025,22 @@ window.KernnelBridge = Object.freeze({
  <h2 id="song-picker-title"></h2>
  <div id="song-picker-list" class="stack"></div>
  <form method="dialog" class="dialog-actions"><button>Cancelar</button></form>
+</dialog>
+<dialog id="repertoire-picker" aria-labelledby="repertoire-picker-title">
+ <h2 id="repertoire-picker-title">Seleccionar repertorio</h2>
+ <p>Elige un repertorio para volver a Inicio y ver sus canciones.</p>
+ <div id="repertoire-picker-list" class="repertoire-picker-list"></div>
+ <div class="dialog-actions"><button id="repertoire-picker-close" type="button">Cancelar</button></div>
+</dialog>
+<dialog id="leave-edit-dialog" aria-labelledby="leave-edit-title">
+ <h2 id="leave-edit-title">¿Guardar antes de salir de Edición?</h2>
+ <p>Elige si quieres conservar los cambios desde el último guardado manual antes de cambiar de pantalla.</p>
+ <p id="leave-edit-status" role="status" aria-live="polite"></p>
+ <div class="dialog-actions">
+  <button id="leave-edit-cancel" type="button">Cancelar</button>
+  <button id="leave-edit-discard" type="button">Salir sin guardar</button>
+  <button id="leave-edit-save" class="primary" type="button">Guardar y salir</button>
+ </div>
 </dialog>
 <dialog id="profile-dialog" aria-labelledby="profile-title">
  <form id="profile-form">

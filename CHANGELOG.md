@@ -2,6 +2,14 @@
 
 El contenido de esta página describe **funcionalidades publicadas en la rama `main`**. Las propuestas y prototipos experimentales se enumeran por separado y **no están activados** en la aplicación principal.
 
+## 23 de noviembre de 2026 · Repertorios, navegación y clic acentuado
+- Formulario **Crear repertorio** directamente en Inicio y panel lateral desplegado en esa pantalla; Edición y Estudio comienzan con las herramientas contraídas.
+- Nuevo acceso superior **Repertorios** en Edición y Estudio, con selector de listas y retorno al repertorio elegido.
+- Al abandonar Edición, aviso con tres opciones: Guardar y salir, Salir sin guardar, Cancelar.
+- Botón **Eliminar** en cada canción de un repertorio expandido; confirmación y recuperación desde la papelera, conservando referencias a sus repertorios.
+- Metrónomo con **acentos configurables por pulso** y guardados por canción, compatible con canciones ya existentes.
+- [Evaluación futura del reproductor musical](docs/propuesta-reproductor-musical-futuro.md), **sin implementación**.
+
 ## 23 de noviembre de 2026 · Mantenimiento y legibilidad
 - Nuevo panel desplegable «Novedades de la plataforma» en Inicio, con acceso al manual y a este historial.
 - Diferenciación cromática de los módulos de herramientas en temas claro y oscuro; se conserva el alto contraste.

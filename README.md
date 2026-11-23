@@ -9,12 +9,12 @@
 
 ## Funciones presentes en la rama oficial `main`
 
-- Inicio con repertorios, creación de canciones y acceso a Edición/Estudio.
+- Inicio con panel lateral desplegado, formulario independiente **Crear repertorio**, repertorios desplegables y opciones **Estudiar, Editar y Eliminar** por canción; la eliminación mueve la canción a papelera.
 - Canciones con estructura por compases, secciones, anotaciones y marcadores; guardado y respaldo JSON.
-- Metrónomo local, BPM original y de práctica, controles de reproducción y repetición de tramos.
+- Metrónomo local, BPM original y de práctica, **acentos elegibles por pulso y por canción**, controles de reproducción y repetición de tramos.
 - Acceso obligatorio con Google y usuarios autorizados por invitación (PR #7).
 - Sincronización incremental automática de canciones y repertorios, historial de hasta 20 revisiones por elemento y tratamiento de conflictos (PR #8).
-- Mejoras de navegación, reproducción, anotaciones gráficas y perfil (PR #10 y #11).
+- Mejoras de navegación, reproducción, anotaciones gráficas y perfil (PR #10 y #11). **Repertorios** en la navegación superior de Edición y Estudio: abre una lista y regresa al repertorio elegido. Al abandonar Edición, permite guardar, descartar o cancelar.
 - Temas claro, oscuro y automático; alto contraste; módulos con colores diferenciados; avisos de novedades.
 - Aplicación web instalable (PWA) y funcionamiento local sin conexión después de la primera carga y autorización compatibles.
 
@@ -24,8 +24,8 @@
 
 1. Abre https://kernnel.app/ y accede con una cuenta Google autorizada.
 2. En **Inicio**, crea o selecciona un repertorio y una canción.
-3. Utiliza **Edición** para organizar compases, secciones y anotaciones.
-4. En **Estudio**, ajusta el BPM de práctica y utiliza Reproducir, Detener, Ir a compás o Loop.
+3. Utiliza **Edición** para organizar compases, secciones y anotaciones. En Edición o Estudio pulsa **Repertorios** en el encabezado para escoger uno; desde Edición confirma si deseas guardar antes de salir.
+4. En **Estudio**, ajusta el BPM de práctica, selecciona los pulsos que deseas acentuar desde **Metrónomo y audio** y utiliza Reproducir, Detener, Ir a compás o Loop.
 5. En herramientas, utiliza **Respaldos y papelera** para exportar un JSON de seguridad. Guarda el archivo fuera del navegador.
 6. En **Sincronización Google**, comprueba el estado de los cambios: antes de cerrar o cambiar de equipo, espera la confirmación «Guardado en la nube», si hay Internet.
 
@@ -60,3 +60,7 @@ Los archivos de demostración publicados bajo `/demos/` no usan cuentas ni datos
 ## Estructura técnica
 
 Aplicación estática en HTML/CSS/JavaScript (incluye Web Audio y Service Worker), sincronización de datos por Firebase Authentication/Firestore y GitHub Pages para publicación. El manual público está en un repositorio independiente: `osdrumm-sudo/kernnel-guia-oficial`.
+
+## Estudio futuro (sin implementar)
+
+- [Propuesta de reproductor musical personal](docs/propuesta-reproductor-musical-futuro.md): archivos de audio aportados por cada usuario, reproducción y bucle A/B. Se evaluarán almacenamiento, permisos, cuotas y funcionamiento en iPad antes de programarlo. **La app actual no incluye este reproductor.**
