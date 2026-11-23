@@ -201,3 +201,7 @@ body.app.mq-amber #access-gate{z-index:999}
 :root[data-contrast="true"] body.app.mq-amber .mq-studio .mq-tab[aria-selected="true"]{color:var(--ink)!important;border-bottom-color:var(--active)}
 @media(max-width:1090px){.mq-open-settings{margin-left:auto}}
 @media(max-width:760px){.mq-open-settings{flex:1 0 100%;margin:2px 0 0;max-width:none;width:100%}}
+
+.mq-song-change{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.mq-song-change select{font-size:12px;max-width:190px;min-height:30px;padding:4px 6px;background:var(--panel);border-color:var(--border);color:var(--ink);border-radius:7px}
+@media(max-width:760px){.mq-song-change{gap:5px}.mq-song-change select{max-width:150px}}
