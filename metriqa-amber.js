@@ -179,7 +179,18 @@
     button.textContent=state.showScore?'Ocultar partitura completa':'Ver partitura completa';
     if(state.showScore)requestAnimationFrame(()=>document.querySelector('.scorebox')?.scrollIntoView({behavior:'smooth',block:'start'}));
   }
+  function openPracticeSettings(){
+    if(ui.view!=='study')return;
+    if(!ui.studyMenu)$a('study-settings-button')?.click();
+    ui.mobileMenu=true;
+    $a('sidebar')?.classList.add('show-mobile');
+    $a('mobile-menu')?.setAttribute('aria-expanded','true');
+    const metro=$a('menu-metronome');
+    if(metro)metro.open=true;
+    requestAnimationFrame(()=>metro?.scrollIntoView({block:'nearest',behavior:'smooth'}));
+  }
   $a('mq-style-toggle')?.addEventListener('click',()=>setEnabled(!state.enabled));
+  $a('mq-open-settings')?.addEventListener('click',openPracticeSettings);
   $a('mq-seek')?.addEventListener('change',event=>selectMeasure(event.target.value));
   $a('mq-show-score')?.addEventListener('click',toggleScore);
   $a('mq-add-note')?.addEventListener('click',editCurrentMeasure);
@@ -190,9 +201,7 @@
   document.querySelector('[data-rail-study]')?.addEventListener('click',()=>document.getElementById('nav-study')?.click());
   document.querySelector('[data-rail-settings]')?.addEventListener('click',()=>{
     if(ui.view==='study'){
-      $a('study-settings-button')?.click();
-      $a('menu-metronome').open=true;
-      document.getElementById('sidebar')?.scrollIntoView({block:'nearest',behavior:'smooth'});
+      openPracticeSettings();
     }else{
       const dialog=document.getElementById('accessibility-dialog');
       if(dialog&&!dialog.open)dialog.showModal();
