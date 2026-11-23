@@ -579,6 +579,7 @@ function renderData(){
 function restoreTrash(item){
  if(item.type==='song'){
   const t=clone(item.value);if(D.temas.some(z=>z.id===t.id))t.id=uniqueId('t');D.temas.push(t);D.sel=t.id;
+  for(const r of D.repertorios)if((item.repertoireIds||[]).includes(r.id)&&!r.songs.includes(t.id))r.songs.push(t.id);
  }else if(item.type==='repertoire'){
   const r=clone(item.value);if(D.repertorios.some(z=>z.id===r.id))r.id=uniqueId('r');r.songs=r.songs.filter(id=>D.temas.some(t=>t.id===id));D.repertorios.push(r);
  }else if(item.type==='measure'){
@@ -855,14 +856,15 @@ function initEvents(){
  $('repertoire-filter').addEventListener('change',e=>{ui.rep=e.target.value;renderLibrary()});
  $('create-song').addEventListener('submit',onCreateSongV2);
  $('create-repertoire').addEventListener('submit',e=>{
-  e.preventDefault();const input=$('repertoire-name'),name=input.value.trim();if(!name)return;
-  const r={id:uniqueId('r'),nombre:name,songs:[]};D.repertorios.push(r);ui.rep=r.id;save();renderLibrary();input.value='';toast('Repertorio creado.')
+  e.preventDefault();
+  const input=$('repertoire-name');
+  if(createRepertoireV2(input.value))input.value='';
  });
- $('save-song-edits').addEventListener('click',saveSongEdits);
+ $('save-song-edits').addEventListener('click',()=>saveSongEdits());
  $('cancel-song-edits').addEventListener('click',cancelSongEdits);
  $('rename-song').addEventListener('click',()=>{const t=current();if(!t)return;const name=prompt('Nuevo título de la canción:',t.nombre);if(name===null)return;if(!name.trim())return toast('El título no puede estar vacío.');t.nombre=name.trim().slice(0,150);save();renderAll()});
  $('delete-song').addEventListener('click',deleteSong);
- $('exit-edit').addEventListener('click',returnToRepertoireV2);
+ $('exit-edit').addEventListener('click',()=>confirmLeaveEditV2(returnToRepertoireV2));
  $('play-button').addEventListener('click',startMetro);$('stop-button').addEventListener('click',stopMetro);
  $('jump-measure').addEventListener('click',()=>{
   const t=current();
