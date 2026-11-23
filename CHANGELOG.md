@@ -2,6 +2,14 @@
 
 El contenido de esta página describe **funcionalidades publicadas en la rama `main`**. Las propuestas y prototipos experimentales se enumeran por separado y **no están activados** en la aplicación principal.
 
+## 23 de noviembre de 2026 · Vista Full, propuesta 4 (grafito y ámbar)
+- Nueva interfaz de Estudio de bajo contraste, basada en la paleta 4 aprobada, con opción **Vista clásica** para alternar sin cambiar canciones.
+- Secciones reales navegables, vista de posición por compases, selección de canción, indicadores de pulso y acento.
+- Comentarios/notas por compás, imágenes de extractos adjuntas y apertura de la partitura completa existente.
+- Acceso visible a Metrónomo y audio en escritorio y móvil, sin activar el reproductor de audio futuro.
+- Preferencia visual guardada localmente; sin cambios en Firebase, modelo de canciones ni derechos de acceso.
+- [Pruebas y limitaciones de la propuesta](docs/propuesta-4-ambar-prueba.md).
+
 ## 23 de noviembre de 2026 · Repertorios, navegación y clic acentuado
 - Formulario **Crear repertorio** directamente en Inicio y panel lateral desplegado en esa pantalla; Edición y Estudio comienzan con las herramientas contraídas.
 - Nuevo acceso superior **Repertorios** en Edición y Estudio, con selector de listas y retorno al repertorio elegido.

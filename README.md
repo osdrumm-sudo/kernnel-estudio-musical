@@ -4,6 +4,7 @@
 
 - **Aplicación:** https://kernnel.app/
 - **Manual público:** https://manual.kernnel.app/#manual
+- **Prueba gráfica Full · propuesta 4:** [Instrucciones y funciones](docs/propuesta-4-ambar-prueba.md)
 - **Novedades verificables en GitHub:** [CHANGELOG.md](CHANGELOG.md)
 - **Protocolo de validación:** [docs/validacion-prepublicacion.md](docs/validacion-prepublicacion.md)
 
@@ -64,3 +65,7 @@ Aplicación estática en HTML/CSS/JavaScript (incluye Web Audio y Service Worker
 ## Estudio futuro (sin implementar)
 
 - [Propuesta de reproductor musical personal](docs/propuesta-reproductor-musical-futuro.md): archivos de audio aportados por cada usuario, reproducción y bucle A/B. Se evaluarán almacenamiento, permisos, cuotas y funcionamiento en iPad antes de programarlo. **La app actual no incluye este reproductor.**
+
+## Vista Full ámbar — propuesta gráfica 4
+
+Estilo grafito cálido y ámbar, reversible mediante **Vista clásica**, con pantalla de Estudio que reutiliza datos reales: estructura del tema, salto entre compases, metrónomo y acentos, notas, imágenes adjuntas y regreso a Edición. La barra de posición expresa **compases**, no reproducción de audio grabado. El sistema de suscripciones y el futuro límite Free (2 repertorios y 4 canciones por repertorio) **no están implementados**.

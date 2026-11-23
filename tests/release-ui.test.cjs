@@ -31,5 +31,5 @@ test('colores por módulo respetan los modos oscuro y alto contraste', () => {
 });
 
 test('la PWA incrementa versión de recursos tras cambios visuales', () => {
-  assert.match(file('sw.js'), /kernnel-shell-2026-11-23-repertoires-accent-v1/);
+  assert.match(file('sw.js'), /kernnel-shell-2026-11-23-full-ambar-preview-v1/);
 });

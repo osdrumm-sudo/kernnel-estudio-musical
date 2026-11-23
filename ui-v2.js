@@ -156,6 +156,12 @@ function updateNavigationV2(){
   document.body.classList.toggle('edit',ui.view==='edit');
   document.body.classList.toggle('study',ui.view==='study');
   $('nav-repertoires').hidden=ui.view==='home';
+  document.querySelectorAll('.design-rail [data-rail-view],.design-rail [data-rail-library],.design-rail [data-rail-edit],.design-rail [data-rail-study]').forEach(button=>{
+    const view=button.hasAttribute('data-rail-edit')?'edit':button.hasAttribute('data-rail-study')?'study':'home';
+    const active=ui.view===view&&!button.hasAttribute('data-rail-library');
+    button.classList.toggle('is-current',active);
+    if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+  });
   const enabled=D.temas.length>0;
   [['home','nav-home'],['edit','nav-edit'],['study','nav-study']].forEach(([view,id])=>{
     const el=$(id);
@@ -272,6 +278,7 @@ function renderV2(){
   updateNavigationV2();
   renderHomeV2();
   renderCreateChoicesV2();
+  window.renderStudioAmber?.();
 }
 function openModeV2(view){
   if(ui.view!=='home'){
