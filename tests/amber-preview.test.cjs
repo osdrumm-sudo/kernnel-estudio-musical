@@ -36,7 +36,7 @@ class FakeElement{
   scrollIntoView(){}
 }
 function harness(){
-  const ids=['mq-style-toggle','mq-song-name','mq-song-details','mq-section-name','mq-section-range','mq-meter','mq-section-buttons','mq-measure-strip','mq-attachments','mq-note-list','mq-measure-num','mq-measure-total','mq-beat-number','mq-position-label','mq-seek','mq-pulse-dots','mq-show-score','mq-image-dialog','mq-image-full','mq-image-title','mq-image-close','mq-add-note','mq-open-settings','nav-edit','sidebar','mobile-menu','menu-metronome','study-settings-button','accessibility-dialog'];
+  const ids=['mq-style-toggle','mq-song-name','mq-song-details','mq-song-select','mq-section-name','mq-section-range','mq-meter','mq-section-buttons','mq-measure-strip','mq-attachments','mq-note-list','mq-measure-num','mq-measure-total','mq-beat-number','mq-position-label','mq-seek','mq-pulse-dots','mq-show-score','mq-image-dialog','mq-image-full','mq-image-title','mq-image-close','mq-add-note','mq-open-settings','nav-edit','sidebar','mobile-menu','menu-metronome','study-settings-button','accessibility-dialog'];
   const nodes=Object.fromEntries(ids.map(id=>[id,new FakeElement()]));
   const tabs=['comments','notes'].map(tab=>{const el=new FakeElement('button');el.dataset.tab=tab;return el});
   const rails=['[data-rail-edit]','[data-rail-study]','[data-rail-settings]'].map(key=>[key,new FakeElement('button')]);
@@ -56,13 +56,13 @@ function harness(){
    estudio:{meter:'4/4',practiceBpm:112,accents:[1,3]}};
   const data={temas:[song],sel:'one'};
   const window={};
-  const local=new Map();
+  const local=new Map(),chosen=[];
   const context={document,window,localStorage:{getItem:k=>local.get(k)??null,setItem:(k,v)=>local.set(k,v)},requestAnimationFrame:fn=>fn(),
-    ui:state.ui,clock:state.clock,current:()=>data.temas.find(t=>t.id===data.sel),
+    D:data,ui:state.ui,clock:state.clock,current:()=>data.temas.find(t=>t.id===data.sel),
     setting:t=>t.estudio,beatsPerMeasure:x=>Number(x.meter.split('/')[0]),
-    goToMeasure:n=>{state.clock.visualMeasure=n;window.updateStudioAmber?.()}};
+    goToMeasure:n=>{state.clock.visualMeasure=n;window.updateStudioAmber?.()},chooseSongV2:(id,view)=>chosen.push({id,view})};
   vm.runInNewContext(js,context,{filename:'metriqa-amber.js'});
-  return {nodes,tabs,context,window,state,document,song,local};
+  return {nodes,tabs,context,window,state,document,song,local,chosen};
 }
 
 test('vista alternativa conserva acceso a diseño clásico y CSS válido',()=>{
@@ -77,6 +77,7 @@ test('vista alternativa conserva acceso a diseño clásico y CSS válido',()=>{
 test('renderiza estructura, canción, compases y posición reales',()=>{
   const h=harness();
   assert.equal(h.nodes['mq-song-name'].textContent,'Tema de prueba');
+  assert.equal(h.nodes['mq-song-select'].children.length,1);
   assert.equal(h.nodes['mq-section-buttons'].children.length,2);
   assert.equal(h.nodes['mq-measure-strip'].children.length,4);
   assert.equal(h.nodes['mq-seek'].max,'4');
@@ -122,4 +123,10 @@ test('ajustes del metrónomo son alcanzables desde la nueva vista',()=>{
   assert.equal(opened,1);
   assert.equal(h.nodes['menu-metronome'].open,true);
   assert.equal(h.state.ui.mobileMenu,true);
+});
+
+test('el selector permite escoger una canción para estudiar',()=>{
+  const h=harness();
+  h.nodes['mq-song-select'].fire('change','one');
+  assert.deepEqual(h.chosen,[{id:'one',view:'study'}]);
 });
