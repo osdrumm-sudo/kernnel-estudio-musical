@@ -1094,8 +1094,11 @@ window.KernnelBridge = Object.freeze({
 <script>
 initEvents();manageWake();
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',updateThemeColor);
-document.querySelector('[data-rail-view]').addEventListener('click',()=>setViewV2('home'));
-document.querySelector('[data-rail-library]').addEventListener('click',()=>{setViewV2('home');document.querySelector('.home-intro').scrollIntoView({block:'start'})});
+document.querySelector('[data-rail-view]').addEventListener('click',()=>$('nav-home').click());
+document.querySelector('[data-rail-library]').addEventListener('click',()=>confirmLeaveEditV2(()=>{
+  setViewV2('home');
+  document.querySelector('.home-intro')?.scrollIntoView({block:'start'});
+}));
 /* Instalación de recursos para funcionar sin red después de la primera carga. */
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
   window.addEventListener('load', () => {
