@@ -111,7 +111,7 @@ test('restaurar una canción de papelera recupera sus repertorios originales',()
   assert.ok(script);
   const runtime=new Function('window','document','localStorage','indexedDB',script[1]+[
     'save=()=>{}; initSelection=()=>{}; renderAll=()=>{}; toast=()=>{};',
-    'return {restoreTrash,setData:data=>D=data};'
+    'return {restoreTrash,setData:data=>D=data,getData:()=>D};'
   ].join('\n'))({}, {}, {}, {});
   const item={id:'trash-demo',type:'song',value:{id:'s1',nombre:'Mi tema',notas:['Intro'],estudio:{meter:'4/4',bpm:100}},repertoireIds:['r1','r2']};
   const data={temas:[],sel:null,papelera:[item],repertorios:[
@@ -120,6 +120,6 @@ test('restaurar una canción de papelera recupera sus repertorios originales',()
   runtime.setData(data);
   runtime.restoreTrash(item);
   assert.equal(data.temas.length,1);
-  assert.equal(data.papelera.length,0);
+  assert.equal(runtime.getData().papelera.length,0);
   assert.deepEqual(data.repertorios.map(r=>r.songs),[['s1'],['s1']]);
 });
