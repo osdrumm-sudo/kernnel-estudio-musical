@@ -89,8 +89,9 @@ test('navegar a una sección cambia compás, sección y contenido',()=>{
   h.nodes['mq-section-buttons'].children[1].click();
   assert.equal(h.nodes['mq-measure-num'].textContent,'3');
   assert.equal(h.nodes['mq-section-name'].textContent,'Coro');
-  assert.equal(h.nodes['mq-note-list'].children.length,1);
+  assert.equal(h.nodes['mq-note-list'].children.length,2);
   assert.equal(h.nodes['mq-note-list'].children[0].children[1].textContent,'Acentuar el 3');
+  assert.equal(h.nodes['mq-note-list'].children[1].children[1].textContent,'Crescendo');
 });
 test('seguimiento visual identifica pulsos y acentos configurados',()=>{
   const h=harness();
