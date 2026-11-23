@@ -211,6 +211,21 @@
 <section class="work" aria-label="Área principal de Kernnel">
  <section id="kernnel-home" class="home-screen" aria-label="Inicio, repertorios y creación de canciones">
   <div class="home-intro"><div><h2>Mis repertorios</h2><p>Organiza tus canciones y prepara tu próxima práctica.</p></div><span class="pill">Kernnel · Inicio</span></div>
+  <details class="home-whats-new" id="home-whats-new">
+    <summary><span class="update-icon" aria-hidden="true">✦</span><span class="update-title"><strong>Novedades de la plataforma</strong><small>Mejoras de uso, respaldo y mantenimiento</small></span><time class="update-date" datetime="2026-11-23">23 nov 2026</time></summary>
+    <div class="update-body">
+      <p>Seguimos mejorando Kernnel / Metriqa sin alterar tus canciones.</p>
+      <ul>
+        <li>Acceso mediante Google y autorización por invitación.</li>
+        <li>Sincronización automática de canciones y repertorios, con historial de versiones.</li>
+        <li>Mejoras de navegación, edición, reproducción y perfil.</li>
+        <li>Colores diferenciados por módulo, mayor legibilidad y nuevas comprobaciones automáticas de respaldo.</li>
+      </ul>
+      <a href="https://manual.kernnel.app/#manual" target="_blank" rel="noopener noreferrer">Consultar manual</a>
+      <span aria-hidden="true"> · </span>
+      <a href="https://github.com/osdrumm-sudo/kernnel-estudio-musical/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Historial de actualizaciones</a>
+    </div>
+  </details>
   <div id="home-repertories" class="home-repertories" aria-label="Listado de repertorios"></div>
   <details id="home-create" class="home-create"><summary>＋ Crear canción</summary><div class="home-create-body"><p>Crea un tema y asígnalo a los repertorios que necesites. También puedes crear uno nuevo desde aquí.</p><form id="create-song" class="stack"><label class="field">Título<input id="song-new-title" required maxlength="150" placeholder="Ej. Fortunate Son"></label><div class="grid2"><label class="field">Compases<input id="song-new-count" type="number" min="1" max="256" value="8" required></label><label class="field">Métrica<select id="song-new-meter"><option>4/4</option><option>2/4</option><option>3/4</option><option>6/8</option><option>9/8</option><option>12/8</option></select></label></div><div class="stack"><strong>Repertorios asociados</strong><small>Selecciona uno, varios o ninguno. Sin selección, se guardará en «Canciones sin repertorio».</small><div id="new-song-repertoires" class="repertoire-choices" aria-label="Repertorios disponibles"></div><div class="new-song-counter">Seleccionados: <strong id="create-reps-count">0</strong></div><button id="new-repertoire-toggle" type="button" aria-expanded="false" aria-controls="new-repertoire-inline">＋ Crear un repertorio nuevo</button><div id="new-repertoire-inline" class="new-repertoire-inline" hidden><label class="field">Nombre del nuevo repertorio<input id="new-repertoire-title" maxlength="120" placeholder="Ej. Ensayo acústico"></label><button id="new-repertoire-add" type="button">Agregar al formulario</button><small>El repertorio se guardará junto con la canción.</small></div></div><div class="new-song-actions"><button class="primary" type="submit">＋ Crear canción y abrir edición</button></div></form></div></details>
  </section>
