@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="es-CL"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#091722"><title>Metriqa · Timeline · Demo funcional</title>
+<style>
+:root{color-scheme:dark;--bg:#091722;--sidebar:#0c1e2a;--panel:#142a39;--panel2:#1c3344;--line:#315267;--muted:#9fbdca;--ink:#f1fcff;--accent:#31ddc3;--teal:#056f67;--blue:#4ab9e8;--purple:#a677cf;--green:#64d4a8;--amber:#e5b95f;--red:#ed8c96}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;color:var(--ink);border:1px solid var(--line);background:#213849;border-radius:10px;padding:10px 14px}button:hover{border-color:#40cfba;background:#29485c}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}button:disabled{opacity:.45;cursor:not-allowed}.btn-primary{background:var(--accent);color:#06252d;border-color:transparent;font-weight:800}.btn-primary:hover{background:#6cf4d5}.btn-icon{display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn-ghost{background:transparent}.btn-sm{font-size:12px;padding:7px 10px}.active-btn{border-color:var(--accent);background:rgba(49,221,195,.15);color:#8cf4e0}h1,h2,h3,p{margin:0}h1{font-size:28px}h2{font-size:21px}h3{font-size:16px}.muted{color:var(--muted)}small{font-size:12px}.app{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:100vh}.sidebar{background:linear-gradient(165deg,#0b1d2a,#101f32);border-right:1px solid var(--line);padding:26px 15px;display:flex;flex-direction:column;gap:6px}.logo{font-weight:900;letter-spacing:1.3px;font-size:23px;margin:0 5px 34px}.logo::first-letter{color:var(--accent)}.nav{display:flex;align-items:center;gap:11px;text-align:left;padding:12px 13px;border:none;background:transparent;color:#bed2df;border-radius:9px;font-size:14px}.nav.sel{background:linear-gradient(90deg,#007b70,#0a5255);color:#fff;font-weight:700}.nav:not(.sel){cursor:default}.sidebar-foot{margin-top:auto;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding:16px 8px}.main{min-width:0;padding:23px clamp(14px,2.5vw,38px) 28px;display:flex;flex-direction:column;gap:18px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px}.title-wrap{display:flex;align-items:center;gap:12px}.chip{border-radius:100px;border:1px solid #3d877f;background:#16433f;padding:5px 11px;color:#70eacb;font-size:12px;font-weight:700}.card{background:linear-gradient(160deg,#172b3b,#122536);border:1px solid #2b4960;border-radius:17px;padding:18px;box-shadow:0 12px 30px #0000001a}.card-lite{background:#1a3040;border:1px solid #3a5c71;border-radius:12px;padding:12px}.control-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#1a303e;border:1px solid #365364;padding:13px 16px;border-radius:16px;flex-wrap:wrap}.transport{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.beat-leds{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.led{height:21px;width:21px;border-radius:50%;background:#375467;border:1px solid #4d6f82;transition:transform .08s,box-shadow .08s,background .08s}.led.accent{border-color:#1c8b86}.led.on{background:var(--accent);box-shadow:0 0 15px #45ffd3;transform:scale(1.12)}.led.on:not(.accent){background:#75baed;box-shadow:0 0 12px #4aa8e5}.pill{border-radius:9px;background:#244456;color:#b8dbdd;padding:6px 10px;font-size:12px;font-weight:700}.stat{font-variant-numeric:tabular-nums}.message{font-size:12px;color:#acd2d7;min-height:18px}.section-label{font-size:12px;color:#a8bdcb;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:8px}.toolbar .now{display:flex;flex-direction:column}.toolbar .now strong{font-size:18px}.responsive-label{display:none}.screen-note{font-size:12px;color:#a7c5cf;margin-top:-8px}.control-field{display:flex;align-items:center;gap:7px;color:#bbd0d7;font-size:13px}.control-field input{width:75px;background:#122939;border:1px solid #44718a;color:#fff;border-radius:9px;padding:8px}.control-field select{background:#122939;border:1px solid #44718a;color:#fff;border-radius:9px;padding:8px}.mini-legend{font-size:12px;color:var(--muted)}@media(max-width:900px){.app{grid-template-columns:66px minmax(0,1fr)}.sidebar{padding:20px 8px;align-items:center}.logo{font-size:12px;writing-mode:vertical-rl;letter-spacing:0;max-height:80px;margin:0 0 24px}.nav{width:46px;justify-content:center;font-size:20px}.nav span:last-child,.sidebar-foot{display:none}.main{padding:15px}.topbar h1{font-size:21px}}@media(max-width:610px){.app{display:block}.sidebar{height:52px;padding:8px 12px;flex-direction:row;justify-content:space-between;border-right:0;border-bottom:1px solid var(--line)}.logo{font-size:16px;writing-mode:horizontal-tb;margin:0}.sidebar .nav{display:none}.main{padding:13px;gap:13px}.topbar{align-items:flex-start}.topbar h1{font-size:18px}.chip{font-size:10px}.card{padding:13px}.transport button{padding:9px 12px}.toolbar{padding:12px}.led{height:17px;width:17px}.responsive-label{display:block}}
+
+.timeline{overflow-x:auto;border:1px solid #365366;border-radius:13px;background:#102532}.timeline-inner{min-width:840px;padding:14px}.timeline-head,.timeline-row{display:grid;grid-template-columns:125px minmax(0,1fr);gap:9px;align-items:stretch}.timeline-head{margin-bottom:8px}.timeline-row{margin-bottom:7px}.row-name{display:flex;gap:6px;align-items:center;padding:9px;background:#1a3445;border:1px solid #31516a;border-radius:8px;font-weight:700;font-size:12px}.ruler,.cells,.section-header{display:grid;grid-template-columns:repeat(16,minmax(0,1fr));gap:3px}.section-header{margin-bottom:11px}.section-block{border-radius:7px;padding:10px 4px;text-align:center;font-size:13px;font-weight:800}.section-block span{display:block;font-size:11px;font-weight:500;margin-top:2px}.section-block.purple{background:#6b458d}.section-block.green{background:#178067}.section-block.amber{background:#93733c}.section-block.blue{background:#3d5eaa}.ruler button{background:none;border:0;border-radius:4px;padding:4px 1px;color:#acc9d7;font-size:12px}.ruler button.current{background:#0b837a;color:#fff}.timeline-cell{height:52px;display:flex;justify-content:center;align-items:center;border:1px solid #567283;border-radius:6px;background:#21394b;position:relative;padding:2px;min-width:0;overflow:hidden}.timeline-cell::before{content:'';position:absolute;inset:0;opacity:.32;background:var(--clip)}.timeline-cell.picked{border:2px solid var(--accent)}.timeline-cell.playhead{box-shadow:inset 0 0 0 2px #57ddca,0 0 7px #30ccb13d}.timeline-cell span{z-index:1;color:#dcf5f9;font-size:11px;font-weight:750;pointer-events:none;text-shadow:0 1px 3px #000}.timeline-cell .signal{position:absolute;inset:12px 4px;display:flex;align-items:center;justify-content:space-between;gap:2px;opacity:.5}.signal i{width:2px;flex:1;max-width:3px;background:#d5f4fa;border-radius:3px}.top-controls{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.inspector{display:grid;grid-template-columns:minmax(0,1fr) 1.2fr;gap:18px}.beat-guide{display:flex;flex-direction:column;gap:10px;justify-content:center}.big-position{font-size:30px;font-weight:900}.editor-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.editor-fields label{font-size:12px;color:#a9c7d2;display:flex;flex-direction:column;gap:6px}.editor-fields input,.editor-fields select{width:100%;min-width:0;border:1px solid #466c85;border-radius:9px;background:#0b2433;color:#fff;padding:10px 7px}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.feedback{padding:8px 11px;border:1px solid #467367;border-radius:8px;background:#173e40;color:#abe9d4;font-size:12px;min-height:35px}.legend{display:flex;align-items:center;gap:8px;font-size:12px;color:#bed2dd}.legend b{height:9px;width:9px;background:var(--accent);border-radius:50%}.top-links{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.select-help{font-size:12px;color:#acc9ce}.track-switch{margin:0 0 13px;display:flex;flex-wrap:wrap;gap:7px}.track-switch button{padding:7px 10px;font-size:12px}.user-guide{margin-top:4px;font-size:12px;color:#b0c9d1}.status-area{display:flex;align-items:center;gap:9px}.meter-stat{background:#253f50;border:1px solid #46667a;padding:7px 12px;border-radius:10px}.editor-heading{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}.time-unit{font-size:12px;color:#b6d2d9}.timeline-cell:hover{border-color:#8fe6d5}.track-message{font-size:12px;color:#a1c7d5;margin-top:8px}@media(max-width:1140px){.inspector{grid-template-columns:1fr}.editor-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:610px){.timeline-inner{min-width:800px;padding:8px}.editor-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.timeline-inner .row-name{font-size:11px}.toolbar .meter-stat{display:none}}
+</style></head>
+<body><div class="app"><aside class="sidebar" aria-label="Menú simulado"><div class="logo">〽 METRIQA</div><div class="nav"><span>⌂</span><span> Inicio</span></div><div class="nav sel"><span>♬</span><span> Edición</span></div><div class="nav"><span>♫</span><span> Estudio</span></div><div class="nav"><span>♧</span><span> Salas</span></div><div class="sidebar-foot">PROTOTIPO LOCAL<br>Guardado en este navegador</div></aside>
+<main class="main">
+  <div class="topbar"><div><h1>Metriqa Timeline</h1><p class="muted">Tema de ejemplo · Editor rítmico y práctica</p></div><div class="chip">DEMO FUNCIONAL · OPCIÓN 4</div></div>
+  <section class="card" aria-label="Línea temporal"><div class="top-controls"><div><div class="section-label">Estructura del tema</div><h2>Compases 1–16</h2></div><div class="top-links"><span class="pill">Haz clic en un compás</span><button type="button" id="reset" class="btn-sm btn-ghost">↺ Restablecer demo</button></div></div>
+    <div class="timeline" id="timeline"><div class="timeline-inner"><div class="timeline-head"><div class="row-name">Secciones</div><div id="section-header" class="section-header" style="margin:0"></div></div><div class="timeline-head"><div class="row-name">Compases</div><div id="ruler" class="ruler"></div></div><div id="track-rows"></div></div></div>
+    <p class="track-message" id="track-message">Cada línea es ilustrativa. El audio de esta demo es únicamente el metrónomo.</p>
+  </section>
+  <section class="card" aria-label="Editor del compás seleccionado">
+    <div class="editor-heading"><div><div class="section-label">Inspector de compás</div><h2 id="inspector-title">Compás 1 · 4/4</h2></div><div class="chip" id="section-chip">Intro</div></div>
+    <div class="inspector"><div class="beat-guide"><div><strong class="big-position stat" id="big-position">4/4</strong><span class="time-unit" id="unit-caption"> · pulso de negra</span></div><div class="beat-leds" id="beat-leds"></div><div class="mini-legend" id="group-display">Acentos: 1 + 1 + 1 + 1</div><div class="legend"><b></b><span>Verde = pulso acentuado / activo</span></div><div class="select-help">El metrónomo recorre las modificaciones guardadas y adapta su pulso en cada compás.</div></div>
+      <form id="edit-form"><div class="editor-fields"><label>Cifra indicadora<select id="meter"><option>4/4</option><option>3/4</option><option>5/4</option><option>7/8</option><option>6/8</option><option>9/8</option><option>12/8</option></select></label><label>BPM<input id="bpm" type="number" min="35" max="260" value="110" required></label><label>Unidad de pulso<select id="unit"><option value="quarter">Negra</option><option value="eighth">Corchea</option><option value="dotted-quarter">Negra con puntillo</option></select></label><label>Agrupación<input id="group" type="text" value="1+1+1+1" aria-describedby="group-hint"></label></div><div class="buttons"><button class="btn-primary" type="submit">Guardar compás</button><button id="apply-section" type="button">Aplicar a sección (4 compases)</button></div><p class="user-guide" id="group-hint">Ejemplo: 7/8 → 2+2+3. La suma debe coincidir con el numerador.</p></form></div>
+    <div style="margin-top:12px" role="status" id="feedback" class="feedback">Selecciona un compás, modifica sus valores y presiona Guardar compás.</div>
+  </section>
+  <div class="toolbar"><div class="now"><strong id="now">Intro · Compás 1</strong><small class="muted">Metrónomo con métricas variables</small></div><div class="transport"><button id="back" title="Inicio" aria-label="Ir al comienzo" type="button">|◀</button><button id="play" class="btn-primary" type="button">▶ Reproducir</button><button id="pause" disabled type="button">Ⅱ Pausar</button><button id="stop" type="button">■ Detener</button><button id="loop" type="button" aria-pressed="false">↻ Repetir sección: no</button></div><div class="status-area"><div class="meter-stat stat" id="now-tempo">110 BPM · 4/4</div><div class="pill" id="status" role="status">Listo</div></div></div>
+  <p class="screen-note">Demo autónoma con Web Audio y persistencia local. El dibujo de pistas es ilustrativo: no reproduce instrumentos ni interpreta partituras reales. Tecla Espacio: reproducir/pausar; Esc: detener.</p>
+  <p id="error" role="alert" class="message"></p>
+</main></div>
+<script>
+/* Motor de metrónomo de demostración. Web Audio; sin dependencias externas. */
+class MetriqaEngine {
+  constructor(measures, handlers={}) {
+    this.measures=measures; this.handlers=handlers; this.playing=false;
+    this.ctx=null; this.timer=null; this.visualTimers=[]; this.nodes=[];
+    this.nextMeasure=0; this.nextPulse=0; this.shownMeasure=0; this.shownPulse=-1;
+    this.nextTime=0; this.loop=null; this.generation=0; this.finalizing=false;
+  }
+  meter(m){return Number(m.meter.split('/')[0]);}
+  subdivisionTime(m){
+    const denominator=Number(m.meter.split('/')[1]);
+    const beatQuarter=({quarter:1,eighth:.5,'dotted-quarter':1.5})[m.unit]||1;
+    return (60/m.bpm)*(4/denominator)/beatQuarter;
+  }
+  accents(m){
+    const accents=new Set([0]); let count=0;
+    for (const n of m.group.split('+').map(Number)) {accents.add(count); count+=n;}
+    return accents;
+  }
+  async play(){
+    if(this.playing) return;
+    try{
+      const Audio=window.AudioContext||window.webkitAudioContext;
+      if(!Audio)throw new Error('Este navegador no permite audio Web Audio.');
+      this.ctx??=new Audio(); await this.ctx.resume();
+      this.playing=true;this.finalizing=false; const run=++this.generation;
+      this.nextTime=this.ctx.currentTime+.065;
+      this.timer=setInterval(()=>this.schedule(run),24);
+      this.handlers.state?.('playing');this.schedule(run);
+    }catch(e){this.handlers.error?.(e.message||'No se pudo activar el metrónomo.');}
+  }
+  schedule(run){
+    if(!this.playing ||run!==this.generation||!this.ctx)return;
+    while(this.playing && !this.finalizing && this.nextTime < this.ctx.currentTime+.14){
+      if(this.nextMeasure>=this.measures.length){this.finish(run);break;}
+      const measure=this.measures[this.nextMeasure];
+      const number=this.meter(measure);const pulse=this.nextPulse;
+      const duration=this.subdivisionTime(measure);
+      const accent=this.accents(measure).has(pulse);
+      const t=this.nextTime;
+      const osc=this.ctx.createOscillator(),gain=this.ctx.createGain();
+      osc.type='sine';osc.frequency.setValueAtTime(accent?1120:710,t);
+      gain.gain.setValueAtTime(.0001,t);
+      gain.gain.exponentialRampToValueAtTime(accent?.22:.105,t+.004);
+      gain.gain.exponentialRampToValueAtTime(.0001,t+.065);
+      osc.connect(gain).connect(this.ctx.destination);
+      osc.start(t);osc.stop(t+.07);
+      this.nodes.push(osc);
+      osc.onended=()=>{this.nodes=this.nodes.filter(x=>x!==osc);try{osc.disconnect();gain.disconnect()}catch{}};
+      const delay=Math.max(0,(t-this.ctx.currentTime)*1000);
+      const token=setTimeout(()=>{
+        if(run!==this.generation||!this.playing)return;
+        this.shownMeasure=this.nextShownMeasureSafe(this.shownMeasure,this.nextMeasure);
+        this.shownMeasure=measure._index;
+        this.shownPulse=pulse;
+        this.handlers.beat?.({measure:measure._index,pulse,accent});
+      },delay);
+      this.visualTimers.push(token);
+      this.nextTime+=duration;this.nextPulse++;
+      if(this.nextPulse>=number){
+        this.nextPulse=0;this.nextMeasure++;
+        if(this.loop && this.nextMeasure>this.loop[1])this.nextMeasure=this.loop[0];
+        if(this.nextMeasure>=this.measures.length&&!this.loop){this.finish(run);}
+      }
+    }
+  }
+  nextShownMeasureSafe(a,b){return Number.isFinite(b)?b:a;}
+  finish(run){
+    if(this.finalizing)return;
+    this.finalizing=true;
+    clearInterval(this.timer);this.timer=null;
+    const delay=Math.max(75,(this.nextTime-this.ctx.currentTime)*1000);
+    const token=setTimeout(()=>{if(run!==this.generation)return;this.stop();this.handlers.finished?.();},delay);
+    this.visualTimers.push(token);
+  }
+  silence(){
+    ++this.generation;clearInterval(this.timer);this.timer=null;
+    this.visualTimers.forEach(clearTimeout);this.visualTimers=[];
+    for(const node of this.nodes){try{node.stop()}catch{}}
+    this.nodes=[];this.playing=false;this.finalizing=false;
+  }
+  pause(){
+    if(!this.playing)return;
+    const m=this.shownMeasure;
+    const p=Math.max(0,this.shownPulse+1);
+    this.silence();
+    if(p>=this.meter(this.measures[m])){this.nextMeasure=m+1;this.nextPulse=0;
+      if(this.loop&&this.nextMeasure>this.loop[1])this.nextMeasure=this.loop[0];
+      if(this.nextMeasure>=this.measures.length)this.nextMeasure=0;
+    }else{this.nextMeasure=m;this.nextPulse=p;}
+    this.handlers.state?.('paused');
+  }
+  stop(){
+    this.silence();this.nextMeasure=0;this.nextPulse=0;
+    this.shownMeasure=0;this.shownPulse=-1;
+    this.handlers.state?.('stopped');this.handlers.beat?.({measure:0,pulse:-1,accent:false});
+  }
+  seek(index){
+    const wasPlaying=this.playing;
+    this.silence();this.nextMeasure=Math.max(0,Math.min(this.measures.length-1,index));
+    this.nextPulse=0;this.shownMeasure=this.nextMeasure;this.shownPulse=-1;
+    this.handlers.beat?.({measure:this.shownMeasure,pulse:-1,accent:false});
+    this.handlers.state?.('stopped');if(wasPlaying)this.play();
+  }
+  setLoop(start,end){
+    if(start===null){this.loop=null;return;}
+    this.loop=[Math.max(0,start),Math.min(end,this.measures.length-1)];
+    if(this.nextMeasure<this.loop[0]||this.nextMeasure>this.loop[1])this.seek(this.loop[0]);
+  }
+  dispose(){this.silence();this.ctx?.close?.();}
+}
+
+(()=>{'use strict';
+const defaults=[
+ {name:'Intro',meter:'4/4',bpm:110,unit:'quarter',group:'1+1+1+1'},
+ {name:'Verso',meter:'7/8',bpm:160,unit:'eighth',group:'2+2+3'},
+ {name:'Puente',meter:'6/8',bpm:80,unit:'dotted-quarter',group:'3+3'},
+ {name:'Coro',meter:'4/4',bpm:110,unit:'quarter',group:'1+1+1+1'}
+];
+const sections=['Intro','Verso','Puente','Coro'];const colors=['#8655a5','#259c73','#dba449','#526ac4'];const $=id=>document.getElementById(id),storageKey='metriqa-timeline-demo-v1';
+const makeDefault=()=>defaults.flatMap((s,section)=>Array.from({length:4},(_,i)=>({...s,_index:section*4+i,section})));
+let measures=makeDefault();try{const raw=JSON.parse(localStorage.getItem(storageKey)||'null');if(Array.isArray(raw)&&raw.length===16&&raw.every((m,i)=>m.meter&&m.bpm&&m.group&&m.unit)){measures=raw.map((m,i)=>({...m,_index:i,section:Math.floor(i/4)}))}}catch{}
+let selected=0,visibleTrack='Todos',nowMeasure=0,nowPulse=-1,loop=false;
+const unitLabel={quarter:'negra',eighth:'corchea','dotted-quarter':'negra con puntillo'};
+const defaultGroup={'4/4':'1+1+1+1','3/4':'1+1+1','5/4':'3+2','7/8':'2+2+3','6/8':'3+3','9/8':'3+3+3','12/8':'3+3+3+3'};
+const defaultUnit={'4/4':'quarter','3/4':'quarter','5/4':'quarter','7/8':'eighth','6/8':'dotted-quarter','9/8':'dotted-quarter','12/8':'dotted-quarter'};
+const engine=new MetriqaEngine(measures,{beat:onBeat,state:onState,error:msg=>$('error').textContent=msg,finished:()=>{$('status').textContent='Tema terminado';}});
+const tracks=[['🥁','Batería','drums'],['🎸','Guitarra','guitar'],['🎹','Teclado','keys'],['🎤','Voz','voice']];
+function signal(i,track){const n=track==='voice'?5:7;return `<div class="signal" aria-hidden="true">${Array.from({length:n},(_,k)=>`<i style="height:${7+((i*3+k*7+track.length*2)%24)}px"></i>`).join('')}</div>`}
+function renderTimeline(){
+ $('section-header').innerHTML=sections.map((name,i)=>`<div class="section-block ${['purple','green','amber','blue'][i]}" style="grid-column:span 4">${name}<span>${measures[i*4].meter} · ${measures[i*4].bpm} BPM</span></div>`).join('');
+ $('ruler').innerHTML=measures.map((m,i)=>`<button type="button" data-measure="${i}" class="${selected===i?'current':''}" title="Compás ${i+1}, ${m.meter}">${i+1}</button>`).join('');
+ $('track-rows').innerHTML=tracks.filter(x=>visibleTrack==='Todos'||x[1]===visibleTrack).map(([emoji,name,type])=>`<div class="timeline-row"><div class="row-name">${emoji} ${name}</div><div class="cells">${measures.map((m,i)=>`<button type="button" data-measure="${i}" class="timeline-cell ${selected===i?'picked':''} ${engine.playing&&nowMeasure===i?'playhead':''}" style="--clip:${colors[m.section]}" title="Seleccionar compás ${i+1} (${m.meter})">${signal(i,type)}<span>${m.meter}</span></button>`).join('')}</div></div>`).join('');
+ document.querySelectorAll('[data-measure]').forEach(b=>b.onclick=()=>selectMeasure(Number(b.dataset.measure)));
+}
+function refreshInspector(){
+ const m=measures[selected];$('inspector-title').textContent='Compás '+(selected+1)+' · '+m.meter;$('section-chip').textContent=sections[m.section];
+ $('meter').value=m.meter;$('bpm').value=m.bpm;$('unit').value=m.unit;$('group').value=m.group;
+}
+function onBeat({measure,pulse}){
+ nowMeasure=measure;nowPulse=pulse;const m=measures[measure];
+ $('big-position').textContent=m.meter;$('unit-caption').textContent=' · pulso de '+unitLabel[m.unit];$('group-display').textContent='Acentos: '+m.group.replaceAll('+',' + ');
+ const accents=engine.accents(m);$('beat-leds').innerHTML=Array.from({length:engine.meter(m)},(_,i)=>`<div title="Pulso ${i+1}" class="led ${accents.has(i)?'accent':''} ${pulse===i?'on':''}"></div>`).join('');
+ $('now').textContent=sections[m.section]+' · Compás '+(measure+1);$('now-tempo').textContent=m.bpm+' BPM · '+m.meter;
+ renderTimeline();
+}
+function onState(state){$('status').textContent=({playing:'▶ Reproduciendo',paused:'Ⅱ Pausado',stopped:'Listo'})[state];$('play').disabled=state==='playing';$('pause').disabled=state!=='playing';$('play').textContent=state==='paused'?'▶ Continuar':'▶ Reproducir'}
+function selectMeasure(i){selected=i;refreshInspector();renderTimeline();engine.seek(i);if(loop)engine.setLoop(Math.floor(i/4)*4,Math.floor(i/4)*4+3)}
+function validateForm(){const meter=$('meter').value;const bpm=Number($('bpm').value);const unit=$('unit').value;const group=$('group').value.trim().replace(/\s+/g,'');const parts=group.split('+');const numerator=Number(meter.split('/')[0]);
+ if(!Number.isInteger(bpm)||bpm<35||bpm>260)throw Error('El BPM debe ser entero entre 35 y 260.');
+ if(!parts.every(x=>/^\d+$/.test(x)&&Number(x)>0) || parts.reduce((sum,x)=>sum+Number(x),0)!==numerator)throw Error('La agrupación debe sumar '+numerator+' (por ejemplo, 2+2+3 para 7/8).');
+ return {meter,bpm,unit,group};
+}
+function saveConfig(all){
+ try{const cfg=validateForm();engine.silence();let from=all?Math.floor(selected/4)*4:selected;let to=all?from+4:selected+1;
+ for(let i=from;i<to;i++)Object.assign(measures[i],cfg);
+ try{localStorage.setItem(storageKey,JSON.stringify(measures))}catch(e){$('error').textContent='El navegador no permitió guardar cambios locales.'}
+ onState('stopped');engine.seek(selected);refreshInspector();renderTimeline();$('feedback').textContent=all?`Se actualizaron los compases ${from+1}–${to} a ${cfg.meter} y ${cfg.bpm} BPM.`:`Compás ${selected+1} guardado: ${cfg.meter}, ${cfg.bpm} BPM, ${cfg.group}.`;
+ }catch(e){$('feedback').textContent='⚠ '+e.message;}
+}
+function init(){
+ renderTimeline();refreshInspector();onBeat({measure:0,pulse:-1});
+ $('edit-form').onsubmit=e=>{e.preventDefault();saveConfig(false)};$('apply-section').onclick=()=>saveConfig(true);
+ $('meter').onchange=()=>{const sig=$('meter').value;$('group').value=defaultGroup[sig];$('unit').value=defaultUnit[sig]};
+ $('play').onclick=()=>engine.play();$('pause').onclick=()=>engine.pause();$('stop').onclick=()=>engine.stop();$('back').onclick=()=>{engine.stop();selectMeasure(0)};
+ $('loop').onclick=()=>{loop=!loop;$('loop').textContent='↻ Repetir sección: '+(loop?'sí':'no');$('loop').setAttribute('aria-pressed',String(loop));$('loop').classList.toggle('active-btn',loop);engine.setLoop(loop?Math.floor(selected/4)*4:null,Math.floor(selected/4)*4+3)};
+ $('reset').onclick=()=>{if(!confirm('¿Restablecer los 16 compases de esta demo?'))return;engine.stop();measures=makeDefault();engine.measures=measures;try{localStorage.removeItem(storageKey)}catch{}selected=0;refreshInspector();onBeat({measure:0,pulse:-1});$('feedback').textContent='Demo restablecida a sus valores iniciales.'};
+ document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/BUTTON|INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();engine.playing?engine.pause():engine.play()}if(e.key==='Escape')engine.stop()});
+ window.addEventListener('pagehide',()=>engine.dispose());
+}
+init();
+})();
+</script></body></html>
