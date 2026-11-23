@@ -107,6 +107,7 @@ function openRepertoirePickerV2(){
   $('repertoire-picker').showModal();
 }
 function goToRepertoireV2(repId){
+  if($('home-create').open){$('home-create').open=false;ui.createExpanded=false}
   ui.homeOpenReps=[repId];
   ui.homeFocusSong=null;
   ui.originRep=repId;
@@ -123,6 +124,7 @@ function createRepertoireV2(name){
   const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es-CL');
   if(D.repertorios.some(r=>norm(r.nombre)===norm(nombre))){toast('Ya existe un repertorio con ese nombre.');return false}
   const r={id:uniqueId('r'),nombre,songs:[]};
+  if($('home-create').open){$('home-create').open=false;ui.createExpanded=false}
   D.repertorios.push(r);
   ui.homeOpenReps=[r.id];
   ui.originRep=r.id;
