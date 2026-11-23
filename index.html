@@ -286,6 +286,8 @@ function setting(t){if(!t.estudio||typeof t.estudio!=='object')t.estudio={};cons
  if(x.zoom!=='auto')x.zoom=Number.isFinite(Number(x.zoom))?bounded(x.zoom,.75,2.5,1):'auto';
  if(!Array.isArray(x.marcadores))x.marcadores=[];if(!Array.isArray(x.sesiones))x.sesiones=[];
  if(!['click','perc','mute'].includes(x.sound))x.sound='click';x.volume=bounded(x.volume,0,1,.55);
+ const totalBeats=Number(x.meter.split('/')[0])||4;
+ x.accents=Array.isArray(x.accents)?[...new Set(x.accents.map(Number).filter(n=>Number.isInteger(n)&&n>=1&&n<=totalBeats))].sort((a,b)=>a-b):[1];
  if(![0,1,2,4].includes(x.count))x.count=1;if(typeof x.scroll!=='boolean')x.scroll=true;
  if(!x.last||typeof x.last!=='object')x.last={start:1,end:t.notas.length,loop:false};
  return x}
@@ -394,7 +396,7 @@ function renderEditActions(t=current()){
  const disabled=!loadedStorage||!editCheckpoint||editCheckpoint.saving;
  $('save-song-edits').disabled=$('cancel-song-edits').disabled=disabled;
 }
-function saveSongEdits(){
+function saveSongEdits(onComplete){
  const checkpoint=editCheckpoint,t=current();
  if(!checkpoint||checkpoint.saving||t?.id!==checkpoint.song.id)return;
  const song=clone(t),savedDeletions=[...checkpoint.deletedMeasures];
@@ -409,6 +411,7 @@ function saveSongEdits(){
   }
   renderEditActions();
   toast(saved?'Cambios guardados. Punto de retorno actualizado.':'No se pudo guardar el tema en este equipo.');
+  if(typeof onComplete==='function')onComplete(saved);
  });
 }
 function cancelSongEdits(){
@@ -502,7 +505,19 @@ function renderMetronome(){
  box.append(label('Sonido',sel([['click','Clic clásico'],['perc','Percusión'],['mute','Solo visual (silencio)']],x.sound,v=>{x.sound=v;save();renderAll()})));
  const vol=mk('input',{type:'range',min:0,max:100,step:1,value:Math.round(x.volume*100),on:{input:e=>{x.volume=Number(e.target.value)/100;saveSoon()}}});box.append(label('Volumen independiente',vol));
  box.append(label('Compases de preparación',sel([[0,'Sin preparación'],[1,'1 compás'],[2,'2 compases'],[4,'4 compases']],x.count,v=>{x.count=Number(v);save();renderAll()})));
- box.append(info('En 6/8, 9/8 y 12/8 el clic se produce en cada corchea. Solo el primer pulso del compás es acentuado.'));
+ box.append(title('Acentos del clic'));
+ box.append(info('Selecciona qué pulsos llevan acento. Puedes marcar varios o ninguno. Se guarda por canción.'));
+ const accentOptions=mk('div',{class:'accent-options',role:'group','aria-label':'Pulsos acentuados'});
+ for(let beat=1;beat<=beatsPerMeasure(x);beat++){
+  const accent=x.accents.includes(beat);
+  accentOptions.append(button(String(beat),()=>{
+   x.accents=x.accents.includes(beat)?x.accents.filter(n=>n!==beat):[...x.accents,beat].sort((a,b)=>a-b);
+   save();renderMetronome();renderTransport();
+  },'accent-beat-toggle'+(accent?' is-accented':''),{'aria-pressed':String(accent),'aria-label':'Acentuar pulso '+beat}));
+ }
+ box.append(accentOptions);
+ box.append(button('Acentuar solo el primer pulso',()=>{x.accents=[1];save();renderMetronome();renderTransport()},'tiny-control'));
+ box.append(info('En 6/8, 9/8 y 12/8 el clic se produce en cada corchea. Los acentos son configurables.'));
 }
 function changeBpm(delta){const t=current();if(!t)return;const x=setting(t);x.practiceBpm=bounded(x.practiceBpm+delta,30,300,x.practiceBpm);save();renderAll()}
 function renderPractice(){
@@ -666,7 +681,7 @@ function renderTransport(){
  $('play-button').disabled=!enabled||clock.starting;
  $('play-button').textContent=clock.starting?'Activando audio…':clock.paused?'▶ Reanudar':clock.playing?'Ⅱ Pausar':'▶ Reproducir';
  const el=$('beat-dots');el.replaceChildren();if(!x)return;
- const count=beatsPerMeasure(x);for(let i=0;i<count;i++)el.append(mk('span',{class:'beatdot'+(i===0?' accent':'')+(clock.visualBeat===i?' active':''),title:`Pulso ${i+1}`}));
+ const count=beatsPerMeasure(x);for(let i=0;i<count;i++)el.append(mk('span',{class:'beatdot'+(x.accents.includes(i+1)?' accent':'')+(clock.visualBeat===i?' active':''),title:`Pulso ${i+1}`}));
 }
 function visualUpdate(){
  const t=current();
@@ -760,7 +775,7 @@ function scheduleTick(){
    break;
   }
   const beat=phase==='count'?(x.count*count-c.countRemaining)%count:c.beat;
-  clickAudio(at,beat===0,x);
+  clickAudio(at,x.accents.includes(beat+1),x);
   const delay=Math.max(0,(at-currentTime)*1000);
   // Congelar el compás y el pulso de este clic antes de adelantar el planificador.
   const snapshot={measure:c.measure,countRemaining:c.countRemaining};
@@ -801,8 +816,7 @@ async function manageWake(){
  try{clock.wakeLock=await navigator.wakeLock.request('screen');clock.wakeLock.addEventListener('release',()=>{clock.wakeLock=null},{once:true})}catch(e){/* Algunos navegadores bloquean el permiso en archivos locales. */}
 }
 function toggleStudy(){if(ui.study)returnToRepertoireV2();else setViewV2('study')}
-function deleteSong(){const t=current();if(!t)return;if(!confirm(`¿Eliminar la canción «${t.nombre}»? Podrás restaurarla desde la papelera.`))return;
- stopMetro();D.papelera.push({id:uniqueId('trash'),type:'song',value:clone(t),at:Date.now()});D.temas=D.temas.filter(z=>z.id!==t.id);D.repertorios.forEach(r=>r.songs=r.songs.filter(id=>id!==t.id));D.sel=D.temas[0]?.id||null;initSelection();save();renderAll();toast('Canción movida a la papelera.')}
+function deleteSong(){deleteSongByIdV2(current()?.id)}
 function mergeTransfer(data){
  const imported=normalize(data);let count=0;
  const ids=new Map();for(const t of imported.temas){const copy=clone(t);const old=copy.id;copy.id=uniqueId('t');ids.set(old,copy.id);copy.nombre=D.temas.some(a=>a.nombre===copy.nombre)?copy.nombre+' (importada)':copy.nombre;D.temas.push(copy);count++}
