@@ -2,7 +2,7 @@
 
 **Estado:** demostraciones independientes para evaluación, no integradas en la aplicación oficial.  
 **Rama:** `prototipos/metriqa-practica-3-4` (nace de `main`).  
-**Decisiones de producto:** [evolución híbrida #13](../../issues/13) y [PR #12 pendiente](../../pull/12).
+**Decisiones de producto:** [evolución híbrida #13](https://github.com/osdrumm-sudo/kernnel-estudio-musical/issues/13) y [PR #12 pendiente](https://github.com/osdrumm-sudo/kernnel-estudio-musical/pull/12).
 
 ## Archivos
 
