@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#091722">
+<title>Metriqa · Instrument Hub · Demo funcional</title>
+<style>
+:root{color-scheme:dark;--bg:#091722;--sidebar:#0c1e2a;--panel:#142a39;--panel2:#1c3344;--line:#315267;--muted:#9fbdca;--ink:#f1fcff;--accent:#31ddc3;--teal:#056f67;--blue:#4ab9e8;--purple:#a677cf;--green:#64d4a8;--amber:#e5b95f;--red:#ed8c96}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer;color:var(--ink);border:1px solid var(--line);background:#213849;border-radius:10px;padding:10px 14px}button:hover{border-color:#40cfba;background:#29485c}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}button:disabled{opacity:.45;cursor:not-allowed}.btn-primary{background:var(--accent);color:#06252d;border-color:transparent;font-weight:800}.btn-primary:hover{background:#6cf4d5}.btn-icon{display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn-ghost{background:transparent}.btn-sm{font-size:12px;padding:7px 10px}.active-btn{border-color:var(--accent);background:rgba(49,221,195,.15);color:#8cf4e0}h1,h2,h3,p{margin:0}h1{font-size:28px}h2{font-size:21px}h3{font-size:16px}.muted{color:var(--muted)}small{font-size:12px}.app{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:100vh}.sidebar{background:linear-gradient(165deg,#0b1d2a,#101f32);border-right:1px solid var(--line);padding:26px 15px;display:flex;flex-direction:column;gap:6px}.logo{font-weight:900;letter-spacing:1.3px;font-size:23px;margin:0 5px 34px}.logo::first-letter{color:var(--accent)}.nav{display:flex;align-items:center;gap:11px;text-align:left;padding:12px 13px;border:none;background:transparent;color:#bed2df;border-radius:9px;font-size:14px}.nav.sel{background:linear-gradient(90deg,#007b70,#0a5255);color:#fff;font-weight:700}.nav:not(.sel){cursor:default}.sidebar-foot{margin-top:auto;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding:16px 8px}.main{min-width:0;padding:23px clamp(14px,2.5vw,38px) 28px;display:flex;flex-direction:column;gap:18px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px}.title-wrap{display:flex;align-items:center;gap:12px}.chip{border-radius:100px;border:1px solid #3d877f;background:#16433f;padding:5px 11px;color:#70eacb;font-size:12px;font-weight:700}.card{background:linear-gradient(160deg,#172b3b,#122536);border:1px solid #2b4960;border-radius:17px;padding:18px;box-shadow:0 12px 30px #0000001a}.card-lite{background:#1a3040;border:1px solid #3a5c71;border-radius:12px;padding:12px}.control-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.toolbar{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#1a303e;border:1px solid #365364;padding:13px 16px;border-radius:16px;flex-wrap:wrap}.transport{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.beat-leds{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.led{height:21px;width:21px;border-radius:50%;background:#375467;border:1px solid #4d6f82;transition:transform .08s,box-shadow .08s,background .08s}.led.accent{border-color:#1c8b86}.led.on{background:var(--accent);box-shadow:0 0 15px #45ffd3;transform:scale(1.12)}.led.on:not(.accent){background:#75baed;box-shadow:0 0 12px #4aa8e5}.pill{border-radius:9px;background:#244456;color:#b8dbdd;padding:6px 10px;font-size:12px;font-weight:700}.stat{font-variant-numeric:tabular-nums}.message{font-size:12px;color:#acd2d7;min-height:18px}.section-label{font-size:12px;color:#a8bdcb;letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:8px}.toolbar .now{display:flex;flex-direction:column}.toolbar .now strong{font-size:18px}.responsive-label{display:none}.screen-note{font-size:12px;color:#a7c5cf;margin-top:-8px}.control-field{display:flex;align-items:center;gap:7px;color:#bbd0d7;font-size:13px}.control-field input{width:75px;background:#122939;border:1px solid #44718a;color:#fff;border-radius:9px;padding:8px}.control-field select{background:#122939;border:1px solid #44718a;color:#fff;border-radius:9px;padding:8px}.mini-legend{font-size:12px;color:var(--muted)}@media(max-width:900px){.app{grid-template-columns:66px minmax(0,1fr)}.sidebar{padding:20px 8px;align-items:center}.logo{font-size:12px;writing-mode:vertical-rl;letter-spacing:0;max-height:80px;margin:0 0 24px}.nav{width:46px;justify-content:center;font-size:20px}.nav span:last-child,.sidebar-foot{display:none}.main{padding:15px}.topbar h1{font-size:21px}}@media(max-width:610px){.app{display:block}.sidebar{height:52px;padding:8px 12px;flex-direction:row;justify-content:space-between;border-right:0;border-bottom:1px solid var(--line)}.logo{font-size:16px;writing-mode:horizontal-tb;margin:0}.sidebar .nav{display:none}.main{padding:13px;gap:13px}.topbar{align-items:flex-start}.topbar h1{font-size:18px}.chip{font-size:10px}.card{padding:13px}.transport button{padding:9px 12px}.toolbar{padding:12px}.led{height:17px;width:17px}.responsive-label{display:block}}
+
+.instrument-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.instrument-tab{padding:15px 7px;font-weight:750;white-space:nowrap;background:#152b3b}.instrument-tab.selected{color:#c4fff2;border-color:var(--accent);background:linear-gradient(180deg,#075f58,#12433e);box-shadow:inset 0 0 0 1px #3fe8c5}.instrument-tab .ico{font-size:22px;display:block;line-height:1.3;margin-bottom:5px}.hub-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(240px,.65fr);gap:16px}.content-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px}.tab-switch{display:flex;gap:4px;background:#09202f;padding:4px;border-radius:10px}.tab-switch button{font-size:12px;padding:7px 11px;background:transparent;border-color:transparent}.tab-switch button.selected{background:#116d67;border-color:#2b9e8e}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.chord{border:1px solid #345567;background:#223b4b;border-radius:11px;min-height:124px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px}.chord strong{font-size:20px}.chord span{font-size:12px;color:#c5d9e1;overflow-wrap:anywhere}.chord.current{border-color:var(--accent);background:#124d4b;box-shadow:0 0 0 1px #238b83}.diagram{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;border:1px solid #557888;border-radius:3px;padding:5px;min-width:80px}.diagram b{height:5px;width:5px;border-radius:50%;background:#4abeb0}.diagram b.mark{background:#f5ffff;box-shadow:0 0 0 2px #6ecdc0}.guide-line{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid #325268;padding:9px 0;font-size:14px}.guide-line:last-child{border:0}.section-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.sec{background:#243e50;border:2px solid transparent;border-radius:10px;padding:13px 7px;text-align:center;display:flex;align-items:center;flex-direction:column;gap:4px;min-width:0}.sec.active{border-color:var(--accent);box-shadow:0 0 0 2px #0c3334}.sec b{font-size:15px}.sec small{color:#d8e5e7}.sec.sec-0{background:#393052}.sec.sec-1{background:#14584e}.sec.sec-2{background:#5d4b29}.sec.sec-3{background:#313e68}.sec .progress{height:4px;background:#ffffff38;border-radius:5px;width:100%;overflow:hidden;margin-top:5px}.sec .progress i{display:block;height:100%;background:#62eed8;transition:width .06s}.practice-panel{display:flex;flex-direction:column;gap:12px}.meter-large{font-size:54px;line-height:1;font-weight:900;letter-spacing:-2px}.group-label{font-size:16px;color:#7cebd3;font-weight:750}.instrument-description{line-height:1.5;min-height:45px}.side-stat{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid #355367;padding:8px 0}.side-stat:last-child{border:0}.tips{color:#b8d7de;font-size:12px}.section-title{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}.bpm-change{display:flex;align-items:center;gap:6px}.bpm-change strong{font-size:17px;min-width:38px;text-align:center}.section-footer{margin-top:11px;display:flex;flex-wrap:wrap;align-items:center;gap:8px}.section-info{margin-left:auto;color:#bdd4dc;font-size:12px}.sr{position:absolute;clip:rect(0 0 0 0);width:1px;height:1px;overflow:hidden}@media(max-width:1100px){.hub-grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.instrument-tabs{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}.instrument-tab{font-size:10px;padding:10px 3px}.instrument-tab .ico{font-size:19px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.section-cards{grid-template-columns:repeat(2,minmax(0,1fr))}.content-head{flex-direction:column;align-items:stretch}.tab-switch{justify-content:space-evenly}.meter-large{font-size:42px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" aria-label="Menú simulado">
+  <div class="logo">〽 METRIQA</div>
+  <div class="nav sel"><span>▶</span><span> Estudio</span></div>
+  <div class="nav"><span>♫</span><span> Canciones</span></div>
+  <div class="nav"><span>▱</span><span> Repertorios</span></div>
+  <div class="nav"><span>♬</span><span> Instrumentos</span></div>
+  <div class="nav"><span>♧</span><span> Salas</span></div>
+  <div class="sidebar-foot">PROTOTIPO LOCAL<br>Sin datos reales ni nube</div>
+</aside>
+<main class="main">
+  <div class="topbar"><div class="title-wrap"><div><h1>Instrument Hub</h1><p class="muted">Canción de ejemplo · Modo práctica</p></div></div><div class="chip">DEMO FUNCIONAL · OPCIÓN 3</div></div>
+  <section aria-label="Seleccionar instrumento" class="instrument-tabs" id="instrument-tabs"></section>
+  <div class="hub-grid">
+    <section class="card" aria-label="Guía por instrumento">
+      <div class="content-head"><div><div class="section-label" id="instrument-caption">Capa: Guitarra</div><h2 id="content-title">Acordes y estructura</h2></div><div class="tab-switch" role="group" aria-label="Tipo de guía"><button class="selected" data-view="acordes" type="button">Material</button><button data-view="guia" type="button">Guía</button><button data-view="notas" type="button">Notas</button></div></div>
+      <div id="content-area" aria-live="polite"></div>
+    </section>
+    <section class="card practice-panel" aria-label="Metrónomo"><div class="section-label">Metrónomo inteligente</div><div class="meter-large stat" id="meter">4/4</div><div class="group-label" id="group">1 + 1 + 1 + 1</div><div class="beat-leds" id="beat-leds" aria-label="Pulsos del compás"></div><div class="side-stat"><span class="muted">Pulso</span><strong id="beat-unit">Negra</strong></div><div class="side-stat"><span class="muted">Tempo actual</span><strong id="bpm-readout">110 BPM</strong></div><div class="side-stat"><span class="muted">Posición</span><strong class="stat" id="position">Compás 1 / 16</strong></div><p class="tips">Los cambios de métrica, tempo y acentos se aplican automáticamente al pasar de sección.</p></section>
+  </div>
+  <section class="card" aria-label="Estructura compartida">
+    <div class="section-title"><div><div class="section-label">Estructura compartida</div><h2>Selecciona una sección para practicar</h2></div><span class="muted" id="selected-section">Intro</span></div>
+    <div class="section-cards" id="sections"></div>
+    <div class="section-footer"><button id="loop" type="button" aria-pressed="false">↻ Repetir sección: no</button><span class="muted">Tempo de esta sección:</span><div class="bpm-change"><button class="btn-sm" id="less" aria-label="Restar 5 BPM" type="button">−</button><strong id="section-bpm">110</strong><button class="btn-sm" id="more" aria-label="Sumar 5 BPM" type="button">+</button></div><span class="section-info">Cambios solo en esta demo</span></div>
+  </section>
+  <div class="toolbar" aria-label="Transporte de práctica"><div class="now"><strong id="now">Intro · Compás 1</strong><small class="muted">Batería, guitarra, bajo, teclado y voz</small></div><div class="transport"><button id="back" type="button" title="Ir al comienzo" aria-label="Ir al comienzo">|◀</button><button id="play" class="btn-primary" type="button">▶ Reproducir</button><button id="pause" type="button" disabled>Ⅱ Pausar</button><button id="stop" type="button">■ Detener</button></div><div class="pill" id="status" role="status">Listo para practicar</div></div>
+  <p class="screen-note">Demostración autónoma. Genera clics reales mediante Web Audio; los acordes, letras y patrones son datos ilustrativos. Abre este archivo en Chrome, Firefox o Safari.</p>
+  <p class="message" id="error" role="alert"></p>
+</main></div>
+<script>
+/* Motor de metrónomo de demostración. Web Audio; sin dependencias externas. */
+class MetriqaEngine {
+  constructor(measures, handlers={}) {
+    this.measures=measures; this.handlers=handlers; this.playing=false;
+    this.ctx=null; this.timer=null; this.visualTimers=[]; this.nodes=[];
+    this.nextMeasure=0; this.nextPulse=0; this.shownMeasure=0; this.shownPulse=-1;
+    this.nextTime=0; this.loop=null; this.generation=0; this.finalizing=false;
+  }
+  meter(m){return Number(m.meter.split('/')[0]);}
+  subdivisionTime(m){
+    const denominator=Number(m.meter.split('/')[1]);
+    const beatQuarter=({quarter:1,eighth:.5,'dotted-quarter':1.5})[m.unit]||1;
+    return (60/m.bpm)*(4/denominator)/beatQuarter;
+  }
+  accents(m){
+    const accents=new Set([0]); let count=0;
+    for (const n of m.group.split('+').map(Number)) {accents.add(count); count+=n;}
+    return accents;
+  }
+  async play(){
+    if(this.playing) return;
+    try{
+      const Audio=window.AudioContext||window.webkitAudioContext;
+      if(!Audio)throw new Error('Este navegador no permite audio Web Audio.');
+      this.ctx??=new Audio(); await this.ctx.resume();
+      this.playing=true;this.finalizing=false; const run=++this.generation;
+      this.nextTime=this.ctx.currentTime+.065;
+      this.timer=setInterval(()=>this.schedule(run),24);
+      this.handlers.state?.('playing');this.schedule(run);
+    }catch(e){this.handlers.error?.(e.message||'No se pudo activar el metrónomo.');}
+  }
+  schedule(run){
+    if(!this.playing ||run!==this.generation||!this.ctx)return;
+    while(this.playing && !this.finalizing && this.nextTime < this.ctx.currentTime+.14){
+      if(this.nextMeasure>=this.measures.length){this.finish(run);break;}
+      const measure=this.measures[this.nextMeasure];
+      const number=this.meter(measure);const pulse=this.nextPulse;
+      const duration=this.subdivisionTime(measure);
+      const accent=this.accents(measure).has(pulse);
+      const t=this.nextTime;
+      const osc=this.ctx.createOscillator(),gain=this.ctx.createGain();
+      osc.type='sine';osc.frequency.setValueAtTime(accent?1120:710,t);
+      gain.gain.setValueAtTime(.0001,t);
+      gain.gain.exponentialRampToValueAtTime(accent?.22:.105,t+.004);
+      gain.gain.exponentialRampToValueAtTime(.0001,t+.065);
+      osc.connect(gain).connect(this.ctx.destination);
+      osc.start(t);osc.stop(t+.07);
+      this.nodes.push(osc);
+      osc.onended=()=>{this.nodes=this.nodes.filter(x=>x!==osc);try{osc.disconnect();gain.disconnect()}catch{}};
+      const delay=Math.max(0,(t-this.ctx.currentTime)*1000);
+      const token=setTimeout(()=>{
+        if(run!==this.generation||!this.playing)return;
+        this.shownMeasure=this.nextShownMeasureSafe(this.shownMeasure,this.nextMeasure);
+        this.shownMeasure=measure._index;
+        this.shownPulse=pulse;
+        this.handlers.beat?.({measure:measure._index,pulse,accent});
+      },delay);
+      this.visualTimers.push(token);
+      this.nextTime+=duration;this.nextPulse++;
+      if(this.nextPulse>=number){
+        this.nextPulse=0;this.nextMeasure++;
+        if(this.loop && this.nextMeasure>this.loop[1])this.nextMeasure=this.loop[0];
+        if(this.nextMeasure>=this.measures.length&&!this.loop){this.finish(run);}
+      }
+    }
+  }
+  nextShownMeasureSafe(a,b){return Number.isFinite(b)?b:a;}
+  finish(run){
+    if(this.finalizing)return;
+    this.finalizing=true;
+    clearInterval(this.timer);this.timer=null;
+    const delay=Math.max(75,(this.nextTime-this.ctx.currentTime)*1000);
+    const token=setTimeout(()=>{if(run!==this.generation)return;this.stop();this.handlers.finished?.();},delay);
+    this.visualTimers.push(token);
+  }
+  silence(){
+    ++this.generation;clearInterval(this.timer);this.timer=null;
+    this.visualTimers.forEach(clearTimeout);this.visualTimers=[];
+    for(const node of this.nodes){try{node.stop()}catch{}}
+    this.nodes=[];this.playing=false;this.finalizing=false;
+  }
+  pause(){
+    if(!this.playing)return;
+    const m=this.shownMeasure;
+    const p=Math.max(0,this.shownPulse+1);
+    this.silence();
+    if(p>=this.meter(this.measures[m])){this.nextMeasure=m+1;this.nextPulse=0;
+      if(this.loop&&this.nextMeasure>this.loop[1])this.nextMeasure=this.loop[0];
+      if(this.nextMeasure>=this.measures.length)this.nextMeasure=0;
+    }else{this.nextMeasure=m;this.nextPulse=p;}
+    this.handlers.state?.('paused');
+  }
+  stop(){
+    this.silence();this.nextMeasure=0;this.nextPulse=0;
+    this.shownMeasure=0;this.shownPulse=-1;
+    this.handlers.state?.('stopped');this.handlers.beat?.({measure:0,pulse:-1,accent:false});
+  }
+  seek(index){
+    const wasPlaying=this.playing;
+    this.silence();this.nextMeasure=Math.max(0,Math.min(this.measures.length-1,index));
+    this.nextPulse=0;this.shownMeasure=this.nextMeasure;this.shownPulse=-1;
+    this.handlers.beat?.({measure:this.shownMeasure,pulse:-1,accent:false});
+    this.handlers.state?.('stopped');if(wasPlaying)this.play();
+  }
+  setLoop(start,end){
+    if(start===null){this.loop=null;return;}
+    this.loop=[Math.max(0,start),Math.min(end,this.measures.length-1)];
+    if(this.nextMeasure<this.loop[0]||this.nextMeasure>this.loop[1])this.seek(this.loop[0]);
+  }
+  dispose(){this.silence();this.ctx?.close?.();}
+}
+
+(() => {
+'use strict';
+const sec=[
+ {name:'Intro',meter:'4/4',bpm:110,unit:'quarter',group:'1+1+1+1',color:0,caption:'Primer contacto'},
+ {name:'Verso',meter:'7/8',bpm:160,unit:'eighth',group:'2+2+3',color:1,caption:'Pulso irregular'},
+ {name:'Puente',meter:'6/8',bpm:80,unit:'dotted-quarter',group:'3+3',color:2,caption:'Compás compuesto'},
+ {name:'Coro',meter:'4/4',bpm:110,unit:'quarter',group:'1+1+1+1',color:3,caption:'Regreso al 4/4'}
+];
+const measures=sec.flatMap((s,si)=>Array.from({length:4},(_,i)=>({...s,_index:si*4+i,section:si})));let instrument='Guitarra',view='acordes',selectedSection=0,positionMeasure=0,positionPulse=-1,loop=false;
+const instruments=[['Batería','🥁'],['Guitarra','🎸'],['Bajo','🎸'],['Teclado','🎹'],['Voz','🎤']];
+const notes={
+ 'Batería':['Groove sencillo: bombo en 1 y 3, caja en 2 y 4.','7/8 acentuado en 2+2+3.','6/8 con énfasis en 1 y 4.','Retorno al groove en 4/4.'],
+ 'Guitarra':['Arpegio ligero para la introducción.','Acentuar cada grupo del 7/8.','Práctica de rasgueo en 6/8.','Acordes completos para el coro.'],
+ 'Bajo':['Raíces en los cambios de acorde.','Frase de siete corcheas.','Dos pulsos compuestos por compás.','Vuelve a las raíces del coro.'],
+ 'Teclado':['Pad de introducción.','Inversiones cortas en el 7/8.','Arpegio en compás compuesto.','Voicings abiertos para el coro.'],
+ 'Voz':['Entrada vocal tras la introducción.','Fraseo ajustado a 2+2+3.','Respiración antes del coro.','Sostener la última frase.']
+};
+const material={
+ 'Batería':[['Bombo','1 • 3'],['Caja','2 • 4'],['Hi-hat','Corcheas'],['Fill','Último compás']],
+ 'Guitarra':[['Em7','022030'],['Cadd9','x32033'],['G','320033'],['D','xx0232']],
+ 'Bajo':[['Mi','E2'],['Do','C3'],['Sol','G2'],['Re','D3']],
+ 'Teclado':[['Em7','E · G · B · D'],['Cadd9','C · E · G · D'],['G','G · B · D'],['D','D · F# · A']],
+ 'Voz':[['Intro','Espera'],['Verso','Entrada'],['Puente','Respiración'],['Coro','Armonías']]
+};
+const $=id=>document.getElementById(id),escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const unitLabel={quarter:'Negra',eighth:'Corchea','dotted-quarter':'Negra con puntillo'};
+const engine=new MetriqaEngine(measures,{beat:updateBeat,state:updateState,error:msg=>$('error').textContent=msg,finished:()=>{$('status').textContent='Canción terminada';}});
+function renderInstruments(){
+ $('instrument-tabs').innerHTML=instruments.map(([name,ico])=>`<button type="button" class="instrument-tab ${instrument===name?'selected':''}" data-instrument="${name}" aria-pressed="${instrument===name}"><span class="ico">${ico}</span>${name}</button>`).join('');
+ $('instrument-tabs').querySelectorAll('button').forEach(b=>b.onclick=()=>{instrument=b.dataset.instrument;renderInstruments();renderContent()});
+}
+function renderContent(){
+ $('instrument-caption').textContent='Capa: '+instrument;
+ $('content-title').textContent=({acordes:'Material de '+instrument,guia:'Guía rítmica y acentos',notas:'Anotaciones de estudio'})[view];
+ document.querySelectorAll('[data-view]').forEach(b=>{b.classList.toggle('selected',b.dataset.view===view);b.setAttribute('aria-pressed',b.dataset.view===view)});
+ const current=measures[positionMeasure]||measures[0];const id=current.section;
+ if(view==='notas'){$('content-area').innerHTML=`<div class="card-lite" style="font-size:17px;margin-bottom:12px">${escape(notes[instrument][id])}</div><p class="muted">Notas de demostración; la edición real y sincronización serán desarrollos posteriores.</p>`;return}
+ if(view==='guia'){$('content-area').innerHTML=`<div class="card-lite"><div class="guide-line"><strong>Sección</strong><strong>${current.name}</strong></div><div class="guide-line"><span>Cifra indicadora</span><strong>${current.meter}</strong></div><div class="guide-line"><span>Acentos</span><strong>${current.group.replaceAll('+',' + ')}</strong></div><div class="guide-line"><span>Pulso / BPM</span><strong>${unitLabel[current.unit]} · ${current.bpm}</strong></div><div class="guide-line"><span>Nota por instrumento</span><strong>${escape(notes[instrument][id])}</strong></div></div>`;return}
+ $('content-area').innerHTML=`<div class="cards">${material[instrument].map(([a,b],i)=>`<div class="chord ${i===id?'current':''}"><strong>${escape(a)}</strong>${instrument==='Guitarra'?`<div class="diagram" aria-hidden="true">${Array.from({length:18},(_,j)=>`<b class="${j%5===i?'mark':''}"></b>`).join('')}</div>`:''}<span>${escape(b)}</span></div>`).join('')}</div><p class="muted" style="margin-top:13px">Contenido de demostración: selecciona otra sección para ver su material destacado.</p>`;
+}
+function renderSections(){ $('sections').innerHTML=sec.map((s,i)=>{const active=Math.floor(positionMeasure/4)===i;const completion=active?(((positionMeasure%4)+1)*25):i<Math.floor(positionMeasure/4)?100:0;return `<button type="button" data-section="${i}" class="sec sec-${i} ${selectedSection===i?'active':''}" aria-pressed="${selectedSection===i}"><b>${s.name}</b><small>${s.meter} · ${s.bpm} BPM</small><small>${s.caption}</small><div class="progress"><i style="width:${completion}%"></i></div></button>`}).join('');$('sections').querySelectorAll('button').forEach(b=>b.onclick=()=>selectSection(Number(b.dataset.section))); }
+function selectSection(i){selectedSection=i;$('selected-section').textContent=sec[i].name;$('section-bpm').textContent=sec[i].bpm;if(loop)engine.setLoop(i*4,i*4+3);engine.seek(i*4);renderSections();renderContent()}
+function updateBeat({measure,pulse}){
+ positionMeasure=measure;positionPulse=pulse;
+ const m=measures[measure]; const n=Number(m.meter.split('/')[0]); const accents=engine.accents(m);
+ $('meter').textContent=m.meter;$('group').textContent=m.group.replaceAll('+',' + ');$('beat-unit').textContent=unitLabel[m.unit];$('bpm-readout').textContent=m.bpm+' BPM';$('position').textContent='Compás '+(measure+1)+' / 16';$('now').textContent=m.name+' · Compás '+(measure+1);
+ $('beat-leds').innerHTML=Array.from({length:n},(_,i)=>`<span title="Pulso ${i+1}" class="led ${accents.has(i)?'accent':''} ${pulse===i?'on':''}"></span>`).join('');
+ if(selectedSection!==m.section){/* selector de edición se mantiene independiente del compás de reproducción */}
+ renderSections();renderContent();
+}
+function updateState(status){$('status').textContent=({playing:'▶ Reproduciendo clics',paused:'Ⅱ En pausa',stopped:'Listo para practicar'})[status];$('play').disabled=status==='playing';$('pause').disabled=status!=='playing';$('play').textContent=status==='paused'?'▶ Continuar':'▶ Reproducir';}
+function init(){renderInstruments();renderSections();updateBeat({measure:0,pulse:-1});
+ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{view=b.dataset.view;renderContent()});
+ $('play').onclick=()=>engine.play();$('pause').onclick=()=>engine.pause();$('stop').onclick=()=>engine.stop();$('back').onclick=()=>{engine.stop();selectSection(0)};
+ $('loop').onclick=()=>{loop=!loop;$('loop').classList.toggle('active-btn',loop);$('loop').setAttribute('aria-pressed',String(loop));$('loop').textContent='↻ Repetir sección: '+(loop?'sí':'no');engine.setLoop(loop?selectedSection*4:null,selectedSection*4+3)};
+ for(const [id,delta] of [['less',-5],['more',5]])$(id).onclick=()=>{const s=sec[selectedSection];s.bpm=Math.max(35,Math.min(260,s.bpm+delta));for(let k=selectedSection*4;k<selectedSection*4+4;k++)measures[k].bpm=s.bpm;$('section-bpm').textContent=s.bpm;renderSections();updateBeat({measure:positionMeasure,pulse:positionPulse});};
+ document.addEventListener('keydown',e=>{if(e.code==='Space'&&!/BUTTON|INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();engine.playing?engine.pause():engine.play()}if(e.key==='Escape')engine.stop()});
+ window.addEventListener('pagehide',()=>engine.dispose());
+}
+init();
+})();
+</script>
+</body></html>
