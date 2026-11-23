@@ -210,12 +210,20 @@
   document.querySelector('[data-rail-edit]')?.addEventListener('click',()=>document.getElementById('nav-edit')?.click());
   document.querySelector('[data-rail-study]')?.addEventListener('click',()=>document.getElementById('nav-study')?.click());
   document.querySelector('[data-rail-settings]')?.addEventListener('click',()=>{
-    if(ui.view==='study'){
-      openPracticeSettings();
-    }else{
-      const dialog=document.getElementById('accessibility-dialog');
-      if(dialog&&!dialog.open)dialog.showModal();
-    }
+    if(ui.view==='study'){openPracticeSettings();return}
+    const open=()=>{
+      if(ui.view!=='home')setViewV2('home');
+      ui.homeSidebarOpen=true;
+      ui.mobileMenu=true;
+      $a('sidebar')?.classList.add('show-mobile');
+      $a('mobile-menu')?.setAttribute('aria-expanded','true');
+      applyPrefs();
+      const panel=$a('menu-practice');
+      if(panel)panel.open=true;
+      requestAnimationFrame(()=>panel?.scrollIntoView({block:'nearest',behavior:'smooth'}));
+    };
+    if(ui.view==='edit')confirmLeaveEditV2(open);
+    else open();
   });
   window.renderStudioAmber=renderStudioAmber;
   window.updateStudioAmber=updateStudioAmber;
