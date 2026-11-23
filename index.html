@@ -146,7 +146,7 @@
  <span role="img" aria-label="YouTube" title="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3z" fill="currentColor"/></svg></span>
  <span role="img" aria-label="WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12A8.5 8.5 0 0 1 8 19.5L3.5 21l1.4-4.5A8.5 8.5 0 1 1 20.5 12Z"/><path d="M9 8c-.8-.5-1.6.4-1.5 1.5.2 2.5 3.5 5.7 6 6 .9.1 1.8-.6 1.8-1.4l-2.2-1.2-.8 1a7.7 7.7 0 0 1-2.7-2.7l.8-.8Z" fill="currentColor" stroke="none"/></svg></span>
 </div></nav>
-<header class="top"><div class="brand"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Ocultar herramientas e instrucciones" aria-controls="sidebar" aria-expanded="true" title="Ocultar herramientas e instrucciones"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg><span>Herramientas e instrucciones</span><span class="sidebar-chevron" aria-hidden="true">⌄</span></button><div class="brandmark" id="app-logo-slot" aria-hidden="true" title="Espacio reservado para el logo definitivo">♫</div><div><h1>Kernnel Estudio musical</h1><small>Partituras · Metrónomo · Estudio</small></div></div><nav class="view-nav" aria-label="Navegación principal"><button id="nav-home" type="button" aria-current="page">⌂ Inicio</button><button id="nav-edit" type="button">✎ Edición</button><button id="nav-study" type="button">▶ Estudio</button></nav><div class="topright"><button id="profile-button" type="button" aria-haspopup="dialog" hidden>Elegir nombre</button><span class="pill" id="sync-indicator" role="status">Nube: esperando sesión</span><span class="pill" id="save-indicator" role="status">Cargando datos…</span><button id="toggle-study" class="primary" type="button">◫ Modo estudio</button></div></header>
+<header class="top"><div class="brand"><button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Ocultar herramientas e instrucciones" aria-controls="sidebar" aria-expanded="true" title="Ocultar herramientas e instrucciones"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg><span>Herramientas e instrucciones</span><span class="sidebar-chevron" aria-hidden="true">⌄</span></button><div class="brandmark" id="app-logo-slot" aria-hidden="true" title="Espacio reservado para el logo definitivo">♫</div><div><h1>Kernnel Estudio musical</h1><small>Partituras · Metrónomo · Estudio</small></div></div><nav class="view-nav" aria-label="Navegación principal"><button id="nav-home" type="button" aria-current="page">⌂ Inicio</button><button id="nav-edit" type="button">✎ Edición</button><button id="nav-study" type="button">▶ Estudio</button><button id="nav-repertoires" class="nav-repertoires" type="button" aria-haspopup="dialog" aria-controls="repertoire-picker" hidden>▤ Repertorios</button></nav><div class="topright"><button id="profile-button" type="button" aria-haspopup="dialog" hidden>Elegir nombre</button><span class="pill" id="sync-indicator" role="status">Nube: esperando sesión</span><span class="pill" id="save-indicator" role="status">Cargando datos…</span><button id="toggle-study" class="primary" type="button">◫ Modo estudio</button></div></header>
 <main class="shell">
 <aside class="sidebar" id="sidebar" aria-label="Menús de la aplicación">
  <div class="sidebar-head"><strong>Herramientas y ajustes</strong><small>Abre solo lo que necesites</small></div>
@@ -226,7 +226,8 @@
       <a href="https://github.com/osdrumm-sudo/kernnel-estudio-musical/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Historial de actualizaciones</a>
     </div>
   </details>
-  <div id="home-repertories" class="home-repertories" aria-label="Listado de repertorios"></div>
+  <form id="home-create-repertoire" class="home-repertoire-create"><label for="home-repertoire-name">Crear repertorio</label><div class="home-repertoire-form"><input id="home-repertoire-name" type="text" maxlength="120" required placeholder="Nombre del nuevo repertorio" autocomplete="off"><button type="submit" class="primary">＋ Crear repertorio</button></div></form>
+   <div id="home-repertories" class="home-repertories" aria-label="Listado de repertorios"></div>
   <details id="home-create" class="home-create"><summary>＋ Crear canción</summary><div class="home-create-body"><p>Crea un tema y asígnalo a los repertorios que necesites. También puedes crear uno nuevo desde aquí.</p><form id="create-song" class="stack"><label class="field">Título<input id="song-new-title" required maxlength="150" placeholder="Ej. Fortunate Son"></label><div class="grid2"><label class="field">Compases<input id="song-new-count" type="number" min="1" max="256" value="8" required></label><label class="field">Métrica<select id="song-new-meter"><option>4/4</option><option>2/4</option><option>3/4</option><option>6/8</option><option>9/8</option><option>12/8</option></select></label></div><div class="stack"><strong>Repertorios asociados</strong><small>Selecciona uno, varios o ninguno. Sin selección, se guardará en «Canciones sin repertorio».</small><div id="new-song-repertoires" class="repertoire-choices" aria-label="Repertorios disponibles"></div><div class="new-song-counter">Seleccionados: <strong id="create-reps-count">0</strong></div><button id="new-repertoire-toggle" type="button" aria-expanded="false" aria-controls="new-repertoire-inline">＋ Crear un repertorio nuevo</button><div id="new-repertoire-inline" class="new-repertoire-inline" hidden><label class="field">Nombre del nuevo repertorio<input id="new-repertoire-title" maxlength="120" placeholder="Ej. Ensayo acústico"></label><button id="new-repertoire-add" type="button">Agregar al formulario</button><small>El repertorio se guardará junto con la canción.</small></div></div><div class="new-song-actions"><button class="primary" type="submit">＋ Crear canción y abrir edición</button></div></form></div></details>
  </section>
  <div class="study-exits" aria-label="Salir del modo estudio"><button id="study-to-edit" type="button">✎ Modo edición</button><button id="study-to-repertoire" type="button">▤ Ir al repertorio</button></div>
@@ -1008,6 +1009,22 @@ window.KernnelBridge = Object.freeze({
  <h2 id="song-picker-title"></h2>
  <div id="song-picker-list" class="stack"></div>
  <form method="dialog" class="dialog-actions"><button>Cancelar</button></form>
+</dialog>
+<dialog id="repertoire-picker" aria-labelledby="repertoire-picker-title">
+ <h2 id="repertoire-picker-title">Seleccionar repertorio</h2>
+ <p>Elige un repertorio para volver a Inicio y ver sus canciones.</p>
+ <div id="repertoire-picker-list" class="repertoire-picker-list"></div>
+ <div class="dialog-actions"><button id="repertoire-picker-close" type="button">Cancelar</button></div>
+</dialog>
+<dialog id="leave-edit-dialog" aria-labelledby="leave-edit-title">
+ <h2 id="leave-edit-title">¿Guardar antes de salir de Edición?</h2>
+ <p>Elige si quieres conservar los cambios desde el último guardado manual antes de cambiar de pantalla.</p>
+ <p id="leave-edit-status" role="status" aria-live="polite"></p>
+ <div class="dialog-actions">
+  <button id="leave-edit-cancel" type="button">Cancelar</button>
+  <button id="leave-edit-discard" type="button">Salir sin guardar</button>
+  <button id="leave-edit-save" class="primary" type="button">Guardar y salir</button>
+ </div>
 </dialog>
 <dialog id="profile-dialog" aria-labelledby="profile-title">
  <form id="profile-form">
