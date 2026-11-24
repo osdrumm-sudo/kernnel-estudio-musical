@@ -164,6 +164,7 @@
     const parsed = parseMeter(meter);
     const measure = music.measures[section.desde - 1];
     if (!measure) throw Error('Compás inexistente.');
+    const oldEvents = clone(music.meterEvents);
     const collision = music.meterEvents.find(e => e.measureId === measure.id);
     if (collision) {
       collision.numerator = parsed.numerator;
@@ -171,13 +172,9 @@
     } else {
       music.meterEvents.push({ measureId: measure.id, numerator: parsed.numerator, denominator: parsed.denominator });
     }
-    // Un cambio de métrica puede dejar figuras fuera del compás: se valida antes de persistir.
     const errors = validate(song);
     if (errors.length) {
-      if (collision) {
-        collision.numerator = parsed.numerator;
-        collision.denominator = parsed.denominator;
-      }
+      music.meterEvents = oldEvents;
       throw Error('La métrica requiere revisión de fragmentos: ' + errors.join('; '));
     }
   }
@@ -198,7 +195,7 @@
       return errors;
     } catch (e) { return [e.message]; }
   }
-  const api = { PPQ, clone, parseMeter, durationTicks, pulseTicks, create, ensure, timeline, absolute, fromAbsolute, createFragment, fragmentById, addEvent, removeEvent, validate };
+  const api = { PPQ, clone, parseMeter, durationTicks, pulseTicks, create, ensure, timeline, absolute, fromAbsolute, createFragment, fragmentById, addEvent, removeEvent, setMeterAtSection, validate };
   root.MetriqaMusicCore = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
