@@ -77,6 +77,15 @@
       saveChange();
     } catch (e) { state.undo.pop(); message=e.message; render(); }
   }
+  function deleteFragment() {
+    const t = song(), f = fragment(t);
+    if (!f || !confirm('¿Eliminar el fragmento musical «' + f.name + '»? Podrás deshacer esta acción durante la sesión.')) return;
+    capture();
+    t.musica.fragments = t.musica.fragments.filter(x => x.id !== f.id);
+    state.fragmentId = t.musica.fragments[0]?.id || null;
+    message = 'Fragmento eliminado.';
+    saveChange();
+  }
   function insert(measureId, tick) {
     const t = song(), f = fragment(t); if (!f) return;
     capture();
@@ -158,6 +167,7 @@
     const list=[['','Selecciona un fragmento'],...music.fragments.map(f=>[f.id,f.name+' · '+modeLabels[f.mode]])];
     bar.append(select(list,state.fragmentId||'',v=>{state.fragmentId=v||null;render()},'Fragmento musical'));
     bar.append(button('↶ Deshacer',undo));
+    bar.append(button('Eliminar fragmento',deleteFragment));
     bar.append(button('＋ Nuevo fragmento',()=>{
       const f = document.getElementById('mqm-new-form');
       f.hidden = !f.hidden;
@@ -214,7 +224,7 @@
     const status=h('p','mqm-status',message);
     status.setAttribute('role','status');host.append(status);
     if (view === 'study') {
-      host.querySelectorAll('input,select,.mqm-cell,.mqm-new-form button,.mqm-event,.mqm-note').forEach(el=>el.disabled=true);
+      host.querySelectorAll('button,input,select').forEach(el=>el.disabled=true);
       host.append(h('p','mqm-helper','Modo Estudio: vista de lectura. La sincronización continua y los loops precisos se integrarán en la siguiente entrega de la Fase 1.'));
     }
   }
