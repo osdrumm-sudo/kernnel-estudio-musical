@@ -127,6 +127,7 @@
 </style>
 <link rel="stylesheet" href="./ui-v2.css">
 <link rel="stylesheet" href="./design-theme.css">
+<link rel="stylesheet" href="./music-editor.css">
 <link rel="stylesheet" href="./design-layout.css">
 <link rel="stylesheet" href="./access.css">
 <link rel="stylesheet" href="./metriqa-amber.css">
@@ -415,7 +416,7 @@ function updateThemeColor(){
 }
 function applyPrefs(){const p=D.prefs;document.documentElement.dataset.theme=p.theme==='system'?'':p.theme;document.documentElement.dataset.contrast=String(!!p.highContrast);document.body.classList.toggle('big-controls',!!p.bigControls);document.body.classList.toggle('study',ui.study);document.body.classList.toggle('show-settings',!!ui.studyMenu);document.body.classList.toggle('mobile-menu',ui.mobileMenu);document.body.classList.toggle('sidebar-collapsed',ui.view==='home'?!ui.homeSidebarOpen:ui.study?!ui.studyMenu:ui.sidebarCollapsed);syncSidebarToggle();updateThemeColor()}
 function setField(container,contents){container.replaceChildren(...contents)}
-function renderAll(){applyPrefs();renderLibrary();renderSongEditor();renderMetronome();renderPractice();renderAppearance();renderData();renderTitle();renderScore();renderTransport();renderV2()}
+function renderAll(){applyPrefs();renderLibrary();renderSongEditor();renderMetronome();renderPractice();renderAppearance();renderData();renderTitle();renderScore();renderTransport();renderV2();window.MetriqaMusic?.render?.()}
 let editCheckpoint=null;
 function renderEditActions(t=current()){
  if(ui.view!=='edit'||!t){
@@ -503,12 +504,13 @@ function renderSongEditor(){
  const box=$('song-editor'),t=current();box.replaceChildren();if(ui.study)return;
  if(!t){box.append(info('Crea o selecciona una canción en «Biblioteca y repertorios».'));return}
  const x=setting(t);box.append(title('Estructura de la canción'));
- box.append(label('Métrica',sel(METERS.map(m=>[m,m]),x.meter,v=>{stopMetro();x.meter=v;save();renderAll()})));
+ box.append(label('Métrica',sel(METERS.map(m=>[m,m]),x.meter,v=>{if(t.musica){toast('La edición de métrica de canciones con fragmentos se habilitará en una siguiente entrega.');renderSongEditor();return;}stopMetro();x.meter=v;save();renderAll()})));
  box.append(label('BPM original',number(x.bpm,30,300,v=>{x.bpm=v;save();renderAll()})));
  box.append(mk('div',{class:'notice',text:`Compases actuales: ${t.notas.length}. Las anotaciones se editan directamente debajo de cada compás.`}));
  box.append(button('+ Añadir compás al final',()=>{if(t.notas.length>=256)return toast('Máximo 256 compases.');t.notas.push('');if(!Array.isArray(t.nombres))t.nombres=[];t.nombres.push('');x.last.end=t.notas.length;clock.playEnd=t.notas.length;save();renderAll()}));
  box.append(button('− Eliminar último compás',()=>{
    if(t.notas.length<=1)return toast('Cada canción debe contener al menos un compás.');
+   if(window.MetriqaMusic?.hasEventsOnLastMeasure?.(t))return toast('Este compás tiene fragmentos musicales. Elimina primero esos fragmentos.');
    if(!confirm(`¿Eliminar el compás ${t.notas.length} de «${t.nombre}»? Podrás recuperarlo desde la papelera.`))return;
    const n=t.notas.length,trashId=uniqueId('trash');
    D.papelera.push({id:trashId,type:'measure',songId:t.id,songName:t.nombre,index:n-1,value:{note:t.notas[n-1],name:(t.nombres||[])[n-1]||'',beats:(t.tiempos||[])[n-1]||null},at:Date.now()});
@@ -1091,8 +1093,10 @@ window.KernnelBridge = Object.freeze({
 <script src="./study-comments.js"></script>
 <script src="./ui-v2.js"></script>
 <script src="./metriqa-amber.js"></script>
+<script src="./music-core.js"></script>
+<script src="./music-editor.js"></script>
 <script>
-initEvents();manageWake();
+initEvents();manageWake();window.MetriqaMusic?.init?.();
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',updateThemeColor);
 document.querySelector('[data-rail-view]').addEventListener('click',()=>$('nav-home').click());
 document.querySelector('[data-rail-library]').addEventListener('click',()=>confirmLeaveEditV2(()=>{

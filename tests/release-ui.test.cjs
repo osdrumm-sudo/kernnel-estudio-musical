@@ -30,6 +30,11 @@ test('colores por módulo respetan los modos oscuro y alto contraste', () => {
   assert.match(design, /:root\[data-contrast="true"\] \.menu-unit \.accordion/);
 });
 
-test('la PWA incrementa versión de recursos tras cambios visuales', () => {
-  assert.match(file('sw.js'), /kernnel-shell-2026-11-23-full-ambar-preview-v1/);
+test('la PWA versiona su caché y precarga el minieditor sin conexión', () => {
+  const sw = file('sw.js');
+  assert.match(sw, /kernnel-shell-2026-11-24-music-editor-f1a/);
+  for (const name of ['music-core.js','music-editor.js','music-editor.css']) {
+    assert.ok(sw.includes("'./" + name + "'"), name + ' no aparece en la caché PWA');
+    assert.ok(html.includes('./' + name), name + ' no está enlazado en la página');
+  }
 });
