@@ -532,9 +532,9 @@ function renderSongEditor(){
 }
 function renderMetronome(){
  const box=$('metro-settings'),t=current();box.replaceChildren();if(!t){box.append(info('Selecciona una canción.'));return}const x=setting(t);
- box.append(title('Velocidad y sonido'),label('BPM de práctica',number(x.practiceBpm,30,300,v=>{x.practiceBpm=v;save();renderAll()})));
+ box.append(title('Velocidad y sonido'),label('BPM de práctica',number(x.practiceBpm,30,300,v=>{stopMetro();x.practiceBpm=v;save();renderAll()})));
  const speed=mk('div',{class:'flex'});
- speed.append(button('− 1 BPM',()=>changeBpm(-1)),button('+ 1 BPM',()=>changeBpm(1)),button('Usar BPM original',()=>{x.practiceBpm=x.bpm;save();renderAll()}));box.append(speed);
+ speed.append(button('− 1 BPM',()=>changeBpm(-1)),button('+ 1 BPM',()=>changeBpm(1)),button('Usar BPM original',()=>{stopMetro();x.practiceBpm=x.bpm;save();renderAll()}));box.append(speed);
  box.append(label('Sonido',sel([['click','Clic clásico'],['perc','Percusión'],['mute','Solo visual (silencio)']],x.sound,v=>{x.sound=v;save();renderAll()})));
  const vol=mk('input',{type:'range',min:0,max:100,step:1,value:Math.round(x.volume*100),on:{input:e=>{x.volume=Number(e.target.value)/100;saveSoon()}}});box.append(label('Volumen independiente',vol));
  box.append(label('Compases de preparación',sel([[0,'Sin preparación'],[1,'1 compás'],[2,'2 compases'],[4,'4 compases']],x.count,v=>{x.count=Number(v);save();renderAll()})));
@@ -552,7 +552,7 @@ function renderMetronome(){
  box.append(button('Acentuar solo el primer pulso',()=>{x.accents=[1];save();renderMetronome();renderTransport()},'tiny-control'));
  box.append(info('En 6/8, 9/8 y 12/8 el clic se produce en cada corchea. Los acentos son configurables.'));
 }
-function changeBpm(delta){const t=current();if(!t)return;const x=setting(t);x.practiceBpm=bounded(x.practiceBpm+delta,30,300,x.practiceBpm);save();renderAll()}
+function changeBpm(delta){const t=current();if(!t)return;stopMetro();const x=setting(t);x.practiceBpm=bounded(x.practiceBpm+delta,30,300,x.practiceBpm);save();renderAll()}
 function renderPractice(){
  const box=$('practice-settings'),t=current();box.replaceChildren();if(!t){box.append(info('Selecciona una canción.'));return}const x=setting(t);
  box.append(title('Intervalo y repetición'));
@@ -628,11 +628,14 @@ function renderScore(){
  const t=current(),el=$('score');setStudiedSong(ui.study?t?.id??null:null);studyComments.reset();el.replaceChildren();if(!t){el.append(mk('div',{class:'empty',text:'Crea o selecciona una canción desde «Biblioteca y repertorios». '}));return}
  const x=setting(t);el.style.setProperty('--zoom',x.zoom==='auto'?'1':String(x.zoom));
  const per=beatsPerMeasure(x), eighth=x.meter.endsWith('/8');
+ const measureClock=t.musica?window.MetriqaMusicalClock.measuresFor(t,x.practiceBpm):null;
  for(let i=0;i<t.notas.length;i+=4){
   const line=mk('div',{class:'scoreline'+(i+4>=t.notas.length?' last':'')});
   const ts=mk('div',{class:'time-signature'});ts.innerHTML=`${esc(x.meter.split('/')[0])}<br>${esc(x.meter.split('/')[1])}`;line.append(ts);
   for(let j=i;j<Math.min(i+4,t.notas.length);j++){
    const n=j+1;const m=mk('div',{class:'measure'+(n===t.notas.length?' last-in-song':''),'data-measure':n});
+   const measurePulseCount=measureClock?.[j]?.pulseCount||per;
+   const measureIsEighth=measureClock?measureClock[j].denominator>=8:eighth;
    const header=mk('div',{class:'measure-header'});header.append(mk('b',{text:String(n)}));
    const caption=(t.nombres||[])[j]||'';
    const star=x.marcadores.includes(n);
@@ -645,12 +648,15 @@ function renderScore(){
     header.append(button(star?'★':'☆',()=>{if(star)x.marcadores=x.marcadores.filter(v=>v!==n);else x.marcadores.push(n);save();renderScore();renderPractice()},'mark'+(star?' on':''),{'aria-label':star?'Desmarcar compás difícil':'Marcar compás difícil',title:'Marcar compás difícil'}));
    }
    m.append(header);
+   if(measureClock&&measureClock[j]&&(measureClock[j].numerator+'/'+measureClock[j].denominator)!==x.meter){
+     header.append(mk('small',{class:'measure-meter',text:measureClock[j].numerator+'/'+measureClock[j].denominator}));
+   }
    if(studiedMeasures.has(n))markMeasureStudied(m,n);
    const bars=mk('div',{class:'sectionbars'});(t.secciones||[]).filter(s=>n>=s.desde&&n<=s.hasta).forEach(s=>{
     bars.append(mk('div',{style:`background:${s.color}`}),mk('span',{class:'section-name',text:s.nombre,style:`background:${s.color}25;color:var(--ink)`}));
    });m.append(bars);
    const beatrow=mk('div',{class:'beats'});
-   for(let k=0;k<per;k++){
+   for(let k=0;k<measurePulseCount;k++){
     const data=(t.tiempos||[])[j]?.[k]||null;
     const comment=typeof data?.txt==='string'&&data.txt.trim()?data.txt:'';
     const beatProps={class:'beat','data-beat':k};
@@ -660,7 +666,7 @@ function renderScore(){
      Object.assign(beatProps,{type:'button','aria-label':`Ver ${annotation} del pulso ${k+1} del compás ${n}`,'data-study-note':comment});
     }
     const beat=mk(beatProps.type?'button':'div',beatProps);
-    beat.innerHTML=eighth?NOTE8:NOTE4;
+    beat.innerHTML=measureIsEighth?NOTE8:NOTE4;
     if(data?.color)beat.style.backgroundColor=data.color+'25';
     if(!ui.study&&comment)beat.append(mk('small',{text:comment,title:comment}));
     if(data?.img){const img=mk('img',{src:data.img,alt:'Imagen del pulso '+(k+1)});beat.append(img)}
