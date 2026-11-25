@@ -120,6 +120,8 @@
     if(!state.enabled||ui.view!=='study')return;
     const t=current();if(!t)return;
     const x=setting(t),n=currentMeasure(),s=getSection(t,n);
+    const activeMeter=t.musica?window.MetriqaMusicalClock.measuresFor(t,x.practiceBpm)[n-1]:null;
+    const meterLabel=activeMeter?(activeMeter.numerator+'/'+activeMeter.denominator):x.meter;
     state.measure=n;
     const songSelect=$a('mq-song-select');
     if(songSelect){
@@ -131,10 +133,10 @@
       songSelect.value=t.id;
     }
     setText('mq-song-name',t.nombre);
-    setText('mq-song-details',x.meter+' · '+x.practiceBpm+' BPM de práctica · '+t.notas.length+' compases');
+    setText('mq-song-details',meterLabel+' · '+x.practiceBpm+' BPM de práctica · '+t.notas.length+' compases');
     setText('mq-section-name',s.nombre);
     setText('mq-section-range','Compases '+s.desde+'–'+s.hasta);
-    setText('mq-meter',x.meter);
+    setText('mq-meter',meterLabel);
     renderSections(t,n);
     renderMeasureStrip(t,n,x);
     renderImages(t,n);
@@ -148,7 +150,9 @@
     if(n!==state.measure){
       state.measure=n;renderStudioAmber();return;
     }
-    const x=setting(t),count=beatsPerMeasure(x),beat=Number(clock.visualBeat);
+    const x=setting(t),active=t.musica?window.MetriqaMusicalClock.measuresFor(t,x.practiceBpm)[n-1]:null;
+    const count=clock.position?.pulseCount||active?.pulseCount||beatsPerMeasure(x),beat=Number(clock.visualBeat);
+    const accents=t.musica&&active&&Array.isArray(t.musica.accentOverrides?.[active.id])?t.musica.accentOverrides[active.id]:x.accents;
     setText('mq-measure-num',String(n));
     setText('mq-measure-total','/ '+t.notas.length);
     setText('mq-beat-number',beat>=0&&beat<count?(beat+1)+' / '+count:'— / '+count);
@@ -163,7 +167,7 @@
     }
     [...(dots?.children||[])].forEach((dot,i)=>{
       dot.classList.toggle('is-now',i===beat);
-      dot.classList.toggle('is-accent',x.accents.includes(i+1));
+      dot.classList.toggle('is-accent',accents.includes(i+1));
     });
     document.querySelectorAll('.mq-measure-card').forEach(btn=>btn.classList.toggle('is-now',Number(btn.firstChild?.textContent)===n));
   }

@@ -122,6 +122,7 @@
     const selected = f.events.filter(x => x.measureId === m.id);
     selected.forEach(e => {
       const el = button(e.kind === 'rest' ? '𝄽' : '●',()=>remove(e.id),'mqm-note');
+      el.dataset.mqmEventId=e.id;
       let row = e.voice === 1 ? 2 : 4;
       if (f.mode === 'melody') row = 4.5 - (e.pitch - 60) / 4;
       if (f.mode === 'percussion') {
@@ -134,6 +135,7 @@
       el.setAttribute('aria-label',el.title);
       staff.append(el);
     });
+    const playhead=h('span','mqm-playhead');playhead.hidden=true;playhead.setAttribute('aria-hidden','true');staff.append(playhead);
     fig.append(staff);
     const grid = h('div','mqm-grid');
     grid.style.setProperty('--mqm-cols', String(Math.min(32,Math.ceil(m.durationTicks / state.step))));
@@ -147,8 +149,9 @@
     fig.append(grid);
     const listing = h('div','mqm-events');
     selected.sort((a,b)=>a.tick-b.tick || a.voice-b.voice).forEach(e => {
-      listing.append(button(labelEvent(e,f.mode)+' · '+e.tick+'t · voz '+e.voice+' ×',
-        ()=>remove(e.id),'mqm-event'));
+      const item=button(labelEvent(e,f.mode)+' · '+e.tick+'t · voz '+e.voice+' ×',
+        ()=>remove(e.id),'mqm-event');
+      item.dataset.mqmEventId=e.id;listing.append(item);
     });
     fig.append(listing);
     parent.append(fig);
@@ -168,6 +171,12 @@
     bar.append(select(list,state.fragmentId||'',v=>{state.fragmentId=v||null;render()},'Fragmento musical'));
     bar.append(button('↶ Deshacer',undo));
     bar.append(button('Eliminar fragmento',deleteFragment));
+    bar.append(button('Practicar fragmento',()=>{
+      const selected=fragment(song());
+      if(!selected)return;
+      if(root.KernnelPrepareFragment?.(selected))message='Loop preparado. En Estudio, pulsa Reproducir.';
+      render();
+    },'mqm-practice'));
     bar.append(button('＋ Nuevo fragmento',()=>{
       const f = document.getElementById('mqm-new-form');
       f.hidden = !f.hidden;
@@ -225,8 +234,27 @@
     status.setAttribute('role','status');host.append(status);
     if (view === 'study') {
       host.querySelectorAll('button,input,select').forEach(el=>el.disabled=true);
+      host.querySelectorAll('.mqm-practice').forEach(el=>el.disabled=false);
       host.append(h('p','mqm-helper','Modo Estudio: vista de lectura. La sincronización continua y los loops precisos se integrarán en la siguiente entrega de la Fase 1.'));
     }
+  }
+  function updatePlayback(t,position) {
+    if(!host||host.hidden||!t||!t.musica)return;
+    const f=fragment(t),marker=host.querySelector('.mqm-playhead');
+    if(!f||!marker)return;
+    const m=activeMeasure(t,f);
+    const visible=Boolean(m && position?.phase==='play' && position.measureIndex===m.index);
+    marker.hidden=!visible;
+    if(visible)marker.style.left=(5+88*Math.max(0,Math.min(1,(position.tick-m.startTick)/m.durationTicks)))+'%';
+    const active=new Set();
+    if(visible)for(const e of f.events){
+      if(e.measureId!==m.id)continue;
+      const tick=m.startTick+e.tick;
+      if(position.tick>=tick && position.tick<tick+e.durationTicks)active.add(e.id);
+    }
+    host.querySelectorAll('[data-mqm-event-id]').forEach(el=>{
+      el.classList.toggle('mqm-sounding',active.has(el.dataset.mqmEventId));
+    });
   }
   function init() {
     if (host) return;
@@ -237,7 +265,7 @@
     scorebox.parentElement.insertBefore(host,scorebox);
     render();
   }
-  root.MetriqaMusic = {init,render,hasScore:t=>Boolean(t?.musica?.fragments?.length),
+  root.MetriqaMusic = {init,render,updatePlayback,hasScore:t=>Boolean(t?.musica?.fragments?.length),
     hasEventsOnLastMeasure:t=>Boolean(t?.musica?.fragments?.some(f=>{
       const id=t.musica.measures[t.musica.measures.length-1]?.id;
       return f.start?.measureId===id || f.end?.measureId===id || f.events?.some(e=>e.measureId===id);

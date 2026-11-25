@@ -15,6 +15,7 @@ function originForSongV2(songId){
 function setViewV2(view){
   if(view!=='home'&&!current()){toast('Selecciona una canción para continuar.');return}
   stopMetro();
+  if(ui.study && view!=='study' && clock.tickRange){clock.tickRange=null;initSelection();}
   ui.view=view;
   ui.study=view==='study';
   ui.studyMenu=false;
@@ -35,6 +36,7 @@ function chooseSongV2(id,view,repId){
     return;
   }
   stopMetro();
+  clock.tickRange=null;
   D.sel=id;
   ui.originRep=repId??originForSongV2(id);
   ui.homeFocusSong=id;

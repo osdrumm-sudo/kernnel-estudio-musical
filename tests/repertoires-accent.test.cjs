@@ -97,7 +97,11 @@ test('configuración de acentos mantiene compatibilidad con canciones previas',(
   assert.deepEqual(Array.from(setting(custom).accents),[1,4]);
   const silent={notas:[''],estudio:{meter:'4/4',bpm:120,accents:[]}};
   assert.deepEqual(Array.from(setting(silent).accents),[]);
-  assert.match(script[1],/clickAudio\(at,x\.accents\.includes\(beat\+1\),x\)/);
+  assert.match(script[1],/clickAudio\(at,ev\.accent,x\)/);
+  const musicalClock=require('../music-clock.js');
+  const song={notas:[''],estudio:{meter:'4/4',practiceBpm:120,accents:[1,3]}};
+  const scheduled=musicalClock.createPlan(song,{bpm:120}).eventsBetween(0,2);
+  assert.deepEqual(scheduled.map(e=>e.accent),[true,false,true,false]);
 });
 
 test('vistas y diálogo de repertorios tienen sus identificadores en el documento',()=>{
