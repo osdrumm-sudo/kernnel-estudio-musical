@@ -94,3 +94,59 @@ test('un cambio de BPM conserva la posición musical del cursor',()=>{
  close(updated.tick,pos.tick);
  assert.equal(updated.cycle,pos.cycle);
 });
+
+test('validar una canción heredada no activa el modelo v2',()=>{
+ const s=song(),before=JSON.stringify(s);
+ assert.deepEqual(C.validate(s),[]);
+ assert.equal(JSON.stringify(s),before);
+});
+test('el reloj rechaza compases desincronizados sin modificar el modelo',()=>{
+ const s=song(),music=C.ensure(s);
+ s.notas.push('');
+ const before=JSON.stringify(s);
+ assert.throws(()=>K.createPlan(s),/desincronizados/);
+ assert.match(C.validate(s)[0],/desincronizados/);
+ assert.equal(JSON.stringify(s),before);
+ assert.equal(music.measures.length,3);
+});
+test('el reloj rechaza referencias métricas duplicadas o huérfanas',()=>{
+ const s=song(),music=C.ensure(s);
+ music.meterEvents.push({...music.meterEvents[0]});
+ assert.throws(()=>K.createPlan(s),/duplicado/);
+ music.meterEvents.pop();
+ music.meterEvents.push({measureId:'missing',numerator:3,denominator:4});
+ assert.throws(()=>K.createPlan(s),/huérfano/);
+});
+test('validación detecta solapamientos y duplicados de eventos importados sin editar',()=>{
+ const s=song(),f=C.createFragment(s,{mode:'rhythm'}),id=f.start.measureId;
+ const e=C.addEvent(s,f.id,{measureId:id,tick:0,durationTicks:960,voice:1});
+ f.events.push({...e,id:'overlap',tick:480});
+ f.events.push({...e});
+ const before=JSON.stringify(s);
+ const errors=C.validate(s);
+ assert.ok(errors.some(x=>/superpuestas/.test(x)));
+ assert.ok(errors.some(x=>/duplicado/.test(x)));
+ assert.equal(JSON.stringify(s),before);
+});
+test('un cambio de métrica incompatible conserva íntegros los eventos anteriores',()=>{
+ const s=song(),f=C.createFragment(s,{mode:'rhythm',measureIndex:1});
+ C.addEvent(s,f.id,{measureId:f.start.measureId,tick:2880,durationTicks:960,voice:1});
+ const before=JSON.stringify(s);
+ assert.throws(()=>C.setMeterAtSection(s,'bridge','3/4'),/revisión/);
+ assert.equal(JSON.stringify(s),before);
+});
+test('el límite de compás no adelanta la métrica a ticks inmediatamente anteriores',()=>{
+ const s=song(),m=C.ensure(s);
+ m.meterEvents.push({measureId:m.measures[1].id,numerator:6,denominator:8});
+ const p=K.createPlan(s,{bpm:120});
+ const at=p.secondsAtTick(3840);
+ assert.ok(p.secondsAtTick(3840-1e-9)<at);
+ assert.equal(p.positionAt(at).meter,'6/8');
+ assert.equal(p.positionAt(at-1e-10).meter,'4/4');
+});
+test('validación rechaza acentos huérfanos y fuera del rango métrico',()=>{
+ const s=song('3/4'),m=C.ensure(s);
+ m.accentOverrides[m.measures[0].id]=[4];
+ m.accentOverrides.missing=[1];
+ assert.equal(C.validate(s).filter(x=>/Acentos inválidos/.test(x)).length,2);
+});
