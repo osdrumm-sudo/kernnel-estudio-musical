@@ -8,9 +8,10 @@ class SyncEngine{
  stop(){this.closed=true;clearTimeout(this.timer);}
  changed(){if(!this.alive())return;const current=C.entries(this.bridge.snapshot());for(const k of Object.keys({...this.lastValues,...current}))if(C.canonical(current[k]?.value)!==C.canonical(this.lastValues[k]?.value))this.localTimes[k]=Date.now();this.lastValues=current;this.bridge.syncTimes?.(this.localTimes);this.pending=true;this.status('pending');this.schedule(1500);}
  schedule(delay=1500){clearTimeout(this.timer);if(this.alive())this.timer=setTimeout(()=>this.flush(),delay);}
- flush(){if(!this.alive())return Promise.resolve(false);if(this.running)return this.running;if(!this.online()){return C.plan(this.bridge.snapshot(),this.bridge.snapshot()._sync?.base||{}).then(rows=>{this.pending=rows.some(r=>r.action==='push'||r.action==='conflict');this.status(this.pending?'offline':'offline-clean');return !this.pending;});}clearTimeout(this.timer);this.running=this.run().catch(e=>{if(this.alive()){this.pending=true;this.status('error',e);this.schedule(Math.min(60000,3000*2**Math.min(this.retry++,4)));}return false;}).finally(()=>{this.running=null;});return this.running;}
+ flush(){if(!this.alive())return Promise.resolve(false);if(this.running)return this.running;if(!this.online()){return C.plan(this.bridge.snapshot(),this.bridge.snapshot()._sync?.base||{}).then(rows=>{this.pending=rows.some(r=>r.action==='push'||r.action==='conflict');this.status(this.pending?'offline':'offline-clean');return !this.pending;});}clearTimeout(this.timer);this.running=this.run().catch(e=>{if(this.alive()){this.pending=true;this.status('error',e);if(e.code!=='session/conflict')this.schedule(Math.min(60000,3000*2**Math.min(this.retry++,4)));}return false;}).finally(()=>{this.running=null;});return this.running;}
  async run(){
   this.status('saving');
+  const newReservation=await this.store.guard?.acquire();if(!this.alive())return false;
   let heads=await this.store.list();if(!this.alive())return false;
   // Migración de la copia manual sólo cuando aún no hay biblioteca incremental.
   if(!Object.keys(heads).length&&!this.bridge.snapshot()._sync?.legacyChecked){
@@ -20,6 +21,7 @@ class SyncEngine{
    data._sync={...(data._sync||{}),legacyChecked:true};this.bridge.applySync(data);
   }
   const captured=this.bridge.snapshot(),plan=await C.plan(captured,heads),changes=[],base={};
+  if(this.store.guard){try{root.MetriqaSession.verifyPlan(plan);}catch(error){if(newReservation)await this.store.guard.release();throw error;}}
   const remember=(k,h)=>{if(h)base[k]={version:h.version,hash:h.hash,kind:h.kind,id:h.id,modifiedAt:h.modifiedAt};};
   let conflicts=0;
   for(const row of plan){

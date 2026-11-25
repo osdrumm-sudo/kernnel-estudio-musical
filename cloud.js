@@ -5,6 +5,23 @@ const state={auth:null,db:null,sdk:null,user:null,busy:false,allowed:false,bootP
 const info=message=>{byId('cloud-status').textContent=message;byId('access-status').textContent=message;};
 const errors={'auth/popup-blocked':'Permite la ventana de Google e inténtalo de nuevo.','auth/popup-closed-by-user':'Se cerró el ingreso. Puedes intentarlo nuevamente.','auth/unauthorized-domain':'Este dominio aún no está autorizado en Firebase.','auth/operation-not-allowed':'Habilita Google en Firebase Authentication.','permission-denied':'La cuenta no tiene permiso para esta operación.','unavailable':'No se pudo conectar. Revisa tu conexión y vuelve a intentar.'};
 function report(e){console.warn('[Kernnel]',e.code||e.message);info(errors[e.code]||'No se pudo completar la operación. Inténtalo nuevamente.');}
+function sessionNotice(kind){
+ const offline=kind==='offline',id='metriqa-session-notice';
+ let dialog=byId(id);
+ if(!dialog){
+  dialog=document.createElement('dialog');dialog.id=id;dialog.setAttribute('aria-labelledby',id+'-title');
+  const heading=document.createElement('h2');heading.id=id+'-title';
+  const message=document.createElement('p'),button=document.createElement('button');
+  button.type='button';button.className='primary';button.onclick=()=>dialog.close();
+  dialog.append(heading,message,button);document.body.append(dialog);
+ }
+ if(dialog.open&&dialog.dataset.kind===kind)return;
+ dialog.dataset.kind=kind;
+ dialog.querySelector('h2').textContent=offline?'Estás trabajando sin conexión':'Conflicto de sesión';
+ dialog.querySelector('p').textContent=offline?'Tu trabajo se guardará localmente. Cuando recuperes Internet, continúa y finaliza tu trabajo en este mismo dispositivo antes de utilizar otro equipo.':'Se ha detectado actividad simultánea en otro dispositivo o cambios incompatibles. Esta sesión no se guardará en la nube. Tu trabajo permanece en este equipo. Finaliza el trabajo en el dispositivo de origen; no borres los datos locales.';
+ dialog.querySelector('button').textContent=offline?'Continuar sin conexión':'Entendido';
+ if(!dialog.open)dialog.showModal();
+}
 function lock(busy){state.busy=busy;['access-google','cloud-upload','cloud-download','cloud-logout'].forEach(id=>byId(id).disabled=busy);}
 function receipt(){try{return JSON.parse(localStorage.getItem(RECEIPT)||'null')}catch{return null}}
 function forget(){try{localStorage.removeItem(RECEIPT)}catch{}}
@@ -75,6 +92,7 @@ async function grant(user,offline=false){
  if(!offline){try{localStorage.setItem(RECEIPT,JSON.stringify({uid:user.uid,email:user.email}))}catch{}}
  startProfile(user);
  startSync();
+ if(offline)sessionNotice('offline');
  if(!offline)window.KernnelUsage?.start(state.sdk,state.db,user);
 }
 async function checkAccess(){
@@ -118,7 +136,7 @@ async function boot(){
  })().catch(e=>{state.bootPromise=null;throw e});return state.bootPromise;
 }
 async function entry(){if(state.busy)return;lock(true);try{if(!navigator.onLine)throw Error('offline');await boot();const provider=new state.sdk.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await state.sdk.signInWithPopup(state.auth,provider);}catch(e){report(e)}finally{lock(false)}}
-async function logout(){if(state.busy)return;window.KernnelBridge.flushLocal?.();if(syncEngine?.pending){await syncEngine.flush();if(syncEngine.pending&&!confirm('Quedan cambios sin guardar en la nube. Se conservarán en este equipo para esta cuenta. ¿Cerrar sesión de todas formas?'))return;}lock(true);try{localStorage.setItem('kernnel-signout-pending','1');if(state.auth){await state.sdk.signOut(state.auth);localStorage.removeItem('kernnel-signout-pending');}forget();state.epoch++;state.user=null;state.account=null;gate('Sesión cerrada. Inicia sesión con Google para continuar.');byId('access-google').hidden=false;byId('access-logout').hidden=true;byId('access-request').hidden=true;}catch(e){report(e)}finally{lock(false)}}
+async function logout(){if(state.busy)return;window.KernnelBridge.flushLocal?.();if(syncEngine){const engine=syncEngine;const saved=navigator.onLine&&await engine.flush();if(!saved&&engine.pending&&!confirm('Quedan cambios sin guardar en la nube. Se conservarán en este equipo para esta cuenta. ¿Cerrar sesión de todas formas?'))return;if(saved&&navigator.onLine&&engine.store.guard){try{engine.stop();await engine.store.guard.release();}catch(e){report(e);startSync();return;}}}lock(true);try{localStorage.setItem('kernnel-signout-pending','1');if(state.auth){await state.sdk.signOut(state.auth);localStorage.removeItem('kernnel-signout-pending');}forget();state.epoch++;state.user=null;state.account=null;gate('Sesión cerrada. Inicia sesión con Google para continuar.');byId('access-google').hidden=false;byId('access-logout').hidden=true;byId('access-request').hidden=true;}catch(e){report(e)}finally{lock(false)}}
 async function readLegacy(uid,sdk,db){
  const snap=await sdk.getDocFromServer(sdk.doc(db,'users',uid,'kernnelSaves','latest'));if(!snap.exists())return null;const meta=snap.data();
  if(meta.format!=='kernnel-full-snapshot-v1'||!Number.isInteger(meta.parts)||meta.parts<1||meta.parts>300)throw Error('Respaldo anterior inválido.');
@@ -156,15 +174,18 @@ let syncEngine=null,syncWatch=null;
 function stopSync(){syncEngine?.stop();syncEngine=null;syncWatch?.();syncWatch=null;}
 function syncStatus(status,error){
  const messages={pending:'Cambios pendientes de guardar en la nube',saving:'Guardando y comprobando cambios…',saved:'✓ Guardado en la nube','offline-clean':'Sin conexión · sin cambios pendientes',offline:'Sin conexión · cambios pendientes en este equipo',error:'No se pudo sincronizar. Los cambios siguen en este equipo.'};
- const message=error?.code==='permission-denied'?'Falta habilitar las reglas de sincronización en Firebase. Tus cambios siguen en este equipo.':messages[status];
+ const message=error?.code==='session/conflict'?'Conflicto de sesión · no guardado en la nube; cambios en este dispositivo.':error?.code==='permission-denied'?'Falta habilitar las reglas de sincronización en Firebase. Tus cambios siguen en este equipo.':messages[status];
  byId('sync-indicator').textContent=message;byId('cloud-remote').textContent=message;
+ if(error?.code==='session/conflict')sessionNotice('conflict');
  if(error?.conflicts){byId('sync-conflicts').hidden=false;byId('sync-conflicts').textContent='Se detectaron cambios simultáneos. Se conservaron las versiones con contenido; busca «Duplicada por conflicto» y revisa sus fechas.';}
  if(status==='error')console.warn('[Sincronización]',error);
 }
 function startSync(){
  stopSync();if(!window.KernnelSyncEngine)return;
  const uid=state.user.uid,epoch=state.epoch,valid=()=>state.allowed&&state.user?.uid===uid&&state.epoch===epoch;
- const store=new window.KernnelSyncStore(state.sdk,state.db,uid,()=>readLegacy(uid,state.sdk,state.db),valid);
+ let guard=null;
+ if(state.sdk){try{const device=window.MetriqaSession.deviceId(localStorage,()=>crypto.randomUUID());guard=new window.MetriqaSession.SessionGuard({sdk:state.sdk,db:state.db,uid,device,valid});}catch(e){syncStatus('error',e);return;}}
+ const store=new window.KernnelSyncStore(state.sdk,state.db,uid,()=>readLegacy(uid,state.sdk,state.db),valid,guard);
  syncEngine=new window.KernnelSyncEngine({bridge:window.KernnelBridge,store,status:syncStatus,valid});
  syncEngine.flush();
  if(state.sdk)syncWatch=state.sdk.onSnapshot(store.collection(),snap=>{if(!snap.metadata.fromCache&&valid())syncEngine?.schedule(1500);},e=>syncStatus('error',e));
@@ -193,6 +214,6 @@ byId('admin-close').onclick=()=>byId('access-admin').close();
 byId('access-admin-open').onclick=async()=>{byId('access-admin').showModal();try{await loadAdmin()}catch(e){byId('admin-status').textContent='No se pudo cargar. Revisa tu conexión.'}};
 byId('admin-invite').onsubmit=async e=>{e.preventDefault();const button=e.target.querySelector('button');button.disabled=true;try{await authorize(byId('admin-email').value.trim().toLowerCase(),true);byId('admin-email').value='';await loadAdmin()}catch(error){byId('admin-status').textContent='No se pudo autorizar el correo.'}finally{button.disabled=false}};
 window.addEventListener('online',()=>{gate('Revalidando acceso al recuperar conexión…');if(state.sdk&&state.user)checkAccess().catch(report);else boot().catch(report)});
-window.addEventListener('offline',()=>{if(state.allowed)info('Sin conexión. Tus cambios se guardan en este equipo.');});
+window.addEventListener('offline',()=>{if(state.allowed){window.KernnelBridge.flushLocal?.();info('Sin conexión. Continúa tu trabajo en este mismo dispositivo.');sessionNotice('offline');}});
 if(navigator.onLine)boot().catch(report);
 else{const saved=receipt();if(saved?.uid&&saved?.email){state.user=saved;byId('access-logout').hidden=false;grant(saved,true).catch(report)}else gate('Conéctate a Internet para iniciar sesión por primera vez.');}

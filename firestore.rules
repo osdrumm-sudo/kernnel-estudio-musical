@@ -59,6 +59,16 @@ service cloud.firestore {
     && request.resource.data.lastSeen == request.time;
    allow delete: if isAdmin();
   }
+  // Reserva cooperativa por dispositivo; no publicar estas reglas sin validar clientes y emulador.
+  match /users/{userId}/editSessions/{sessionId} {
+   allow get: if isOwner(userId) && sessionId == 'active';
+   allow create: if isOwner(userId) && sessionId == 'active'
+    && request.resource.data.keys().hasOnly(['device','createdAt'])
+    && request.resource.data.device is string && request.resource.data.device.size() >= 16
+    && request.resource.data.device.size() <= 100 && request.resource.data.createdAt == request.time;
+   allow update: if false;
+   allow delete: if isOwner(userId) && sessionId == 'active';
+  }
   // Biblioteca incremental: sólo su propietario autorizado puede acceder.
   function validSyncHead() {
    let d = request.resource.data;

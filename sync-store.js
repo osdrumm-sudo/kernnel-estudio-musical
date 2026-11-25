@@ -3,7 +3,7 @@
 'use strict';
 const C=root.KernnelSyncCore;
 class SyncStore {
- constructor(sdk,db,uid,legacy,valid){Object.assign(this,{sdk,db,uid,legacy,valid});}
+ constructor(sdk,db,uid,legacy,valid,guard=null){Object.assign(this,{sdk,db,uid,legacy,valid,guard});}
  id(){return crypto.randomUUID();}
  check(){if(!this.valid())throw Error('La sesión cambió.');}
  collection(){return this.sdk.collection(this.db,'users',this.uid,'syncItems');}
@@ -25,8 +25,8 @@ class SyncStore {
   for(let i=0;i<parts.length;i++){this.check();await this.sdk.setDoc(this.part(version,i),{index:i,payload:parts[i]});}
   const record={version,kind,id,hash,modifiedAt,name:value?.nombre||'Elemento eliminado',parts:parts.length,bytes,deleted:!value};
   const result=await this.sdk.runTransaction(this.db,async tx=>{
-   this.check();const snap=await tx.get(this.ref(key)),old=snap.exists()?snap.data():null;
-   if((old?.version||null)!==expected){const e=Error('Otro dispositivo guardó cambios. Se volverán a comparar las versiones.');e.code='sync/conflict';throw e;}
+   this.check();await this.guard?.assert(tx);const snap=await tx.get(this.ref(key)),old=snap.exists()?snap.data():null;
+   if((old?.version||null)!==expected){const e=Error('Otro dispositivo guardó cambios. Se volverán a comparar las versiones.');e.code=this.guard?'session/conflict':'sync/conflict';throw e;}
    const history=[record,...(old?.history||[])].slice(0,20),head={...record,history,committedAt:this.sdk.serverTimestamp()};
    tx.set(this.ref(key),head);return {head,evicted:(old?.history||[]).slice(19)};
   });
