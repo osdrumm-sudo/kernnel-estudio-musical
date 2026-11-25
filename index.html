@@ -533,9 +533,9 @@ function renderSongEditor(){
 }
 function renderMetronome(){
  const box=$('metro-settings'),t=current();box.replaceChildren();if(!t){box.append(info('Selecciona una canción.'));return}const x=setting(t);
- box.append(title('Velocidad y sonido'),label('BPM de práctica',number(x.practiceBpm,30,300,v=>{stopMetro();x.practiceBpm=v;save();renderAll()})));
+ box.append(title('Velocidad y sonido'),label('BPM de práctica',number(x.practiceBpm,30,300,v=>setPracticeBpm(v))));
  const speed=mk('div',{class:'flex'});
- speed.append(button('− 1 BPM',()=>changeBpm(-1)),button('+ 1 BPM',()=>changeBpm(1)),button('Usar BPM original',()=>{stopMetro();x.practiceBpm=x.bpm;save();renderAll()}));box.append(speed);
+ speed.append(button('− 1 BPM',()=>changeBpm(-1)),button('+ 1 BPM',()=>changeBpm(1)),button('Usar BPM original',()=>setPracticeBpm(x.bpm)));box.append(speed);
  box.append(label('Sonido',sel([['click','Clic clásico'],['perc','Percusión'],['mute','Solo visual (silencio)']],x.sound,v=>{x.sound=v;save();renderAll()})));
  const vol=mk('input',{type:'range',min:0,max:100,step:1,value:Math.round(x.volume*100),on:{input:e=>{x.volume=Number(e.target.value)/100;saveSoon()}}});box.append(label('Volumen independiente',vol));
  box.append(label('Compases de preparación',sel([[0,'Sin preparación'],[1,'1 compás'],[2,'2 compases'],[4,'4 compases']],x.count,v=>{x.count=Number(v);save();renderAll()})));
@@ -553,7 +553,7 @@ function renderMetronome(){
  box.append(button('Acentuar solo el primer pulso',()=>{x.accents=[1];save();renderMetronome();renderTransport()},'tiny-control'));
  box.append(info('En 6/8, 9/8 y 12/8 el clic se produce en cada corchea. Los acentos son configurables.'));
 }
-function changeBpm(delta){const t=current();if(!t)return;stopMetro();const x=setting(t);x.practiceBpm=bounded(x.practiceBpm+delta,30,300,x.practiceBpm);save();renderAll()}
+function changeBpm(delta){const t=current();if(!t)return;setPracticeBpm(setting(t).practiceBpm+delta)}
 function renderPractice(){
  const box=$('practice-settings'),t=current();box.replaceChildren();if(!t){box.append(info('Selecciona una canción.'));return}const x=setting(t);
  box.append(title('Intervalo y repetición'));
@@ -775,6 +775,41 @@ function clearMetronomeTimers(){
 function queueMetronomeEvent(callback,delay){
  const timer=setTimeout(()=>{clock.timeouts.delete(timer);callback()},delay);
  clock.timeouts.add(timer);
+}
+function setPracticeBpm(value){
+ const t=current();if(!t)return;
+ const x=setting(t),newBpm=bounded(value,30,300,x.practiceBpm);
+ if(newBpm===x.practiceBpm)return;
+ const oldBpm=x.practiceBpm,oldPlan=clock.musicalPlan;
+ const playing=clock.playing,paused=clock.paused;
+ if((playing||paused)&&oldPlan){
+  const elapsed=playing?Math.max(0,metronomeTime()-clock.audioAnchor):clock.pausedElapsed;
+  const oldPosition=oldPlan.positionAt(elapsed);
+  x.practiceBpm=newBpm;
+  try{
+   const range=clock.tickRange?.songId===t.id?clock.tickRange:null;
+   const next=window.MetriqaMusicalClock.createPlan(t,{
+    bpm:newBpm,startMeasureIndex:clock.playStart-1,endMeasureIndex:clock.playEnd-1,
+    startTick:range?.startTick,endTick:range?.endTick,loop:range?true:clock.loop,countInMeasures:x.count
+   });
+   let newElapsed=0;
+   if(oldPosition.phase==='count'){
+    const progress=oldPlan.countSeconds?Math.min(.999999,elapsed/oldPlan.countSeconds):0;
+    newElapsed=progress*next.countSeconds;
+   }else if(oldPosition.phase==='play'){
+    newElapsed=next.countSeconds+
+      (next.loop?oldPosition.cycle*next.playSeconds:0)+
+      next.secondsAtTick(oldPosition.tick)-next.startSeconds;
+   }else newElapsed=next.totalSeconds;
+   clock.token++;clearMetronomeTimers();
+   if(clock.ctx){for(const voice of clock.voices){try{voice.stop()}catch(e){}}clock.voices.clear()}
+   clock.musicalPlan=next;clock.pausedElapsed=newElapsed;
+   clock.audioAnchor=metronomeTime()+.035-newElapsed;
+   clock.scheduledUntil=newElapsed;clock.position=next.positionAt(newElapsed);
+   if(playing){clock.timer=setInterval(scheduleTick,25);scheduleTick();displayClockFrame()}
+  }catch(error){x.practiceBpm=oldBpm;toast('No se pudo ajustar el BPM: '+error.message);return}
+ }else{x.practiceBpm=newBpm;}
+ save();renderAll();
 }
 async function startMetro(){
  const t=current();if(!t||clock.starting)return;
