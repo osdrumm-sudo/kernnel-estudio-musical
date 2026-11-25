@@ -18,5 +18,10 @@
 - Casos: 0/49/50/51 letras o números, espacios y signos no computables, pegado, tildes, caracteres Unicode y saltos de línea, edición de datos históricos, cambio de plan, guardado offline y sincronización posterior.
 - Derechos de plan controlados por servidor, no editables por el cliente; diseñar el tratamiento de sesiones offline y datos históricos antes de publicar reglas.
 
+## Incentivo de ampliación Free — decisión de producto
+- Al alcanzar por tercera vez un límite de Free (anotaciones u otras capacidades limitadas), mostrar un cartel con una alternativa voluntaria para obtener un 10 % adicional de capacidad, acercando al usuario a Premium/Full.
+- No conceder la ampliación sin la acción afirmativa del usuario. Mantener los datos previamente creados y el funcionamiento offline.
+- Propuesta técnica pendiente de aprobación: contar tres ocasiones distintas, no tres pulsaciones consecutivas sobre el mismo límite; registrar el beneficio por cuenta, con sincronización idempotente para evitar duplicaciones. Ejemplo si el porcentaje se calcula sobre el límite Free: 50 → 55 caracteres computables. No se ha definido el redondeo de cupos discretos (repertorios y canciones), la duración, la repetibilidad ni si el beneficio amplía todas las cuotas o solo la que lo activa. No implementar el incentivo hasta resolver estas reglas.
+
 ## Pendiente
 Definir derechos de cuenta, mecanismo de identificación de contenido previo a Free y tratamiento de importaciones nuevas y edición de contenido histórico, unidad Unicode de conteo y máximo del nivel superior. Implementar y probar en rama Free. No cambiar main, producción Firebase ni la rama Full hasta validar.
