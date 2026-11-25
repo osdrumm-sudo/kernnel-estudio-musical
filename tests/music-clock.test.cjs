@@ -80,3 +80,17 @@ test('se rechazan rangos fuera de la canción',()=>{
  assert.throws(()=>K.createPlan(s,{startTick:-1}),/Límites/);
  assert.throws(()=>K.createPlan(s,{bpm:0}),/BPM/);
 });
+
+test('un cambio de BPM conserva la posición musical del cursor',()=>{
+ const s=song('4/4',2);
+ const old=K.createPlan(s,{bpm:120,loop:true,countInMeasures:1});
+ const next=K.createPlan(s,{bpm:175,loop:true,countInMeasures:1});
+ const elapsed=old.countSeconds+1.75*old.playSeconds+old.secondsAtTick(1440)-old.startSeconds;
+ const pos=old.positionAt(elapsed);
+ assert.equal(pos.phase,'play');
+ const newElapsed=next.countSeconds+pos.cycle*next.playSeconds+
+   next.secondsAtTick(pos.tick)-next.startSeconds;
+ const updated=next.positionAt(newElapsed);
+ close(updated.tick,pos.tick);
+ assert.equal(updated.cycle,pos.cycle);
+});
