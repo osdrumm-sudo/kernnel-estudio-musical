@@ -1,6 +1,6 @@
 # Metriqa Full — Minieditor Musical · Fase 1 (primera entrega)
 
-**Estado:** implementación inicial de escritura y persistencia, pendiente del resto de la Fase 1. La rama de respaldo es respaldo/metriqa-publico-2026-11-24 (commit 623c0fb).
+**Estado:** segunda entrega de la Fase 1: escritura, persistencia y reloj musical compartido integrados; la Fase 1 aún no está completa. La rama de respaldo es respaldo/metriqa-publico-2026-11-24 (commit 623c0fb).
 
 ## Incluido en esta entrega
 
@@ -12,13 +12,20 @@
 - Eliminación de eventos y deshacer de acciones durante la sesión.
 - Persistencia dentro de la canción mediante los respaldos JSON y sincronización existentes, sin modificar reglas de Firebase.
 - Caché PWA de los nuevos recursos.
+- Reloj musical único (`music-clock.js`) para eventos Web Audio, pulsos y cursor: 960 ticks por negra, métrica por compás cuando existe en el modelo y cuenta de entrada que no se repite dentro de loops.
+- Programación de clics anticipada con `AudioContext.currentTime`, posición visual interpolada mediante `requestAnimationFrame`, y salto de eventos atrasados después de suspensiones, evitando doble conteo.
+- Loop exacto por ticks en el motor; acción «Practicar fragmento» que prepara el intervalo sin iniciar automáticamente el audio.
+- Cursor continuo sobre la vista simplificada de fragmento y resaltado simultáneo de figuras activas (sin reproducción sintetizada de notas).
+- Pruebas de continuidad 4/4 → 6/8, tresillos, bucles, cuenta de entrada, acentos y 1000 vueltas sin deriva acumulada.
+- Cambiar BPM detiene la reproducción actual para iniciar una nueva planificación estable.
+- Se bloquea temporalmente agregar o quitar compases en canciones que ya usan música v2, hasta contar con remapeo estructural seguro.
 - Protección básica ante la eliminación de un compás con fragmentos enlazados.
 - La canción se conserva en formato antiguo hasta que el usuario pulsa «Habilitar Minieditor».
 
 ## Deliberadamente no incluido aún
 
-- Motor de reloj unificado, reproducción de figuras, cursor continuo y sincronización precisa.
-- Loop por subdivisión, anacrusas, tempo progresivo.
+- La reproducción sintetizada de figuras no está incluida (se mantiene como función futura).
+- Anacrusas completas, tempo progresivo y edición visual de loops con subdivisiones arbitrarias aún no están incluidos. El motor sí acepta límites exactos y «Practicar fragmento» los utiliza.
 - Escritura que atraviese compases, ligaduras, flams, drags y edición compleja.
 - Cambios de métrica editables con previsualización desde la interfaz.
 - Visor MusicXML, PDF y exportación musical.
@@ -38,9 +45,9 @@
 
 ## Siguientes entregas de la Fase 1
 
-1. Diseño e integración del reloj compartido con conversión estable ticks/segundos.
-2. Posición de práctica precisa, loop por intervalos exactos y seguimiento continuo.
-3. Fragmentos de varios compases, edición avanzada de notas y validaciones estructurales.
-4. Pruebas manuales de Safari/iPad, dispositivos Windows y sincronización con cuentas de prueba.
+1. Fragmentos de varios compases y selección editable de límites de práctica por subdivisión desde la interfaz.
+2. Edición estructural segura de compases, validaciones y pruebas de recuperación.
+3. Integración visual de dos compases de anticipación y panel fijo de Estudio.
+4. Pruebas reales de Safari/iPad, dispositivos Windows y sincronización con cuentas de prueba.
 
 La publicación en main debe hacerse únicamente tras verificar CI. Las pruebas automatizadas no sustituyen a las pruebas en dispositivos reales.
