@@ -32,7 +32,7 @@ test('colores por módulo respetan los modos oscuro y alto contraste', () => {
 
 test('la PWA versiona su caché y precarga el minieditor sin conexión', () => {
   const sw = file('sw.js');
-  assert.match(sw, /kernnel-shell-2026-11-25-music-clock-f1b/);
+  assert.match(sw, /kernnel-shell-2026-11-25-minieditor-p1a/);
   for (const name of ['music-core.js','music-clock.js','music-editor.js','music-editor.css']) {
     assert.ok(sw.includes("'./" + name + "'"), name + ' no aparece en la caché PWA');
     assert.ok(html.includes('./' + name), name + ' no está enlazado en la página');
