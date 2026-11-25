@@ -56,8 +56,31 @@
     }
     return music;
   }
-  function timeline(song) {
-    const music = ensure(song);
+  // La lectura del reloj y las validaciones nunca reconcilian ni alteran datos.
+  function readModel(song) {
+    const m = song && song.musica;
+    if (!m || m.schemaVersion !== 2 || m.resolutionPPQ !== PPQ ||
+        !Array.isArray(song.notas) || !song.notas.length ||
+        !Array.isArray(m.measures) || !Array.isArray(m.meterEvents) ||
+        !Array.isArray(m.fragments)) throw Error('Modelo musical v2 inválido.');
+    if (m.measures.length !== song.notas.length) throw Error('Compases desincronizados: requiere reconciliación explícita.');
+    const ids = new Set();
+    for (const measure of m.measures) {
+      if (!measure || typeof measure.id !== 'string' || !measure.id || ids.has(measure.id))
+        throw Error('Identificador de compás inválido o duplicado.');
+      ids.add(measure.id);
+    }
+    const changes = new Set();
+    for (const event of m.meterEvents) {
+      if (!event || !ids.has(event.measureId) || changes.has(event.measureId))
+        throw Error('Cambio de métrica huérfano o duplicado.');
+      parseMeter(event.numerator + '/' + event.denominator);
+      changes.add(event.measureId);
+    }
+    return m;
+  }
+  function timeline(song, options = {}) {
+    const music = options.readOnly ? readModel(song) : ensure(song);
     const changes = new Map(music.meterEvents.map(e => [e.measureId, e]));
     const fallback = parseMeter(song.estudio && song.estudio.meter);
     let meter = fallback, startTick = 0;
@@ -180,17 +203,56 @@
   }
   function validate(song) {
     try {
-      const music = ensure(song), measures = timeline(song);
+      // Validar no habilita el editor ni modifica compases heredados.
+      if (!song || !Array.isArray(song.notas) || !song.notas.length) return ['Canción inválida.'];
+      if (!song.musica) { parseMeter(song.estudio && song.estudio.meter); return []; }
+      const music = readModel(song), measures = timeline(song, {readOnly:true});
       const ids = new Set(measures.map(m => m.id));
-      const errors = [];
+      const errors = [], fragmentIds = new Set(), eventIds = new Set();
       for (const fragment of music.fragments) {
+        if (!fragment || typeof fragment.id !== 'string' || !fragment.id || fragmentIds.has(fragment.id)) {
+          errors.push('Identificador de fragmento inválido o duplicado.'); continue;
+        }
+        fragmentIds.add(fragment.id);
+        if (!['rhythm','melody','percussion'].includes(fragment.mode) || !Array.isArray(fragment.events)) {
+          errors.push('Modalidad o eventos inválidos en ' + fragment.name); continue;
+        }
         if (!ids.has(fragment.start && fragment.start.measureId) || !ids.has(fragment.end && fragment.end.measureId)) {
           errors.push('Referencias inexistentes en ' + fragment.name); continue;
         }
-        if (absolute(song, fragment.start) >= absolute(song, fragment.end)) errors.push('Límites inválidos en ' + fragment.name);
-        for (const event of fragment.events || []) {
-          try { checkEvent(song, fragment, event); } catch (e) { errors.push(fragment.name + ': ' + e.message); }
+        try {
+          if (absolute(song, fragment.start) >= absolute(song, fragment.end)) {
+            errors.push('Límites inválidos en ' + fragment.name); continue;
+          }
+        } catch (e) { errors.push(fragment.name + ': ' + e.message); continue; }
+        const spans = [];
+        for (const event of fragment.events) {
+          if (!event || typeof event.id !== 'string' || !event.id || eventIds.has(event.id)) {
+            errors.push('Identificador de evento inválido o duplicado en ' + fragment.name); continue;
+          }
+          eventIds.add(event.id);
+          try {
+            const span = checkEvent(song, fragment, event);
+            for (const prior of spans) {
+              const other = prior.event;
+              if (other.voice !== event.voice || span.start >= prior.end || prior.start >= span.end) continue;
+              const chord = span.start === prior.start && span.end === prior.end &&
+                event.kind === 'note' && other.kind === 'note' &&
+                ((fragment.mode === 'melody' && event.pitch !== other.pitch) ||
+                 (fragment.mode === 'percussion' && event.instrumentId !== other.instrumentId));
+              if (!chord) errors.push('Figuras superpuestas en ' + fragment.name);
+            }
+            spans.push({...span,event});
+          } catch (e) { errors.push(fragment.name + ': ' + e.message); }
         }
+      }
+      const overrides = music.accentOverrides ?? {};
+      if (typeof overrides !== 'object' || Array.isArray(overrides)) errors.push('Acentos inválidos.');
+      else for (const [id, accents] of Object.entries(overrides)) {
+        const measure = measures.find(m => m.id === id);
+        if (!measure || !Array.isArray(accents) ||
+            accents.some(n => !integer(n,1) || n > measure.numerator) ||
+            new Set(accents).size !== accents.length) errors.push('Acentos inválidos en compás ' + id);
       }
       return errors;
     } catch (e) { return [e.message]; }
