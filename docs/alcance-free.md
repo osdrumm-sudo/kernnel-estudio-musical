@@ -12,11 +12,11 @@
 
 ## Criterios de aceptación
 - Interpretación: 50 caracteres por anotación de compás o pulso, sin contar espacios ni signos; no por canción. Como criterio técnico propuesto, contar letras y números, tratando las letras con tildes como una sola letra.
-- Contador visible y accesible, aviso de acceso a Full al alcanzar 50, y limitador automático que impide añadir caracteres computables por encima de 50 en cuentas Free, incluso sin conexión. El aviso es un elemento independiente del texto de la anotación.
-- Conservar textos históricos de más de 50 caracteres; permitir lectura y operaciones ajenas a su edición, sin truncamiento durante carga, sincronización, migración o restauración.
+- Contador visible y accesible, aviso de acceso a Full al alcanzar 50, y limitador automático que impide añadir caracteres computables por encima de 50 en cuentas Free, incluso sin conexión (requisito confirmado por el titular del producto). Verificar también antes de sincronizar y al reconectar; no descartar los datos históricos ni los cambios válidos. El aviso es un elemento independiente del texto de la anotación.
+- Decisión aprobada: conservar íntegramente todo el contenido creado antes de la entrada en vigor del plan Free (anotaciones de cualquier longitud, canciones y repertorios, incluso si exceden las nuevas cuotas). No eliminar, truncar ni bloquear la consulta de datos históricos durante carga, migración, sincronización o restauración. Las nuevas anotaciones Free conservan hasta 50 caracteres computables; los espacios y signos no cuentan. Las restricciones se aplican a las nuevas incorporaciones y ampliaciones, con tratamiento de edición de textos históricos que no reduzca ni pierda datos automáticamente.
 - No aplicar el límite a títulos, nombres de secciones ni formularios de acceso sin una decisión explícita.
 - Casos: 0/49/50/51 letras o números, espacios y signos no computables, pegado, tildes, caracteres Unicode y saltos de línea, edición de datos históricos, cambio de plan, guardado offline y sincronización posterior.
 - Derechos de plan controlados por servidor, no editables por el cliente; diseñar el tratamiento de sesiones offline y datos históricos antes de publicar reglas.
 
 ## Pendiente
-Definir derechos de cuenta, tratamiento de límites en restauración e importación, unidad Unicode de conteo y máximo del nivel superior. Implementar y probar en rama Free. No cambiar main, producción Firebase ni la rama Full hasta validar.
+Definir derechos de cuenta, mecanismo de identificación de contenido previo a Free y tratamiento de importaciones nuevas y edición de contenido histórico, unidad Unicode de conteo y máximo del nivel superior. Implementar y probar en rama Free. No cambiar main, producción Firebase ni la rama Full hasta validar.
