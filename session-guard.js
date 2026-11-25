@@ -27,7 +27,8 @@ class SessionGuard{
   return this.sdk.runTransaction(this.db,async tx=>{
    this.check();const s=await tx.get(this.ref());this.check();
    if(s.exists()&&s.data().device!==this.device)throw conflict();
-   if(!s.exists())tx.set(this.ref(),{device:this.device,createdAt:this.sdk.serverTimestamp()});
+   if(!s.exists()){tx.set(this.ref(),{device:this.device,createdAt:this.sdk.serverTimestamp()});return true;}
+   return false;
   });
  }
  async assert(tx){this.check();const s=await tx.get(this.ref());this.check();if(!s.exists()||s.data().device!==this.device)throw conflict();}
