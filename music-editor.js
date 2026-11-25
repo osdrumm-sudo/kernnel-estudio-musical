@@ -94,6 +94,7 @@
     if (previous.songId !== t.id) { state.undo=[]; render(); return; }
     t.musica = previous.music;
     state.fragmentId = t.musica.fragments.find(f => f.id === state.fragmentId) ? state.fragmentId : t.musica.fragments[0]?.id || null;
+    message='Acción deshecha; guardado programado.';
     saveChange();
   }
   function fragment(t) {
@@ -145,6 +146,7 @@
     const t = song(), f = fragment(t); if (!f) return;
     capture();
     C.removeEvent(t, f.id, id);
+    message='Figura eliminada; guardado programado.';
     saveChange();
   }
   function labelEvent(event, mode) {
@@ -225,7 +227,8 @@
     if (!music.fragments.length) state.fragmentId=null;
     if (!fragment(t) && music.fragments.length) state.fragmentId=music.fragments[0].id;
     const list=[['','Selecciona un fragmento'],...music.fragments.map(f=>[f.id,f.name+' · '+modeLabels[f.mode]])];
-    bar.append(select(list,state.fragmentId||'',v=>{state.fragmentId=v||null;state.activeMeasureId=null;render()},'Fragmento musical'));
+    const fragmentSelect=select(list,state.fragmentId||'',v=>{state.fragmentId=v||null;state.activeMeasureId=null;render()},'Fragmento musical');
+    fragmentSelect.querySelector('select').classList.add('mqm-study-nav');bar.append(fragmentSelect);
     bar.append(button('↶ Deshacer',undo));
     bar.append(button('Eliminar fragmento',deleteFragment));
     bar.append(button('Practicar fragmento',()=>{
