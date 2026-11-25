@@ -17,7 +17,7 @@
 - Loop exacto por ticks en el motor; acción «Practicar fragmento» que prepara el intervalo sin iniciar automáticamente el audio.
 - Cursor continuo sobre la vista simplificada de fragmento y resaltado simultáneo de figuras activas (sin reproducción sintetizada de notas).
 - Pruebas de continuidad 4/4 → 6/8, tresillos, bucles, cuenta de entrada, acentos y 1000 vueltas sin deriva acumulada.
-- Cambiar BPM detiene la reproducción actual para iniciar una nueva planificación estable.
+- Cambiar BPM durante reproducción o pausa recalcula el reloj manteniendo la posición musical, sin reiniciar el ejercicio.
 - Se bloquea temporalmente agregar o quitar compases en canciones que ya usan música v2, hasta contar con remapeo estructural seguro.
 - Protección básica ante la eliminación de un compás con fragmentos enlazados.
 - La canción se conserva en formato antiguo hasta que el usuario pulsa «Habilitar Minieditor».
