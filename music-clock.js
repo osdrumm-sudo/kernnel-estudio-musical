@@ -18,7 +18,7 @@ function measuresFor(song,bpm) {
  let base;
  if(song.musica) {
   if(song.musica.schemaVersion!==2)throw Error('Formato musical desconocido.');
-  base=C.timeline(song); // lectura de los compases v2, sin crear un formato v2 en canciones antiguas
+  base=C.timeline(song,{readOnly:true}); // no reconciliar ni modificar datos desde el reloj
  }else {
   const meter=C.parseMeter(song.estudio?.meter || '4/4');
   const size=C.durationTicks(meter),pulse=C.pulseTicks(meter);
@@ -43,8 +43,9 @@ function createPlan(song,opts={}) {
  const totalTicks=last.startTick+last.durationTicks,totalSeconds=last.startSeconds+last.durationSeconds;
  const measureAtTick=tick=>{
   if(!Number.isFinite(tick)||tick<0||tick>totalTicks)throw Error('Tick fuera de la canción.');
-  return measures[Math.min(measures.length-1,Math.max(0,
-   lowerBound(measures,tick+EPS,m=>m.startTick+m.durationTicks)))];
+  let i=lowerBound(measures,tick,m=>m.startTick+m.durationTicks);
+  if (measures[i] && measures[i].startTick+measures[i].durationTicks===tick) i++;
+  return measures[Math.min(i,measures.length-1)];
  };
  const secondsAtTick=tick=>{
   if(tick===totalTicks)return totalSeconds;
@@ -54,7 +55,8 @@ function createPlan(song,opts={}) {
  const tickAtSeconds=seconds=>{
   if(!Number.isFinite(seconds)||seconds<0||seconds>totalSeconds+EPS)throw Error('Tiempo fuera de canción.');
   if(seconds>=totalSeconds)return totalTicks;
-  const i=lowerBound(measures,seconds+EPS,m=>m.startSeconds+m.durationSeconds);
+  let i=lowerBound(measures,seconds,m=>m.startSeconds+m.durationSeconds);
+  if (measures[i] && measures[i].startSeconds+measures[i].durationSeconds===seconds) i++;
   const m=measures[Math.min(i,measures.length-1)];
   return m.startTick+(seconds-m.startSeconds)/m.secondsPerTick;
  };
