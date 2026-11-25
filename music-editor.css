@@ -32,3 +32,10 @@
 .mqm-status{font-size:.84rem;color:var(--muted,#666);min-height:1em}
 .mqm-error{color:var(--danger,#b00);font-weight:650}
 @media(max-width:680px){.mqm-panel{padding:11px;border-radius:12px;margin:12px 0}.mqm-field{flex:1 1 42%}.mqm-grid{grid-template-columns:repeat(var(--mqm-cols,16),minmax(28px,1fr))}.mqm-staff{height:126px}.mqm-head h3{font-size:1rem}}
+
+/* El cursor y las notas activas siguen el mismo reloj que Web Audio. */
+.mqm-playhead{position:absolute;z-index:3;top:4%;bottom:4%;width:2px;pointer-events:none;background:#bf883e;box-shadow:0 0 0 1px rgba(0,0,0,.15);transform:translateX(-50%);transition:none}
+.mqm-playhead[hidden]{display:none!important}
+.mqm-note.mqm-sounding{color:#e0a442;filter:drop-shadow(0 0 3px rgba(191,136,62,.5))}
+.mqm-event.mqm-sounding{border-color:#bd8b43;outline:1px solid #bd8b43;background:var(--soft,#eee)}
+.mqm-panel .mqm-practice{border-color:#bf883e;font-weight:700}
