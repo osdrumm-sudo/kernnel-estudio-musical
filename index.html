@@ -508,8 +508,9 @@ function renderSongEditor(){
  box.append(label('Métrica',sel(METERS.map(m=>[m,m]),x.meter,v=>{if(t.musica){toast('La edición de métrica de canciones con fragmentos se habilitará en una siguiente entrega.');renderSongEditor();return;}stopMetro();x.meter=v;save();renderAll()})));
  box.append(label('BPM original',number(x.bpm,30,300,v=>{x.bpm=v;save();renderAll()})));
  box.append(mk('div',{class:'notice',text:`Compases actuales: ${t.notas.length}. Las anotaciones se editan directamente debajo de cada compás.`}));
- box.append(button('+ Añadir compás al final',()=>{if(t.notas.length>=256)return toast('Máximo 256 compases.');t.notas.push('');if(!Array.isArray(t.nombres))t.nombres=[];t.nombres.push('');x.last.end=t.notas.length;clock.playEnd=t.notas.length;save();renderAll()}));
+ box.append(button('+ Añadir compás al final',()=>{if(t.musica)return toast('Los compases de canciones con minieditor se editarán desde el futuro editor estructural.');if(t.notas.length>=256)return toast('Máximo 256 compases.');t.notas.push('');if(!Array.isArray(t.nombres))t.nombres=[];t.nombres.push('');x.last.end=t.notas.length;clock.playEnd=t.notas.length;save();renderAll()}));
  box.append(button('− Eliminar último compás',()=>{
+   if(t.musica)return toast('No se pueden eliminar compases con notación v2 hasta implementar la edición estructural segura.');
    if(t.notas.length<=1)return toast('Cada canción debe contener al menos un compás.');
    if(window.MetriqaMusic?.hasEventsOnLastMeasure?.(t))return toast('Este compás tiene fragmentos musicales. Elimina primero esos fragmentos.');
    if(!confirm(`¿Eliminar el compás ${t.notas.length} de «${t.nombre}»? Podrás recuperarlo desde la papelera.`))return;
