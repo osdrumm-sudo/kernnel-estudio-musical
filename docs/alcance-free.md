@@ -24,5 +24,12 @@
 - Condiciones aprobadas: ampliación permanente, aplicable a todas las capacidades limitadas de Free, una única activación por usuario (no acumulativa). No equivale a desbloquear todas las funcionalidades Premium.
 - Propuesta técnica pendiente de validación: contar tres ocasiones distintas, no tres pulsaciones consecutivas sobre el mismo límite; registrar el beneficio por cuenta, con sincronización idempotente para evitar duplicaciones. Cupos aprobados: 55 caracteres computables, 3 repertorios y 5 canciones por repertorio. El 10 % se calcula sobre Free y se redondea al entero superior para cupos discretos, aunque su incremento efectivo supere el porcentaje nominal.
 
+## Offline y sesiones simultáneas — decisiones aprobadas
+- El beneficio se activa provisionalmente sin conexión y se confirma al reconectar. Una activación permanente y única por cuenta; no acumulativa.
+- Uso offline sin límite temporal después de la autorización inicial, mientras el navegador conserve los datos locales necesarios. Validación de todas las cuotas en el dispositivo y revalidación al reconectar.
+- Las condiciones de uso deben advertir que no se permite crear canciones simultáneamente en dos equipos con la misma cuenta. Si se detecta el conflicto, mostrar un aviso explícito de conexión concurrente y no guardar la sesión conflictiva.
+- Restricción técnica: sin comunicación entre dispositivos no es posible detectar la concurrencia en tiempo real. Al reconectar, verificar el estado de sesión y los cambios concurrentes antes de confirmar escrituras. No modificar datos previamente guardados.
+- Pendiente precisar si no guardar la sesión significa descartar los cambios nuevos locales o conservarlos como borrador no sincronizado. Recomendación: preservar temporalmente el borrador aislado, sin confirmar ni subir la sesión conflictiva, hasta decisión explícita del usuario.
+
 ## Pendiente
 Definir derechos de cuenta, mecanismo de identificación de contenido previo a Free y tratamiento de importaciones nuevas y edición de contenido histórico, unidad Unicode de conteo y máximo del nivel superior. Implementar y probar en rama Free. No cambiar main, producción Firebase ni la rama Full hasta validar.
