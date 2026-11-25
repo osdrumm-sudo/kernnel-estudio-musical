@@ -294,7 +294,7 @@ const NOTE8='<svg viewBox="0 0 20 30" aria-hidden="true"><ellipse cx="7" cy="24"
 const fresh=()=>({temas:[],sel:null,repertorios:[],papelera:[],prefs:{theme:'system',highContrast:false,bigControls:false,wake:true,reminderDays:14},backupAt:null,updatedAt:Date.now()});
 let D=fresh(),writing=0,delayedSave=null,loadedStorage=false;
 let ui={query:'',rep:'all',view:'home',study:false,studyMenu:false,mobileMenu:false,sidebarCollapsed:true,beatDraft:null,importDraft:null,originRep:null,homeFocusSong:null,homeOpenReps:[],createReps:[],pendingReps:[],createExpanded:false};
-const clock={ctx:null,voices:new Set(),timer:null,timeouts:new Set(),token:0,starting:false,playing:false,paused:false,phase:'idle',cursor:null,lastVisual:null,nextTime:0,visualMeasure:0,visualBeat:-1,visualCount:0,playSongId:null,playStart:1,playEnd:1,loop:false,wakeLock:null};
+const clock={ctx:null,voices:new Set(),timer:null,timeouts:new Set(),token:0,starting:false,playing:false,paused:false,phase:'idle',cursor:null,lastVisual:null,nextTime:0,visualMeasure:0,visualBeat:-1,visualCount:0,playSongId:null,playStart:1,playEnd:1,loop:false,wakeLock:null,musicalPlan:null,audioAnchor:0,pausedElapsed:0,scheduledUntil:0,raf:null,position:null,tickRange:null};
 function uniqueId(prefix='t'){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,9)}
 function clone(v){return JSON.parse(JSON.stringify(v))}
 function bounded(x,min,max,def){const n=Number(x);return Number.isFinite(n)?Math.max(min,Math.min(max,n)):def}
@@ -384,6 +384,7 @@ function setStudiedSong(id){
  studiedMeasures.clear();
 }
 function applyPracticeRange(start,end,loop){
+ clock.tickRange=null;
  clock.playStart=start;
  clock.playEnd=end;
  clock.loop=loop;
@@ -707,132 +708,174 @@ function renderTransport(){
  ['prev-measure','jump-measure','loop-button','play-button','next-measure','stop-button','bpm-plus','bpm-minus'].forEach(id=>$(id).disabled=!enabled);
  $('toolbar-bpm').textContent=`${x?.practiceBpm??'—'} BPM actual`;
  $('original-bpm').textContent=`${x?.bpm??'—'} BPM original`;
- $('toolbar-meter').textContent=x?x.meter:'—';
- $('toolbar-meter').setAttribute('aria-label',x?`Métrica ${x.meter}`:'Métrica');
- $('loop-button').textContent=clock.loop?`Loop: ${clock.playStart}–${clock.playEnd}`:'Loop';
+ const meter=clock.position?.meter||x?.meter;
+ $('toolbar-meter').textContent=meter||'—';
+ $('toolbar-meter').setAttribute('aria-label',meter?'Métrica '+meter:'Métrica');
+ $('loop-button').textContent=clock.tickRange?'Loop: fragmento':clock.loop?`Loop: ${clock.playStart}–${clock.playEnd}`:'Loop';
  $('clear-loop').hidden=!enabled||!clock.loop;
  $('play-button').disabled=!enabled||clock.starting;
  $('play-button').textContent=clock.starting?'Activando audio…':clock.paused?'▶ Reanudar':clock.playing?'Ⅱ Pausar':'▶ Reproducir';
  const el=$('beat-dots');el.replaceChildren();if(!x)return;
- const count=beatsPerMeasure(x);for(let i=0;i<count;i++)el.append(mk('span',{class:'beatdot'+(x.accents.includes(i+1)?' accent':'')+(clock.visualBeat===i?' active':''),title:`Pulso ${i+1}`}));
-  window.updateStudioAmber?.();
+ const count=clock.position?.pulseCount||beatsPerMeasure(x);
+ for(let i=0;i<count;i++)el.append(mk('span',{class:'beatdot'+(x.accents.includes(i+1)?' accent':'')+(clock.visualBeat===i?' active':''),title:`Pulso ${i+1}`}));
+ window.updateStudioAmber?.();
 }
 function visualUpdate(){
- const t=current();
- if(!t){studyComments.reset();return}
+ const t=current();if(!t){studyComments.reset();return}
  document.querySelectorAll('.measure.playing,.beat.playing').forEach(e=>e.classList.remove('playing'));
- const number=clock.visualMeasure;
- const measure=number?document.querySelector(`.measure[data-measure="${number}"]`):null;
+ const measure=clock.visualMeasure?document.querySelector(`.measure[data-measure="${clock.visualMeasure}"]`):null;
  const beat=measure?.querySelector(`.beat[data-beat="${clock.visualBeat}"]`);
- measure?.classList.add('playing');
- beat?.classList.add('playing');
+ measure?.classList.add('playing');beat?.classList.add('playing');
  studyComments.update(ui.study?measure:null,beat,!clock.playing);
- const dots=$('beat-dots');if(dots.children.length!==beatsPerMeasure(setting(t)))renderTransport();
+ const x=setting(t),dots=$('beat-dots');
+ const count=clock.position?.pulseCount||beatsPerMeasure(x);
+ if(dots.children.length!==count)renderTransport();
  [...dots.children].forEach((d,i)=>d.classList.toggle('active',i===clock.visualBeat));
-  window.updateStudioAmber?.();
+ window.updateStudioAmber?.();
 }
 function setPlaybackStatus(text){$('playback-status').textContent=text}
 function stopMetro(){
  clock.token++;clearMetronomeTimers();
- clock.starting=false;clock.playing=false;clock.paused=false;clock.phase='idle';clock.cursor=null;clock.visualBeat=-1;clock.visualMeasure=null;
+ clock.starting=false;clock.playing=false;clock.paused=false;clock.phase='idle';
+ clock.cursor=null;clock.musicalPlan=null;clock.position=null;
+ clock.pausedElapsed=0;clock.scheduledUntil=0;clock.visualBeat=-1;clock.visualMeasure=null;
  if(clock.ctx){for(const v of clock.voices){try{v.stop()}catch(e){}}clock.voices.clear()}
+ window.MetriqaMusic?.updatePlayback?.(current(),null);
  visualUpdate();renderTransport();setPlaybackStatus('Listo para practicar');
 }
 function ensureAudio(){
  if(!clock.ctx){const Audio=window.AudioContext||window.webkitAudioContext;if(Audio)clock.ctx=new Audio()}
  return clock.ctx;
 }
-function clickAudio(at,accent,x){if(x.sound==='mute'||x.volume===0)return;const ctx=clock.ctx;if(!ctx)return;
- const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=x.sound==='perc'?'triangle':'square';osc.frequency.setValueAtTime(x.sound==='perc'?(accent?550:330):(accent?1250:850),at);
- gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime((accent?.28:.15)*x.volume,at+.003);gain.gain.exponentialRampToValueAtTime(.0001,at+(x.sound==='perc'?.11:.045));
- osc.connect(gain);gain.connect(ctx.destination);osc.start(at);osc.stop(at+(x.sound==='perc'?.12:.055));clock.voices.add(osc);osc.onended=()=>clock.voices.delete(osc);
+function clickAudio(at,accent,x){
+ if(x.sound==='mute'||x.volume===0)return;const ctx=clock.ctx;if(!ctx)return;
+ const osc=ctx.createOscillator(),gain=ctx.createGain();
+ osc.type=x.sound==='perc'?'triangle':'square';
+ osc.frequency.setValueAtTime(x.sound==='perc'?(accent?550:330):(accent?1250:850),at);
+ gain.gain.setValueAtTime(.0001,at);
+ gain.gain.exponentialRampToValueAtTime((accent?.28:.15)*x.volume,at+.003);
+ gain.gain.exponentialRampToValueAtTime(.0001,at+(x.sound==='perc'?.11:.045));
+ osc.connect(gain);gain.connect(ctx.destination);osc.start(at);
+ osc.stop(at+(x.sound==='perc'?.12:.055));
+ clock.voices.add(osc);osc.onended=()=>clock.voices.delete(osc);
 }
 function metronomeTime(){return clock.ctx?.currentTime??performance.now()/1000}
 function clearMetronomeTimers(){
  clearInterval(clock.timer);clock.timer=null;
  clock.timeouts.forEach(clearTimeout);clock.timeouts.clear();
+ if(clock.raf!==null){cancelAnimationFrame(clock.raf);clock.raf=null}
 }
 function queueMetronomeEvent(callback,delay){
  const timer=setTimeout(()=>{clock.timeouts.delete(timer);callback()},delay);
  clock.timeouts.add(timer);
 }
 async function startMetro(){
- const t=current();
- if(!t||clock.starting)return;
+ const t=current();if(!t||clock.starting)return;
  if(clock.playing){pauseMetro();return}
- const token=++clock.token;
- const x=setting(t);
+ const token=++clock.token,x=setting(t);
+ let plan=clock.musicalPlan;
+ if(!clock.paused||!plan){
+  try{
+   const range=clock.tickRange?.songId===t.id?clock.tickRange:null;
+   plan=window.MetriqaMusicalClock.createPlan(t,{
+    bpm:x.practiceBpm,startMeasureIndex:clock.playStart-1,endMeasureIndex:clock.playEnd-1,
+    startTick:range?.startTick,endTick:range?.endTick,
+    loop:range?true:clock.loop,countInMeasures:x.count
+   });
+  }catch(e){toast('No se puede iniciar el reloj musical: '+e.message);return}
+  clock.pausedElapsed=0;clock.musicalPlan=plan;clock.playSongId=t.id;
+ }
  try{
   const audio=ensureAudio();
   if(audio&&audio.state!=='running'){
-   const resumed=audio.resume();
-   clock.starting=true;
-   renderTransport();
-   await resumed;
+   clock.starting=true;renderTransport();await audio.resume();
   }
- }catch{
+ }catch(e){
   if(token!==clock.token)return;
-  clock.starting=false;
-  renderTransport();
+  clock.starting=false;renderTransport();
   setPlaybackStatus('No se pudo activar el audio. Vuelve a pulsar Reproducir.');
   return;
  }
  if(token!==clock.token)return;
- clock.starting=false;
- if(!clock.paused){
-  clock.playSongId=t.id;
-  clock.phase=x.count?'count':'play';
-  clock.visualBeat=-1;
-  clock.cursor={measure:clock.playStart,beat:0,countRemaining:x.count*beatsPerMeasure(x)};
- }
- clock.paused=false;clock.playing=true;
- clock.nextTime=metronomeTime()+.015;
+ clock.starting=false;clock.paused=false;clock.playing=true;
+ clock.audioAnchor=metronomeTime()+.035-clock.pausedElapsed;
+ clock.scheduledUntil=clock.pausedElapsed;
+ clock.position=plan.positionAt(clock.pausedElapsed);
+ clock.phase=clock.position.phase;
+ clock.nextTime=clock.audioAnchor;
  clock.timer=setInterval(scheduleTick,25);
- scheduleTick();renderTransport();
+ scheduleTick();displayClockFrame();renderTransport();
 }
 function pauseMetro(){
- if(!clock.playing||clock.paused)return;clock.paused=true;clock.playing=false;
- clock.token++;clearMetronomeTimers();
+ if(!clock.playing||clock.paused)return;
+ clock.pausedElapsed=Math.max(0,metronomeTime()-clock.audioAnchor);
+ clock.paused=true;clock.playing=false;clock.token++;clearMetronomeTimers();
  if(clock.ctx){for(const v of clock.voices){try{v.stop()}catch(e){}}clock.voices.clear()}
- visualUpdate();setPlaybackStatus('En pausa · pulsa Reanudar para continuar');renderTransport()
+ visualUpdate();renderTransport();setPlaybackStatus('En pausa · pulsa Reanudar para continuar');
+}
+function displayClockFrame(){
+ if(!clock.playing||!clock.musicalPlan)return;
+ if(!current()||current().id!==clock.playSongId){stopMetro();return}
+ const elapsed=Math.max(0,metronomeTime()-clock.audioAnchor);
+ const position=clock.musicalPlan.positionAt(elapsed);
+ if(position.phase==='finished'){stopMetro();setPlaybackStatus('Reproducción finalizada');return}
+ const measure=position.phase==='play'?position.measureIndex+1:null;
+ const changed=clock.visualMeasure!==measure||clock.visualBeat!==position.beatIndex||clock.phase!==position.phase;
+ clock.position=position;clock.phase=position.phase;
+ clock.visualBeat=position.beatIndex;clock.visualMeasure=measure;
+ if(changed){
+  const x=setting(current());
+  if(position.phase==='count'){
+   setPlaybackStatus(`Preparación · compás ${position.preparationMeasure}/${x.count} · pulso ${position.beatIndex+1}/${position.pulseCount}`);
+  }else{
+   setPlaybackStatus(`Compás ${measure} · pulso ${position.beatIndex+1}/${position.pulseCount}`);
+   if(x.scroll&&position.beatIndex===0){
+    const elem=document.querySelector(`.measure[data-measure="${measure}"]`);
+    if(elem){const r=elem.getBoundingClientRect();
+     if(r.top<95||r.bottom>innerHeight-130)elem.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+   }
+   if(ui.study&&position.beatIndex===position.pulseCount-1&&!studiedMeasures.has(measure)){
+    studiedMeasures.add(measure);
+    markMeasureStudied(document.querySelector(`.measure[data-measure="${measure}"]`),measure);
+   }
+  }
+  visualUpdate();
+ }
+ window.MetriqaMusic?.updatePlayback?.(current(),position);
+ clock.raf=requestAnimationFrame(displayClockFrame);
 }
 function scheduleTick(){
- if(!clock.playing||clock.paused)return;const t=current();if(!t||t.id!==clock.playSongId){stopMetro();return}
- const x=setting(t),count=beatsPerMeasure(x),interval=60/x.practiceBpm;
- const currentTime=metronomeTime();
- let safe=0;
- while(clock.nextTime<currentTime+.13&&safe++<12){
-  const at=clock.nextTime,token=clock.token,phase=clock.phase,c=clock.cursor;
-  if(!c){stopMetro();return}
-  if(phase==='ending'){
-   clearInterval(clock.timer);clock.timer=null;
-   queueMetronomeEvent(()=>{if(token===clock.token){stopMetro();setPlaybackStatus('Reproducción finalizada')}},Math.max(0,(at-currentTime)*1000));
-   break;
-  }
-  const beat=phase==='count'?(x.count*count-c.countRemaining)%count:c.beat;
-  clickAudio(at,x.accents.includes(beat+1),x);
-  const delay=Math.max(0,(at-currentTime)*1000);
-  // Congelar el compás y el pulso de este clic antes de adelantar el planificador.
-  const snapshot={measure:c.measure,countRemaining:c.countRemaining};
-  queueMetronomeEvent(()=>{
-   if(token!==clock.token)return;
-   clock.visualBeat=beat;clock.visualMeasure=phase==='play'?snapshot.measure:null;
-   if(phase==='count')setPlaybackStatus(`Preparación · compás ${x.count-Math.ceil(snapshot.countRemaining/count)+1}/${x.count} · pulso ${beat+1}/${count}`);
-   else{setPlaybackStatus(`Compás ${snapshot.measure} · pulso ${beat+1}/${count}`);if(x.scroll&&beat===0){const elem=document.querySelector(`.measure[data-measure="${snapshot.measure}"]`);if(elem){const r=elem.getBoundingClientRect();if(r.top<95||r.bottom>innerHeight-130)elem.scrollIntoView({behavior:'smooth',block:'center'})}}}
-   if(ui.study&&phase==='play'&&beat===count-1&&!studiedMeasures.has(snapshot.measure)){
-    studiedMeasures.add(snapshot.measure);
-    markMeasureStudied(document.querySelector(`.measure[data-measure="${snapshot.measure}"]`),snapshot.measure);
-   }
-   visualUpdate();
-  },delay);
-  if(phase==='count'){
-   c.countRemaining--;if(c.countRemaining<=0){clock.phase='play';c.beat=0;c.measure=clock.playStart}
-  }else{
-   c.beat++;if(c.beat>=count){c.beat=0;c.measure++;if(c.measure>clock.playEnd){if(clock.loop)c.measure=clock.playStart;else clock.phase='ending'}}
-  }
-  clock.nextTime+=interval;
+ if(!clock.playing||clock.paused||!clock.musicalPlan)return;
+ const t=current();if(!t||t.id!==clock.playSongId){stopMetro();return}
+ const elapsed=metronomeTime()-clock.audioAnchor;
+ const from=Math.max(0,clock.scheduledUntil,elapsed+.003),to=elapsed+.14;
+ if(to<=from)return;
+ const x=setting(t);
+ for(const ev of clock.musicalPlan.eventsBetween(from,to)){
+  const at=clock.audioAnchor+ev.seconds;
+  if(at>=metronomeTime()+.001)clickAudio(at,ev.accent,x);
  }
+ clock.scheduledUntil=to;
 }
+window.KernnelPrepareFragment=function(fragment){
+ const t=current();if(!t||!t.musica||!fragment)return false;
+ try{
+  const startTick=window.MetriqaMusicCore.absolute(t,fragment.start);
+  const endTick=window.MetriqaMusicCore.absolute(t,fragment.end);
+  if(endTick-startTick<160)throw Error('El fragmento es demasiado corto.');
+  const measures=window.MetriqaMusicCore.timeline(t);
+  const first=measures.findIndex(m=>m.id===fragment.start.measureId);
+  const last=measures.findIndex(m=>m.id===fragment.end.measureId);
+  if(first<0||last<0)throw Error('Compás inexistente.');
+  stopMetro();
+  clock.tickRange={songId:t.id,startTick,endTick};
+  clock.playStart=first+1;clock.playEnd=last+1;clock.loop=true;
+  renderTransport();setPlaybackStatus('Fragmento preparado. Pulsa Reproducir cuando quieras.');
+  toast('Fragmento preparado para practicar en loop.');
+  return true;
+ }catch(e){toast('No se pudo preparar el fragmento: '+e.message);return false}
+};
 function goToMeasure(number){
  stopMetro();
  clock.visualMeasure=number;
@@ -1094,6 +1137,7 @@ window.KernnelBridge = Object.freeze({
 <script src="./ui-v2.js"></script>
 <script src="./metriqa-amber.js"></script>
 <script src="./music-core.js"></script>
+<script src="./music-clock.js"></script>
 <script src="./music-editor.js"></script>
 <script>
 initEvents();manageWake();window.MetriqaMusic?.init?.();
