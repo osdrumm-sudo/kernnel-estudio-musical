@@ -32,9 +32,11 @@ test('colores por módulo respetan los modos oscuro y alto contraste', () => {
 
 test('la PWA versiona su caché y precarga el minieditor sin conexión', () => {
   const sw = file('sw.js');
-  assert.match(sw, /kernnel-shell-2026-11-25-music-clock-f1b/);
-  for (const name of ['music-core.js','music-clock.js','music-editor.js','music-editor.css']) {
+  assert.match(sw, /kernnel-shell-2026-11-25-free-session-1/);
+  for (const name of ['music-core.js','music-clock.js','music-editor.js','music-editor.css','session-guard.js']) {
     assert.ok(sw.includes("'./" + name + "'"), name + ' no aparece en la caché PWA');
     assert.ok(html.includes('./' + name), name + ' no está enlazado en la página');
   }
 });
+
+test('offline and conflicting sessions present a distinct notice and local continuity instructions',()=>{const cloud=file('cloud.js');assert.match(cloud,/Estás trabajando sin conexión/);assert.match(cloud,/Conflicto de sesión/);assert.match(cloud,/mismo dispositivo/);assert.match(cloud,/sessionNotice\('offline'\)/);assert.match(cloud,/sessionNotice\('conflict'\)/);});
