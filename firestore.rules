@@ -88,6 +88,69 @@ service cloud.firestore {
     && request.resource.data.payload is string && request.resource.data.payload.size() <= 560000;
    allow update: if false;
   }
+
+  // Portal QA: registros propios (la lista sólo puede consultarla administración).
+  match /evaluationProfiles/{userId} {
+   allow get: if isAdmin() || (isAuthorized() && request.auth.uid == userId);
+   allow list: if isAdmin();
+   allow create, update: if isAuthorized() && request.auth.uid == userId
+    && request.resource.data.keys().hasAll(['uid','email','displayName','lastSeen'])
+    && request.resource.data.keys().hasOnly(['uid','email','displayName','lastSeen'])
+    && request.resource.data.uid == userId
+    && request.resource.data.email == request.auth.token.email
+    && request.resource.data.displayName is string
+    && request.resource.data.displayName.size() <= 80
+    && request.resource.data.lastSeen == request.time;
+   allow delete: if isAdmin() || (isAuthorized() && request.auth.uid == userId);
+  }
+  function validEvaluatorRole() {
+   let d = request.resource.data;
+   return d.keys().hasAll(['email','active','versions','updatedAt'])
+    && d.keys().hasOnly(['email','active','versions','updatedAt'])
+    && d.email is string && d.email.size() >= 3 && d.email.size() <= 200
+    && d.active is bool
+    && d.versions is list && d.versions.size() <= 2
+    && d.versions.hasOnly(['full','initial'])
+    && d.updatedAt == request.time;
+  }
+  function hasEvaluationPermission(version) {
+   return isAuthorized() && exists(/databases/$(database)/documents/evaluationRoles/$(request.auth.uid))
+    && get(/databases/$(database)/documents/evaluationRoles/$(request.auth.uid)).data.active == true
+    && version in get(/databases/$(database)/documents/evaluationRoles/$(request.auth.uid)).data.versions;
+  }
+  match /evaluationRoles/{userId} {
+   allow get: if isAdmin() || (isAuthorized() && request.auth.uid == userId);
+   allow list: if isAdmin();
+   allow create, update: if isAdmin() && validEvaluatorRole();
+   allow delete: if isAdmin();
+  }
+  function validEvaluationReport(reportId) {
+   let d = request.resource.data;
+   return d.keys().hasAll(['ownerUid','version','answers','generalNotes','revision','updatedAt'])
+    && d.keys().hasOnly(['ownerUid','version','answers','generalNotes','revision','updatedAt'])
+    && d.ownerUid == request.auth.uid
+    && d.version in ['full','initial']
+    && reportId == request.auth.uid + '_' + d.version
+    && d.answers is map && d.answers.keys().size() <= 160
+    && d.generalNotes is string && d.generalNotes.size() <= 3000
+    && d.revision is int && d.revision >= 1 && d.revision <= 1000000
+    && d.updatedAt == request.time;
+  }
+  match /evaluationReports/{reportId} {
+   allow get: if isAdmin() || (
+    isAuthorized() && resource.data.ownerUid == request.auth.uid
+    && hasEvaluationPermission(resource.data.version));
+   allow list: if isAdmin();
+   allow create: if (isAdmin() || hasEvaluationPermission(request.resource.data.version))
+    && validEvaluationReport(reportId) && request.resource.data.revision == 1;
+   allow update: if (isAdmin() || hasEvaluationPermission(request.resource.data.version))
+    && validEvaluationReport(reportId)
+    && resource.data.ownerUid == request.resource.data.ownerUid
+    && resource.data.version == request.resource.data.version
+    && request.resource.data.revision == resource.data.revision + 1;
+   allow delete: if isAdmin() || (isAuthorized() && resource.data.ownerUid == request.auth.uid);
+  }
+
   match /{document=**} { allow read, write: if false; }
  }
 }
