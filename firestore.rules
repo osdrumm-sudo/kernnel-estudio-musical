@@ -137,9 +137,10 @@ service cloud.firestore {
     && d.updatedAt == request.time;
   }
   match /evaluationReports/{reportId} {
-   allow get: if isAdmin() || (
-    isAuthorized() && resource.data.ownerUid == request.auth.uid
-    && hasEvaluationPermission(resource.data.version));
+   // Leer también cuando todavía no existe informe; nunca depende de resource.data.
+   allow get: if isAdmin() || (isAuthorized() && (
+    (reportId == request.auth.uid + '_full' && hasEvaluationPermission('full')) ||
+    (reportId == request.auth.uid + '_initial' && hasEvaluationPermission('initial'))));
    allow list: if isAdmin();
    allow create: if (isAdmin() || hasEvaluationPermission(request.resource.data.version))
     && validEvaluationReport(reportId) && request.resource.data.revision == 1;
