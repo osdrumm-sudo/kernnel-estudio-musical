@@ -1,5 +1,5 @@
 /* Kernnel Estudio musical · recursos para uso sin conexión · OSS/26 */
-const CACHE_NAME = 'kernnel-shell-2026-11-25-music-clock-f1b';
+const CACHE_NAME = 'kernnel-shell-2026-11-27-crear-tema-repertorio';
 const SHELL = ['./', './index.html', './ui-v2.css', './ui-v2.js', './metriqa-amber.js', './music-core.js', './music-clock.js', './music-editor.js', './music-editor.css', './metriqa-amber.css', './design-theme.css', './design-layout.css', './design-theme.js', './display-profile.js', './study-comments.js', './manifest.webmanifest', './cloud.js', './usage-admin.js', './sync-core.js', './sync-engine.js', './sync-store.js', './access.css', './firebase-config.js', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', event => {
   event.waitUntil(
