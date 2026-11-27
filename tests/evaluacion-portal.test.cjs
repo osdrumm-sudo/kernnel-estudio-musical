@@ -133,3 +133,22 @@ test('guardado en nube usa transacción con revisión comparada',()=>{
  assert.match(app,/serverTimestamp\(\)/);
  assert.match(app,/sólo|solo|roles|evaluador/i);
 });
+
+test('las reglas aportadas para notas, progreso y salas se conservan junto con QA',()=>{
+ const rules=read('firestore.rules');
+ for(const section of [
+  'function validStudyAttachment(attachment)',
+  'match /users/{userId}/studyNotes/{noteId}',
+  'match /users/{userId}/studyProgress/{progressId}',
+  'match /studyRooms/{roomId}',
+  'match /invites/{email}',
+  'match /scores/{version}/parts/{partId}',
+  'match /clocks/{userId}/samples/{sampleId}',
+  'match /users/{userId}/syncItems/{itemId}',
+  'match /evaluationRoles/{userId}',
+  'match /evaluationReports/{reportId}'
+ ])assert.ok(rules.includes(section),'Falta regla: '+section);
+ assert.equal((rules.match(/match \/\{document=\*\*\}/g)||[]).length,1);
+ assert.match(rules,/allow read: if canReadRoomScore\(roomId, version\)/);
+ assert.match(rules,/allow read: if isOwner\(userId\)/);
+});
