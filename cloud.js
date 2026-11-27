@@ -8,7 +8,7 @@ function report(e){console.warn('[Kernnel]',e.code||e.message);info(errors[e.cod
 function lock(busy){state.busy=busy;['access-google','cloud-upload','cloud-download','cloud-logout'].forEach(id=>byId(id).disabled=busy);}
 function receipt(){try{return JSON.parse(localStorage.getItem(RECEIPT)||'null')}catch{return null}}
 function forget(){try{localStorage.removeItem(RECEIPT)}catch{}}
-function gate(message){window.KernnelUsage?.stop();window.KernnelProfile?.disconnect();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
+function gate(message){window.KernnelEvalEntry?.stop();window.KernnelUsage?.stop();window.KernnelProfile?.disconnect();stopSync();state.allowed=false;document.body.classList.add('auth-locked');byId('access-gate').hidden=false;window.KernnelBridge.pause();if(message)info(message);byId('access-admin-open').hidden=true;byId('access-admin').close();}
 function startProfile(user){
  const profile=window.KernnelProfile;
  if(!profile)return;
@@ -76,6 +76,7 @@ async function grant(user,offline=false){
  startProfile(user);
  startSync();
  if(!offline)window.KernnelUsage?.start(state.sdk,state.db,user);
+ window.KernnelEvalEntry?.start(user,state.sdk,state.db,offline);
 }
 async function checkAccess(){
  const user=state.user;if(!user)return;
