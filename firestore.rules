@@ -39,6 +39,53 @@ service cloud.firestore {
     && request.resource.data.displayName.size() > 0
     && request.resource.data.displayName.size() <= 60;
   }
+  function validStudyAttachment(attachment) {
+   return attachment == null || (
+    attachment is map
+    && attachment.keys().hasAll(['name','type','parts','fingerprint','version'])
+    && attachment.keys().hasOnly(['name','type','parts','fingerprint','version'])
+    && attachment.name is string && attachment.name.size() > 0 && attachment.name.size() <= 200
+    && attachment.type in ['image/png','image/jpeg','image/webp','image/gif','image/avif','image/bmp','application/pdf']
+    && attachment.parts is int && attachment.parts > 0 && attachment.parts <= 21
+    && attachment.fingerprint is string && attachment.fingerprint.matches('^[0-9a-f]{64}$')
+    && attachment.version is string && attachment.version.matches('^[0-9a-f-]{36}$'));
+  }
+  match /users/{userId}/studyNotes/{noteId} {
+   allow read: if isOwner(userId);
+   allow create, update: if isOwner(userId)
+    && noteId.matches('^[0-9a-f]{64}$')
+    && request.resource.data.keys().hasAll(['songId','revision','text','attachment'])
+    && request.resource.data.keys().hasOnly(['songId','revision','text','attachment'])
+    && request.resource.data.songId is string && request.resource.data.songId.size() > 0
+    && request.resource.data.songId.size() <= 500
+    && request.resource.data.revision is string && request.resource.data.revision.matches('^[0-9a-f-]{36}$')
+    && request.resource.data.text is string && request.resource.data.text.size() <= 12000
+    && validStudyAttachment(request.resource.data.attachment);
+   match /parts/{partId} {
+    allow read, delete: if isOwner(userId);
+    allow create, update: if isOwner(userId)
+     && noteId.matches('^[0-9a-f]{64}$')
+     && partId.matches('^([0-9]|1[0-9]|20)$')
+     && request.resource.data.keys().hasAll(['version','payload'])
+     && request.resource.data.keys().hasOnly(['version','payload'])
+     && request.resource.data.version is string && request.resource.data.version.matches('^[0-9a-f-]{36}$')
+     && request.resource.data.payload is string && request.resource.data.payload.size() > 0
+     && request.resource.data.payload.size() <= 200000
+     && (partId != '20' || request.resource.data.payload.size() <= 194304);
+   }
+  }
+  match /users/{userId}/studyProgress/{progressId} {
+   allow read: if isOwner(userId);
+   allow create, update: if isOwner(userId)
+    && progressId.matches('^[0-9a-f]{64}$')
+    && request.resource.data.keys().hasAll(['songId','device','opens','measures'])
+    && request.resource.data.keys().hasOnly(['songId','device','opens','measures'])
+    && request.resource.data.songId is string && request.resource.data.songId.size() > 0
+    && request.resource.data.songId.size() <= 500
+    && request.resource.data.device is string && request.resource.data.device.matches('^[0-9a-f-]{36}$')
+    && request.resource.data.opens is int && request.resource.data.opens >= 0
+    && request.resource.data.measures is list && request.resource.data.measures.size() <= 4096;
+  }
   // Estadísticas separadas: nunca contienen información musical.
   match /usageSessions/{sessionId} {
    allow read: if isAdmin();
@@ -87,6 +134,104 @@ service cloud.firestore {
     && request.resource.data.index is int && request.resource.data.index >= 0 && request.resource.data.index < 300
     && request.resource.data.payload is string && request.resource.data.payload.size() <= 560000;
    allow update: if false;
+  }
+  // Salas separadas de la biblioteca personal. Los correos invitados no viajan en la sala.
+  function roomData(roomId) {
+   return get(/databases/$(database)/documents/studyRooms/$(roomId)).data;
+  }
+  function invitedToRoom(roomId) {
+   let email = request.auth.token.email.lower();
+   return exists(/databases/$(database)/documents/studyRooms/$(roomId)/invites/$(email));
+  }
+  function isRoomOwner(roomId) {
+   return isAuthorized() && roomData(roomId).ownerUid == request.auth.uid;
+  }
+  function canReadRoomScore(roomId, version) {
+   let room = roomData(roomId);
+   return isAuthorized() && !room.closed && room.score != null && room.score.version == version
+    && (room.ownerUid == request.auth.uid || invitedToRoom(roomId));
+  }
+  function canReadRoomClock(roomId, userId) {
+   let room = roomData(roomId);
+   return isOwner(userId) && !room.closed && room.score != null
+    && (room.ownerUid == request.auth.uid || invitedToRoom(roomId));
+  }
+  function validRoomScore(score) {
+   return score is map
+    && score.keys().hasAll(['version','parts','bytes','hash','measures','beats'])
+    && score.keys().hasOnly(['version','parts','bytes','hash','measures','beats'])
+    && score.version is string && score.version.matches('^[0-9a-f]{32}$')
+    && score.hash is string && score.hash.matches('^[0-9a-f]{64}$')
+    && score.parts is int && score.parts >= 1 && score.parts <= 36
+    && score.bytes is int && score.bytes >= 1 && score.bytes <= 6291456
+    && score.measures is int && score.measures >= 1 && score.measures <= 256
+    && score.beats in [2,3,4,6,9,12];
+  }
+  function validRoomTransport(transport, score) {
+   return transport is map
+    && transport.keys().hasAll(['mode','bpm','from','to','loop','startBeat','startsAt'])
+    && transport.keys().hasOnly(['mode','bpm','from','to','loop','startBeat','startsAt'])
+    && transport.mode in ['ready','playing','paused']
+    && transport.bpm is int && transport.bpm >= 30 && transport.bpm <= 300
+    && transport.from is int && transport.from >= 1
+    && transport.to is int && transport.to >= transport.from && transport.to <= score.measures
+    && transport.loop is bool
+    && transport.startBeat is int && transport.startBeat >= 0
+    && transport.startBeat < (transport.to - transport.from + 1) * score.beats
+    && transport.startsAt is int && transport.startsAt >= 0 && transport.startsAt <= 9007199254740991
+    && (transport.mode != 'playing' || transport.startsAt > 0);
+  }
+  match /studyRooms/{roomId} {
+   allow get: if isAuthorized()
+    && (resource.data.ownerUid == request.auth.uid
+     || ((resource.data.score != null || resource.data.closed) && invitedToRoom(roomId)));
+   allow create: if isAuthorized() && roomId.matches('^[0-9a-f]{32}$')
+    && request.resource.data.keys().hasAll(['ownerUid','name','createdAt','closed','score','transport'])
+    && request.resource.data.keys().hasOnly(['ownerUid','name','createdAt','closed','score','transport'])
+    && request.resource.data.ownerUid == request.auth.uid
+    && request.resource.data.name is string
+    && request.resource.data.name.size() >= 1 && request.resource.data.name.size() <= 120
+    && request.resource.data.createdAt == request.time
+    && request.resource.data.closed == false
+    && request.resource.data.score == null && request.resource.data.transport == null;
+   allow update: if isAuthorized() && !resource.data.closed
+    && resource.data.ownerUid == request.auth.uid
+    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['closed','score','transport'])
+    && (
+     (request.resource.data.closed == true
+      && request.resource.data.score == resource.data.score
+      && request.resource.data.transport == resource.data.transport)
+     || (request.resource.data.closed == false && validRoomScore(request.resource.data.score)
+      && validRoomTransport(request.resource.data.transport, request.resource.data.score))
+    );
+   match /invites/{email} {
+    allow get: if isAuthorized() && (request.auth.token.email.lower() == email
+     || roomData(roomId).ownerUid == request.auth.uid);
+    allow list: if isRoomOwner(roomId);
+    allow create: if isRoomOwner(roomId) && !roomData(roomId).closed
+     && email.size() <= 254 && email == email.lower()
+     && email.matches('^[^@/\\s]+@[^@/\\s]+[.][^@/\\s]+$')
+     && request.resource.data.keys().hasOnly(['invited']) && request.resource.data.invited == true;
+   }
+   match /scores/{version}/parts/{partId} {
+    allow read: if canReadRoomScore(roomId, version);
+    allow create: if isRoomOwner(roomId) && !roomData(roomId).closed
+     && (roomData(roomId).score == null || roomData(roomId).score.version != version)
+     && version.matches('^[0-9a-f]{32}$') && partId.matches('^([0-9]|[12][0-9]|3[0-5])$')
+     && request.resource.data.keys().hasAll(['index','payload'])
+     && request.resource.data.keys().hasOnly(['index','payload'])
+     && request.resource.data.index is int && string(request.resource.data.index) == partId
+     && request.resource.data.payload is string
+     && request.resource.data.payload.size() >= 1 && request.resource.data.payload.size() <= 180000;
+    allow delete: if isRoomOwner(roomId) && (roomData(roomId).closed
+     || roomData(roomId).score == null || roomData(roomId).score.version != version);
+   }
+   match /clocks/{userId}/samples/{sampleId} {
+    allow get: if canReadRoomClock(roomId, userId);
+    allow create: if canReadRoomClock(roomId, userId) && sampleId.matches('^[0-9a-f]{32}$')
+     && request.resource.data.keys().hasOnly(['at']) && request.resource.data.at == request.time;
+    allow delete: if isOwner(userId);
+   }
   }
 
   // Portal QA: registros propios (la lista sólo puede consultarla administración).
