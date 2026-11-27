@@ -23,6 +23,11 @@
 - Borrador local por UID/versión, exportación JSON, guardado explícito con transacción Firestore y revisión optimista. Si otro dispositivo cambió el informe, hay que resolverlo antes de guardar.
 - No se modifica ninguna canción, repertorio, minieditor ni archivo privado con este portal.
 
+## Reconciliación de reglas recibidas (27/11/2026)
+Se integró en `firestore.rules` el bloque QA sobre el texto completo proporcionado por el administrador (239 líneas), en lugar de sustituir las reglas vigentes por la versión del repositorio. Se conservaron **sin cambios** los permisos de `studyNotes`, `studyProgress`, `studyRooms`, invitaciones, partituras por partes, reloj de salas, biblioteca incremental, acceso Google y estadísticas. Se añadió solamente el bloque de `evaluationProfiles`, `evaluationRoles` y `evaluationReports` antes del cierre denegatorio.
+
+**No se ha desplegado en Firebase**. Las reglas aportadas son una copia suministrada por el usuario; no equivalen a una lectura verificada de la configuración desplegada. Pendiente validación de compilación y pruebas de reglas con Firebase Emulator, diferenciando administrador, evaluador asignado, usuario sin rol y revocado. El CI de GitHub solo verifica código, pruebas estáticas y detección de regresiones.
+
 ## Procedimiento obligatorio de puesta en marcha
 1. Revisar y conservar una copia de firestore.rules actual de **la consola de Firebase** (las reglas reales podrían diferir del repositorio).
 2. Integrar las reglas de QA de esta rama mediante una revisión **no destructiva** de todas las reglas actuales. Validar sintaxis y permisos en Firebase Emulator con una identidad administradora, un evaluador autorizado, otro usuario y una cuenta revocada. Confirmar que los accesos actuales a canciones permanecen intactos.
