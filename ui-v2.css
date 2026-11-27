@@ -27,6 +27,9 @@
 .home-rep-arrow{font-size:23px;line-height:1;color:var(--accent)}
 .home-rep-songs{display:grid;gap:7px;border-top:1px solid var(--border);padding:11px}
 .home-rep-songs p{margin:4px;color:var(--muted)}
+.home-rep-create-song{width:100%;min-height:44px;border-radius:9px;font-weight:750;text-align:center}
+.home-rep-create-song:focus-visible{outline:3px solid var(--active);outline-offset:2px}
+.repertoire-choices>p{grid-column:1/-1;margin:1px 0 5px;color:var(--muted)}
 .home-song{display:flex;align-items:stretch;gap:6px;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:5px}
 .home-song.last-song{outline:2px solid var(--active);outline-offset:-2px}
 .home-song-edit{flex:0 0 auto;border-color:var(--border);background:var(--panel);font-size:12px}
