@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Portal privado de evaluación de Metriqa Full e Inicial.">
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="./style.css">
+<title>Evaluación de versiones · Metriqa</title>
+</head>
+<body>
+<header class="header">
+  <div class="brand"><span aria-hidden="true">≋</span><div><strong>Metriqa</strong><small>Panel privado de evaluación</small></div></div>
+  <div class="header-actions"><a href="../" class="text-link">Volver a Metriqa</a><span id="user-name" aria-live="polite"></span><button id="logout" type="button" hidden>Cerrar sesión</button></div>
+</header>
+<main class="container">
+  <section id="gate" class="gate card" aria-labelledby="gate-title">
+    <span class="eyebrow">Acceso privado</span>
+    <h1 id="gate-title">Evaluadores de Metriqa</h1>
+    <p>Ingresa con tu cuenta Google autorizada. Solo la administración y las personas designadas pueden consultar y guardar evaluaciones.</p>
+    <p id="gate-status" role="status" aria-live="polite">Comprobando sesión…</p>
+    <button class="primary" id="login" type="button">Ingresar con Google</button>
+    <button id="retry" type="button">Comprobar acceso</button>
+  </section>
+  <div id="portal" hidden>
+    <section class="page-heading">
+      <div><span class="eyebrow">Control de calidad · versión de prueba</span><h1>Evaluación de Metriqa</h1><p>Selecciona una versión. Cada lista es independiente y se guarda en tu cuenta, sin modificar las canciones.</p></div>
+      <span id="role-badge" class="role"></span>
+    </section>
+    <section class="version-grid" aria-label="Versiones disponibles">
+      <button id="choose-full" class="version-card" type="button" aria-pressed="false">
+        <span class="version-type">VERSIÓN DISPONIBLE</span><strong>Metriqa Full</strong>
+        <small>Estudio, repertorios, metrónomo, editor musical y pendientes de integración.</small>
+      </button>
+      <button id="choose-initial" class="version-card" type="button" aria-pressed="false">
+        <span class="version-type">EN DESARROLLO</span><strong>Metriqa Inicial / Free</strong>
+        <small>Cuotas, incentivos, continuidad offline y lanzamiento posterior.</small>
+      </button>
+    </section>
+    <section id="review" class="card review" hidden aria-labelledby="review-title">
+      <div class="review-heading"><div><span class="eyebrow">Formulario de validación</span><h2 id="review-title"></h2><p id="version-context"></p></div>
+        <a id="app-link" href="../" target="_blank" rel="noopener noreferrer">Abrir versión Full</a></div>
+      <div class="progress-area"><div id="progress-text" role="status" aria-live="polite"></div><progress id="progress-bar" value="0" max="100">0 %</progress><div id="progress-breakdown"></div></div>
+      <div id="draft-warning" class="alert" hidden aria-live="polite"><p>El borrador local proviene de otra revisión en la nube. No se guardará encima sin decidir qué versión conservar.</p><div class="actions"><button id="keep-local" type="button">Revisar mi borrador y continuar</button><button id="use-cloud" type="button">Descartar borrador y cargar nube</button></div></div>
+      <div class="filters">
+        <label>Buscar pendiente<input id="filter-text" type="search" placeholder="Ej. Firebase, compases, accesibilidad"></label>
+        <label>Prioridad<select id="filter-priority"><option value="all">Todas</option><option value="P0">P0 · Crítica</option><option value="P1">P1 · Principal</option><option value="P2">P2 · Posterior</option></select></label>
+        <label>Resultado<select id="filter-result"><option value="all">Todos</option><option value="pending">Sin evaluar</option><option value="passed">Aprobado</option><option value="issue">Con incidencia</option><option value="blocked">Bloqueado / aún no disponible</option><option value="na">No aplica</option></select></label>
+      </div>
+      <p class="hint">Marca una casilla solo después de comprobar la prueba. También puedes indicar una incidencia o que la función aún no está disponible. El checklist no certifica automáticamente el estado del desarrollo.</p>
+      <div id="checklist" class="checklist"></div>
+      <div class="general-notes"><label for="general-notes">Observaciones generales de esta versión</label><textarea id="general-notes" maxlength="3000" rows="4" placeholder="Problemas encontrados, equipo/navegador, pasos para reproducir…"></textarea></div>
+      <div class="actions sticky-actions">
+        <p id="save-status" role="status" aria-live="polite">Sin cambios.</p>
+        <button id="download-report" type="button">Exportar mi evaluación (JSON)</button>
+        <button id="reload-report" type="button">Recargar desde la nube</button>
+        <button id="save-report" class="primary" type="button">Guardar evaluación</button>
+      </div>
+    </section>
+    <section id="admin" class="card admin" hidden aria-labelledby="admin-title">
+      <div class="review-heading"><div><span class="eyebrow">Acceso exclusivo del administrador</span><h2 id="admin-title">Designar evaluadores</h2><p>Selecciona usuarios que ya hayan iniciado sesión. Puedes permitir Full, Inicial o ambas y revocar el acceso.</p></div><button id="refresh-admin" type="button">Actualizar usuarios y resultados</button></div>
+      <p class="hint">La lista se forma con el registro de sesiones y los perfiles de evaluación. Una cuenta sin actividad registrada podría no aparecer hasta su siguiente ingreso.</p>
+      <div class="filters"><label>Buscar usuario<input id="admin-search" type="search" placeholder="Correo o nombre"></label></div>
+      <div id="users-list" class="user-list"></div>
+      <h3>Resultados de los evaluadores</h3>
+      <div id="reports-summary" class="reports-summary"></div>
+      <p id="admin-status" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+</main>
+<footer class="footer">Metriqa · Evaluación privada · Los datos de QA se guardan separados de las canciones. <a href="https://github.com/osdrumm-sudo/kernnel-estudio-musical" target="_blank" rel="noopener noreferrer">Repositorio</a></footer>
+<script src="../firebase-config.js"></script>
+<script src="./pendientes.js"></script>
+<script src="./core.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
